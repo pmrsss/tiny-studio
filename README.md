@@ -13,11 +13,9 @@ Le projet veut offrir un endroit à soi, joli et un peu ludique, où l'on range 
 
 ## MVP
 La première version permettra de :
-- Afficher un studio illustré avec quatre meubles cliquables : le dressing, la bibliothèque, l'étagère déco et la coiffeuse
-- Ajouter un article à la main, avec son lien, sa photo et son prix, dans le meuble choisi
-- Cliquer sur un meuble pour voir, dans un panneau latéral, les articles qu'on y a rangés
-- Retrouver ses articles d'une visite à l'autre
-- Cocher le tag "Acheté" lorsqu'on a acquis un objet
+- Parcourir son studio : un studio illustré avec quatre meubles cliquables, le dressing, la bibliothèque, l'étagère déco et la coiffeuse. Un clic sur un meuble ouvre un panneau latéral avec les articles qu'on y a rangés
+- Ranger un article : l'ajouter à la main, avec son lien, sa photo et son prix, dans le meuble choisi
+- Retrouver et mettre à jour ses articles : ils restent enregistrés d'une visite à l'autre, et on peut cocher le tag "Acheté" lorsqu'on a acquis un objet
 
 ## Hors périmètre pour le moment
 - L'extension de navigateur pour ajouter un article en un clic depuis un site marchand
@@ -26,7 +24,7 @@ La première version permettra de :
 
 ## État du projet
 - [x] Idée cadrée
-- [ ] MVP défini
+- [x] MVP défini
 - [ ] Première version construite
 - [ ] Testée avec une ou plusieurs personnes
 - [ ] Améliorée
