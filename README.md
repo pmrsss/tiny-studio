@@ -13,7 +13,7 @@ Le projet veut offrir un endroit à soi, joli et un peu ludique, où l'on range 
 
 ## MVP
 La première version permettra de :
-- Afficher un loft illustré avec quatre meubles cliquables : le dressing, la bibliothèque, l'étagère déco et la coiffeuse
+- Afficher un studio illustré avec quatre meubles cliquables : le dressing, la bibliothèque, l'étagère déco et la coiffeuse
 - Ajouter un article à la main, avec son lien, sa photo et son prix, dans le meuble choisi
 - Cliquer sur un meuble pour voir, dans un panneau latéral, les articles qu'on y a rangés
 - Retrouver ses articles d'une visite à l'autre
