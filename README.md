@@ -8,6 +8,7 @@ Pour moi d'abord et pour toutes les personnes qui repèrent des articles sur ple
 
 ## Le problème ou besoin
 Les envies s'éparpillent : favoris propres à chaque site, captures d'écran, onglets ouverts, paniers abandonnés. On ne les retrouve plus ou on achète sur un coup de tête.
+
 Le projet veut offrir un endroit à soi, joli et un peu ludique, où l'on range ses trouvailles comme on aménage un intérieur.
 
 ## MVP
