@@ -553,11 +553,13 @@ body::after {
   .accroche { margin: 0; font-size: 15px; }
   .scene { width: calc(100% - 64px); grid-template-columns: 360px minmax(0, 1fr) 60px; margin-top: 0; }
   /* La bulle a la même largeur pour l'accueil et la boutique (retour de Pauline, 19 octobre 2026) */
-  .bulle { min-width: 0; }
+  .bulle { min-width: 0; min-height: 440px; }  /* même hauteur pour l'accueil et la boutique : rien ne saute au changement d'onglet */
   /* Les onglets descendent un peu : la pointe de la bulle, qui suit l'onglet choisi, tombait dans
      l'arrondi du coin et faisait un accroc (retour de Pauline, 19 octobre 2026) */
   .onglets { margin-top: 26px; }
-  .menu { margin-top: 36px; }
+  /* Les onglets et la bulle, centrés dans la hauteur de la pièce, loin du nom de l'app (retour de
+     Pauline, 19 octobre 2026) */
+  .menu { grid-row: 1 / span 2; align-self: center; margin-top: 0; }
   .cadre-piece { max-width: none; width: min(100%, calc((100vh - 110px) * 660 / 676)); justify-self: center; }
   .pied { display: none; }
 }
