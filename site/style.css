@@ -551,7 +551,9 @@ body::after {
   .entete { display: flex; align-items: baseline; gap: 16px; width: calc(100% - 64px); padding: 22px 0 0; text-align: left; }
   .marque { font-size: 34px; }
   .accroche { margin: 0; font-size: 15px; }
-  .scene { width: calc(100% - 64px); grid-template-columns: 330px minmax(0, 1fr) 60px; margin-top: 0; }
+  .scene { width: calc(100% - 64px); grid-template-columns: 360px minmax(0, 1fr) 60px; margin-top: 0; }
+  /* La bulle a la même largeur pour l'accueil et la boutique (retour de Pauline, 19 octobre 2026) */
+  .bulle { min-width: 0; }
   .menu { margin-top: 36px; }
   .cadre-piece { max-width: none; width: min(100%, calc((100vh - 110px) * 660 / 676)); justify-self: center; }
   .pied { display: none; }

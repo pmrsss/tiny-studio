@@ -117,9 +117,11 @@ function afficherCompteurs() {
   document.getElementById("accueil-texte").textContent = studioVide
     ? "Ton studio attend tes premiers articles. Touche un meuble, puis « Ajouter un article », et colle le lien d'un produit repéré en ligne."
     : "Touche un meuble pour voir les articles que tu y as rangés.";
-  // Le nombre d'articles en toutes lettres, dans la liste des meubles de la bulle (ordinateur)
+  // Le nombre d'articles en toutes lettres, dans la liste des meubles de la bulle (ordinateur) ;
+  // « Vide » plutôt qu'« Aucun article » (choix de Pauline, 19 octobre 2026)
   document.querySelectorAll("[data-compte-texte]").forEach(function (element) {
-    element.textContent = libelleNombre(meubles[element.dataset.compteTexte].articles.length);
+    const n = meubles[element.dataset.compteTexte].articles.length;
+    element.textContent = n === 0 ? "Vide" : libelleNombre(n);
   });
   document.querySelectorAll("[data-compte]").forEach(function (element) {
     const n = meubles[element.dataset.compte].articles.length;
