@@ -320,15 +320,14 @@ a.article-texte:focus-visible { outline: 3px dashed var(--focus); outline-offset
 }
 
 /* =====================================================================
-   LES STYLES DE DÉCORATION
-   Inspirés de pièces d'Animal Crossing. Chaque style donne une couleur à
-   chaque surface, choisit le motif des deux murs et du sol, et allume ses
-   propres objets (lampe, lanterne, cactus, applique). Les volumes reçoivent
-   leur teinte par --c et en déduisent trois faces : le dessus plus clair,
-   la face éclairée telle quelle, la face à l'ombre plus sombre.
+   LES COULEURS DE LA PIÈCE
+   Une seule pièce, la version par défaut, sans style au sens d'un thème.
+   data-ambiance="defaut" sur <html> laisse la place à d'autres ambiances
+   plus tard. Les volumes reçoivent leur teinte par --c et en déduisent
+   trois faces : le dessus plus clair, la face éclairée telle quelle, la
+   face à l'ombre plus sombre.
    ===================================================================== */
-/* Zen : cloisons shoji, tatamis, bois sombre, coussins en patchwork indigo */
-:root, [data-ambiance="zen"] {
+:root, [data-ambiance="defaut"] {
   /* La palette « rose poudré et noyer doux » (19 octobre 2026) : le fond, l'épaisseur des murs, le socle */
   --fond-1: #F3EADF; --fond-2: #E3D2BE;
   --mur-g: #F5EEDF;

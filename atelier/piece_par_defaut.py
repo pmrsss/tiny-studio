@@ -1,12 +1,18 @@
-"""La pièce de Tiny Studio, dessinée en code : les murs, le sol, les cinq meubles de la wishlist
-(dressing, bibliothèque, étagères déco, coiffeuse, coffre), le fauteuil, la table d'appoint et la
-déco : rideaux, guirlande, tapis, cactus, et quelques objets (tri du 19 octobre 2026). Seuls les choix retenus par Pauline sont gardés ; les variantes essayées vivent dans
-l'historique Git (ménage du 18 octobre 2026).
+"""La pièce de Tiny Studio, dans sa version par défaut, dessinée en code. Elle n'a pas de style au
+sens d'un thème : c'est la pièce de départ, et d'autres pourront s'y ajouter plus tard.
+
+Ce qu'elle contient : les murs à pois et le parquet ; les cinq meubles de la wishlist (dressing,
+bibliothèque, commode déco, coiffeuse, coffre fourre-tout) ; le fauteuil orange et son coussin
+bonbon, la table d'appoint crème ; la déco : la fenêtre et sa vue, qui suit l'heure, le voilage, la
+guirlande, le tapis crème aux coutures bordeaux, le cadre au teckel, la radio, les tulipes, la boîte
+à chapeau, le flacon de parfum et le cactus. Seuls les choix retenus par Pauline sont gardés ; les
+variantes essayées vivent dans l'historique Git.
 
 La direction artistique, niveau 3, « plus mignon » : le réalisme vient des proportions et des
 matières, le côté mignon des formes (des meubles trapus, un bois épais, des angles très ronds,
 des pieds en galette), l'illustration du rendu : des aplats à trois tons par volume, une seule
-lumière venue de la droite (la fenêtre), des reflets en traits interrompus, quelques traits de
+lumière venue de la droite (la fenêtre), avec ses ombres qui suivent le
+moment de la journée (jour, soir, nuit), des reflets en traits interrompus, quelques traits de
 veinage, un léger tremblé, aucun contour noir.
 
 Repère et projection : x longe le mur de droite (plan y = 0), y longe le mur de gauche (plan
@@ -232,7 +238,7 @@ def pot(sx, sy, w, h, POT=POT):
 
 
 def parquet():
-    """Le parquet du Zen, en aplat : de larges lames de bois miel clair posées en quinconce, trois
+    """Le parquet, en aplat : de larges lames de bois miel clair posées en quinconce, trois
     tons tirés au hasard, des joints fins, et quelques traits de veinage."""
     W, D = 12, 12
     tons_lames = M("parquet")[:3]  # selon l'ensemble : miel doux, ou plus foncé
@@ -332,8 +338,8 @@ def fenetre():
     out.extend(vues_fenetre(xa, xb, za, zb))
     # On ne garde du feuillage que ce qui est dans la vitre
     vitre = [p(xa, 0.01, za), p(xb, 0.01, za), p(xb, 0.01, zb), p(xa, 0.01, zb)]
-    clip = '<clipPath id="vitre-zen"><polygon points="' + " ".join(f"{a:.1f},{b:.1f}" for a, b in vitre) + '" /></clipPath>'
-    out = [out[0], clip, '<g clip-path="url(#vitre-zen)">'] + out[1:] + ["</g>"]
+    clip = '<clipPath id="vitre-fenetre"><polygon points="' + " ".join(f"{a:.1f},{b:.1f}" for a, b in vitre) + '" /></clipPath>'
+    out = [out[0], clip, '<g clip-path="url(#vitre-fenetre)">'] + out[1:] + ["</g>"]
     # Les petits bois, fins et en retrait (plus de reflets sur la vitre depuis le 19 octobre 2026)
     xm, zm = (xa + xb) / 2, (za + zb) / 2
     out.append(boite(xm - 0.06, xm + 0.06, 0.01, 0.06, za, zb, tons(B), r=1))
@@ -1306,7 +1312,7 @@ def grand_tapis(x0, x1, y0, y1):
     return "".join(out)
 
 
-def decor_mcm():
+def decor():
     """La déco cozy : ce qui est posé à plat (tapis, lumière au sol), puis les objets debout avec
     leur emprise au sol."""
     # Un seul grand tapis au milieu de la pièce, à la place des deux petits (Pauline, 17 octobre 2026)
@@ -1406,12 +1412,12 @@ def ordonner(objets):
     return ordre
 
 
-def zen(meuble, badge):
+def dessine(meuble, badge):
     """La pièce : les murs et la fenêtre, puis ce qui est posé au sol (tapis, lumière, ombres),
     puis le mobilier et le décor debout, rangés par emprise au sol, en aplats nets."""
     OMBRES.clear()
     OMBRES_MUR.clear()
-    a_plat, debout = decor_mcm()
+    a_plat, debout = decor()
     # L'emprise de chaque meuble, corniche, plateau et tabouret compris
     DEFS.clear()
     motifs_tissu("pois", pois_motif(), 0.9, 0.9, echelle=0.45)  # le léopard, remplacé par des pois le 17 octobre 2026
@@ -1426,7 +1432,7 @@ def zen(meuble, badge):
     # Ce qui est posé au sol (tapis, lumière, ombres) est découpé à la forme du parquet : rien ne
     # déborde sur le socle de la pièce
     sol = [p(0, 0, 0), p(12, 0, 0), p(12, 12, 0), p(0, 12, 0)]
-    decoupe = ('<clipPath id="sol-zen"><polygon points="' + ' '.join(f'{a:.1f},{b:.1f}' for a, b in sol) + '" /></clipPath>')
+    decoupe = ('<clipPath id="sol-parquet"><polygon points="' + ' '.join(f'{a:.1f},{b:.1f}' for a, b in sol) + '" /></clipPath>')
     papier_defs, papier = murs()
     # Les murs restent lisses, hors du grain de papier : sur les photos de Pauline, ils sont unis
     murs_lisses = "<defs>" + papier_defs + "".join(DEFS) + "</defs>" + papier
@@ -1435,6 +1441,6 @@ def zen(meuble, badge):
     au_mur = (recoins() + ambiance([mur_g, mur_d], lueurs_nuit_murs()) + halo_fenetre() + "".join(OMBRES_MUR)
               + fenetre() + voilage() + guirlande())
     # Plus de grain de papier : sur le mobilier, il faisait un pointillé (retour de Pauline, 17 octobre 2026)
-    return (murs_lisses + '<g class="zen-illustre">' + au_mur + decoupe
-            + '<g clip-path="url(#sol-zen)">' + recoins_sol() + lumiere_fenetre() + a_plat + ambiance([sol], lueurs_nuit_sol()) + "".join(OMBRES) + '</g>'
+    return (murs_lisses + '<g class="piece-illustree">' + au_mur + decoupe
+            + '<g clip-path="url(#sol-parquet)">' + recoins_sol() + lumiere_fenetre() + a_plat + ambiance([sol], lueurs_nuit_sol()) + "".join(OMBRES) + '</g>'
             + '<g class="objets">' + "".join(svg for _, svg in tout) + "</g></g>")

@@ -4,14 +4,14 @@ Repère : x va vers la droite le long du mur de droite, y vers la gauche le long
 z vers le haut. Le mur de gauche est le plan x = 0, le mur de droite le plan y = 0.
 
 Ce fichier pose le socle, le sol et l'épaisseur des murs, les badges et les boutons des meubles ;
-la pièce elle-même (murs, mobilier, déco) est dessinée dans zen_illustre.py.
+la pièce elle-même (murs, mobilier, déco) est dessinée dans piece_par_defaut.py.
 
 Usage : python3 atelier/genere_piece.py index.html
 """
 import math
 import sys
 
-import zen_illustre
+import piece_par_defaut
 
 S = 30             # pixels par unité
 OX, OY = 390, 318  # position à l'écran de l'angle du fond, au sol
@@ -116,23 +116,22 @@ def meuble(cle, contenu):
     return f'<g class="meuble" data-meuble="{cle}" tabindex="0" role="button">{contenu}</g>'
 
 
-# ---------- Le style Zen, d'après les inspirations de Pauline du 16 octobre 2026 ----------
-# Des planches d'objets d'Animal Crossing. On ne recopie pas ces objets, qui sont des créations
-# de Nintendo : on dessine nos propres versions d'objets japonais courants, dans leur esprit.
+# ---------- La pièce par défaut ----------
+# Une seule pièce, sans style au sens d'un thème : la version de départ, dessinée dans piece_par_defaut.py.
 
 
 def piece():
     """Le socle, le sol et les murs de fond, l'épaisseur des murs, puis la pièce dessinée dans
-    zen_illustre.py, qui recouvre le sol et les murs."""
+    piece_par_defaut.py, qui recouvre le sol et les murs."""
     o = [f'<g style="{teinte("socle")}">' + boite(-0.5, -0.5, -0.7, W + 0.5, D + 0.5, 0.7, reflet=False) + "</g>"]
     o.append(poly([(0, 0, 0), (W, 0, 0), (W, D, 0), (0, D, 0)], "sol"))
     o.append(poly([(0, 0, 0), (0, D, 0), (0, D, H), (0, 0, H)], "mur-g"))
     o.append(poly([(0, 0, 0), (W, 0, 0), (W, 0, H), (0, 0, H)], "mur-d"))
-    o.append(zen_illustre.parquet())
+    o.append(piece_par_defaut.parquet())
     o.append(poly([(-0.5, -0.5, H), (W, -0.5, H), (W, 0, H), (0, 0, H), (0, D, H), (-0.5, D, H)], "tranche-haut"))
     o.append(poly([(-0.5, D, 0), (0, D, 0), (0, D, H), (-0.5, D, H)], "tranche-g"))
     o.append(poly([(W, -0.5, 0), (W, 0, 0), (W, 0, H), (W, -0.5, H)], "tranche-d"))
-    o.append(zen_illustre.zen(meuble, badge))
+    o.append(piece_par_defaut.dessine(meuble, badge))
     return "".join(o)
 
 
