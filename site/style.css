@@ -198,6 +198,7 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 }
 .fermer:hover { color: var(--rose); border-color: var(--brun); }
 .fermer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
+#panneau-titre:focus { outline: none; }  /* il reçoit le focus à l'ouverture, sans cadre */
 
 /* Le corps du panneau défile d'un bloc : le formulaire d'ajout, puis les fiches */
 .panneau-corps { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 16px -6px 0; padding: 4px 6px 6px; display: flex; flex-direction: column; }

@@ -294,6 +294,9 @@ function ouvrir(cle) {
   ouvrirFormulaire(false);
   remplirPanneau(cle);
   panneau.showModal();
+  // Le focus va au titre du meuble, pas à la croix : sur téléphone, la croix s'affichait entourée
+  // de pointillés dès l'ouverture (retour de Pauline, 19 octobre 2026). Au clavier, Tab y mène.
+  document.getElementById("panneau-titre").focus();
 }
 
 // Un clic, ou Entrée et Espace au clavier, ouvre le meuble
