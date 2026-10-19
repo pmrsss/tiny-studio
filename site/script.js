@@ -141,37 +141,76 @@ const liste = document.getElementById("articles");
 const vide = document.getElementById("vide");
 let meubleOuvert = null;  // le meuble dont le panneau est ouvert, proposé pour ranger un nouvel article
 
-// La couleur du fond d'une photo ajoutée (19 octobre 2026) : l'app lit huit points sur les bords de
-// la photo. Si cinq au moins ont la même couleur, c'est un fond de packshot, et la case la reprend. Sinon,
-// ou si le site de la photo interdit cette lecture, la photo remplit toute la case, sans vide.
-function couleurDuFond(adresse, rappel) {
+// Les règles de mise en forme des photos (décision de Pauline, 19 octobre 2026) :
+// 1. la case prend la couleur du fond de la photo ;
+// 2. le produit est recadré à son contour, puis centré ;
+// 3. il occupe 80 % de la case dans sa plus grande dimension, la même marge pour tous ;
+// 4. si le fond n'est pas uni, ou si le site interdit de lire la photo, elle remplit toute la case.
+// L'analyse se fait une fois, et ses résultats (« fond », « cadre » ou « plein ») s'enregistrent avec l'article.
+function analyserPhoto(adresse, rappel) {
   const sonde = new Image();
   sonde.crossOrigin = "anonymous";
   sonde.addEventListener("load", function () {
     try {
+      // La photo réduite à 160 pixels au plus suffit pour trouver le fond et le contour
+      const echelle = Math.min(1, 160 / Math.max(sonde.naturalWidth, sonde.naturalHeight));
+      const w = Math.max(8, Math.round(sonde.naturalWidth * echelle));
+      const h = Math.max(8, Math.round(sonde.naturalHeight * echelle));
       const toile = document.createElement("canvas");
-      toile.width = 40;
-      toile.height = 40;
+      toile.width = w;
+      toile.height = h;
       const ctx = toile.getContext("2d");
-      ctx.drawImage(sonde, 0, 0, 40, 40);
-      const points = [[1, 1], [38, 1], [1, 38], [38, 38], [20, 1], [20, 38], [1, 20], [38, 20]].map(function (p) {
-        return Array.from(ctx.getImageData(p[0], p[1], 1, 1).data.slice(0, 3));
-      });
-      // Le fond, c'est la couleur que partagent au moins cinq des huit points : le produit peut
-      // toucher un bord, et un fond de studio a souvent un léger dégradé
-      const proches = function (p, q) { return Math.max(Math.abs(p[0] - q[0]), Math.abs(p[1] - q[1]), Math.abs(p[2] - q[2])) <= 16; };
-      const groupes = points.map(function (p) { return points.filter(function (q) { return proches(p, q); }); });
+      ctx.drawImage(sonde, 0, 0, w, h);
+      const pixels = ctx.getImageData(0, 0, w, h).data;
+      const pixel = function (x, y) { const i = (y * w + x) * 4; return [pixels[i], pixels[i + 1], pixels[i + 2]]; };
+      // Le fond, c'est la couleur que partagent au moins cinq des huit points du bord : le produit
+      // peut toucher un bord, et un fond de studio a souvent un léger dégradé
+      const xs = [1, Math.round(w / 2), w - 2], ys = [1, Math.round(h / 2), h - 2];
+      const points = [[xs[0], ys[0]], [xs[2], ys[0]], [xs[0], ys[2]], [xs[2], ys[2]], [xs[1], ys[0]], [xs[1], ys[2]], [xs[0], ys[1]], [xs[2], ys[1]]].map(function (p) { return pixel(p[0], p[1]); });
+      const ecart = function (p, q) { return Math.max(Math.abs(p[0] - q[0]), Math.abs(p[1] - q[1]), Math.abs(p[2] - q[2])); };
+      const groupes = points.map(function (p) { return points.filter(function (q) { return ecart(p, q) <= 16; }); });
       const groupe = groupes.reduce(function (a, g) { return g.length > a.length ? g : a; });
-      const moyenne = [0, 1, 2].map(function (i) {
+      if (groupe.length < 5) { rappel(null); return; }
+      const fond = [0, 1, 2].map(function (i) {
         return Math.round(groupe.reduce(function (s, p) { return s + p[i]; }, 0) / groupe.length);
       });
-      rappel(groupe.length >= 5 ? "#" + moyenne.map(function (v) { return v.toString(16).padStart(2, "0"); }).join("").toUpperCase() : null);
+      // Le contour du produit : tout ce qui s'écarte nettement du fond
+      let x0 = w, y0 = h, x1 = -1, y1 = -1;
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          if (ecart(pixel(x, y), fond) > 28) {
+            if (x < x0) x0 = x;
+            if (x > x1) x1 = x;
+            if (y < y0) y0 = y;
+            if (y > y1) y1 = y;
+          }
+        }
+      }
+      const cadre = x1 < 0 ? [0, 0, 1, 1] : [x0 / w, y0 / h, (x1 + 1) / w, (y1 + 1) / h].map(function (v) { return Math.round(v * 1000) / 1000; });
+      rappel({ fond: "#" + fond.map(function (v) { return v.toString(16).padStart(2, "0"); }).join("").toUpperCase(), cadre: cadre });
     } catch (e) {
       rappel(null);
     }
   });
   sonde.addEventListener("error", function () { rappel(null); });
   sonde.src = adresse;
+}
+
+// Place la photo pour que le contour du produit occupe 80 % de la case, centré
+function cadrer(img, cadre) {
+  function placer() {
+    const W = img.naturalWidth, H = img.naturalHeight;
+    if (!W || !H) return;
+    // En pourcentages de la case, qui est carrée : le calcul ne dépend pas de sa taille à l'écran
+    const cw = (cadre[2] - cadre[0]) * W, ch = (cadre[3] - cadre[1]) * H;
+    const k = 80 / Math.max(cw, ch);
+    img.classList.add("cadree");
+    img.style.width = W * k + "%";
+    img.style.height = H * k + "%";
+    img.style.left = 50 - (cadre[0] * W + cw / 2) * k + "%";
+    img.style.top = 50 - (cadre[1] * H + ch / 2) * k + "%";
+  }
+  if (img.complete) placer(); else img.addEventListener("load", placer);
 }
 
 function fiche(article) {
@@ -195,12 +234,17 @@ function fiche(article) {
     // La case prend la couleur du fond de la photo : le produit y flotte, centré, sans toucher les bords
     visuel.style.background = article.fond || "#FFFFFF";
     visuel.classList.toggle("visuel-plein", Boolean(article.plein));
-    // Une photo ajoutée à la main : sa couleur de fond se lit une fois, puis s'enregistre avec l'article
-    if (!article.fond && !article.plein) {
-      couleurDuFond(article.image, function (couleur) {
-        if (couleur) {
-          article.fond = couleur;
-          visuel.style.background = couleur;
+    const img = document.createElement("img");
+    img.src = article.image;
+    if (article.cadre) cadrer(img, article.cadre);
+    // La photo n'a pas encore été analysée : elle l'est une fois, et le résultat s'enregistre
+    if (!article.cadre && !article.plein) {
+      analyserPhoto(article.image, function (resultat) {
+        if (resultat) {
+          article.fond = resultat.fond;
+          article.cadre = resultat.cadre;
+          visuel.style.background = resultat.fond;
+          cadrer(img, resultat.cadre);
         } else {
           article.plein = true;
           visuel.classList.add("visuel-plein");
@@ -208,8 +252,6 @@ function fiche(article) {
         enregistrerArticles();
       });
     }
-    const img = document.createElement("img");
-    img.src = article.image;
     img.alt = "";
     img.loading = "lazy";
     img.addEventListener("error", function () { visuel.style.background = ""; visuel.innerHTML = neutre; });
