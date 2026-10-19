@@ -139,8 +139,8 @@ function libelleNombre(n) {
 
 // Les pastilles de nombre, sur les meubles et sur les boutons
 function afficherCompteurs() {
-  // Le studio vide (issue n° 4) : l'accueil dit quoi faire, et les pastilles des meubles respirent
-  // doucement avec un « + », pour inviter à toucher. Dès le premier article, tout redevient normal.
+  // Le studio vide (issue n° 4) : l'accueil dit quoi faire, et les pastilles des meubles passent
+  // en rose avec un « + », pour inviter à toucher. Dès le premier article, tout redevient normal.
   const studioVide = Object.keys(meubles).every(function (cle) { return meubles[cle].articles.length === 0; });
   document.documentElement.classList.toggle("studio-vide", studioVide);
   document.getElementById("accueil-texte").textContent = studioVide
