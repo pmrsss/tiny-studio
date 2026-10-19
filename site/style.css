@@ -410,7 +410,8 @@ body::after {
 .scene { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 0 10px; align-items: start; }
 /* Le cadrage est serré sur la pièce depuis le 19 octobre 2026 : 610 px gardent sa taille d'avant sur ordinateur */
 .cadre-piece { width: 100%; max-width: 610px; margin: 0; grid-column: 2; grid-row: 1 / span 2; }
-.menu { grid-column: 1; grid-row: 1; display: flex; align-items: flex-start; gap: 16px; margin-top: 70px; position: relative; z-index: 2; }
+/* L'espace entre les onglets et la bulle, élargi le 19 octobre 2026 (retour de Pauline) */
+.menu { grid-column: 1; grid-row: 1; display: flex; align-items: flex-start; gap: 28px; margin-top: 70px; position: relative; z-index: 2; }
 
 /* Les onglets : des tuiles épaisses. Celle qui est choisie s'allume et avance vers la bulle */
 .onglets { display: flex; flex-direction: column; gap: 12px; }
@@ -487,7 +488,7 @@ body::after {
 /* Sur un écran moyen : les onglets passent en ligne, au-dessus de la bulle et de la pièce */
 @media (max-width: 1080px) {
   .scene { grid-template-columns: minmax(0, 1fr); }
-  .menu { grid-column: 1; grid-row: 1; flex-direction: column; align-items: center; gap: 30px; margin: 20px auto 0; width: min(420px, 100%); }
+  .menu { grid-column: 1; grid-row: 1; flex-direction: column; align-items: center; gap: 46px; margin: 20px auto 0; width: min(420px, 100%); }
   .onglets { flex-direction: row; }
   .onglet[aria-selected="true"] { transform: translateY(4px); }
   .bulle { width: 100%; }
