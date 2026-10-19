@@ -107,7 +107,7 @@ def badge(cle, x, y, z):
     return (f'<g class="badge"><path d="M{sx - 6:.1f} {sy + 10:.1f} L{sx:.1f} {sy + 17:.1f} L{sx + 6:.1f} {sy + 10:.1f} Z" class="badge-pointe" />'
             f'<rect x="{sx - 17:.1f}" y="{sy - 13:.1f}" width="34" height="25" rx="12.5" class="badge-fond" />'
             f'<text x="{sx:.1f}" y="{sy + 5:.1f}" data-compte="{cle}"></text>'
-            # La pièce dorée « % », visible quand le meuble contient une envie en promotion (19 octobre 2026)
+            # La pièce dorée « % », visible quand le meuble contient un article en promotion (19 octobre 2026)
             f'<g class="badge-promo"><circle cx="{sx + 16:.1f}" cy="{sy - 12:.1f}" r="8.5" class="piece-fond" />'
             f'<text x="{sx + 16:.1f}" y="{sy - 8.6:.1f}">%</text></g></g>')
 
