@@ -78,14 +78,14 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .meuble:focus { outline: none; }
 .meuble:focus-visible { outline: 3px dashed var(--focus); outline-offset: 6px; }
 
-/* Le nombre d'envies : une épingle rose, comme un repère sur une carte de jeu */
+/* Le nombre d'articles : une épingle rose, comme un repère sur une carte de jeu */
 .badge { filter: drop-shadow(0 3px 0 rgba(74, 51, 40, 0.28)); }
 .badge-fond, .badge-pointe { fill: var(--rose); stroke: #FFFFFF; stroke-width: 2.5; stroke-linejoin: round; }
 .badge text { fill: #FFFFFF; font: 800 14px Nunito, sans-serif; text-anchor: middle; }
 .meuble:hover .badge-fond, .meuble:focus-visible .badge-fond { fill: var(--rose-ombre); }
 .meuble.est-vide .badge-fond, .meuble.est-vide .badge-pointe { fill: #EAD8C6; }
 .meuble.est-vide .badge text { fill: var(--brun-doux); }
-/* La pièce dorée « % » : un meuble qui contient une envie en promotion (19 octobre 2026) */
+/* La pièce dorée « % » : un meuble qui contient un article en promotion (19 octobre 2026) */
 .badge-promo { display: none; }
 .meuble.en-promo .badge-promo { display: inline; }
 .piece-fond { fill: #F3D27A; stroke: #FFFFFF; stroke-width: 2; }
@@ -199,7 +199,7 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .panneau-corps { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 16px -6px 0; padding: 4px 6px 6px; display: flex; flex-direction: column; }
 .articles { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 
-/* Ranger une envie à la main (issue n° 2, 19 octobre 2026) */
+/* Ranger un article à la main (issue n° 2, 19 octobre 2026) */
 .bouton-ajouter {
   align-self: stretch; display: flex; align-items: center; justify-content: center; gap: 8px;
   font: 700 16px Fredoka, Nunito, sans-serif; color: #FFFFFF; cursor: pointer;
@@ -217,11 +217,13 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .champ { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; min-width: 0; }
 .champ label { font: 800 13px Nunito, sans-serif; color: var(--brun); }
 .facultatif { font-weight: 700; color: var(--brun-doux); font-size: 12px; }
-.champ input {
+.champ input, .champ select {
   font: 600 15px Nunito, sans-serif; color: var(--brun); background: var(--creme);
   border: 2px solid var(--carte-ombre); border-radius: 12px; padding: 9px 11px; min-width: 0; width: 100%;
 }
-.champ input:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-pale); }
+.champ select { appearance: none; cursor: pointer; padding-right: 34px;
+  background: var(--creme) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1.5 1.5 6 6l4.5-4.5' fill='none' stroke='%234A3328' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center; }
+.champ input:focus, .champ select:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-pale); }
 .champ input[aria-invalid="true"] { border-color: var(--rose-texte); }
 .champs-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
 .aide { margin: 0; font-size: 12px; color: var(--brun-doux); line-height: 1.4; }

@@ -1,8 +1,8 @@
-// Les visuels des envies : le packshot du produit (champ « image »), téléchargé dans images/ pour
+// Les visuels des articles : le packshot du produit (champ « image »), téléchargé dans images/ pour
 // s'afficher partout ; à défaut, un dessin dans le style de la pièce (champ « dessin »).
 const dessins = {};  // les dessins des premiers articles, remplacés par les packshots le 19 octobre 2026, sont dans l'historique Git
 
-// Les cinq meubles et les vraies envies de Pauline (19 octobre 2026), chacune avec « lien », la
+// Les cinq meubles et les vrais articles de Pauline (19 octobre 2026), chacune avec « lien », la
 // page du produit. La coiffeuse est vide exprès, pour montrer un meuble qui n'a encore rien.
 // Chaque meuble donne sa teinte à son panneau.
 
@@ -12,7 +12,7 @@ const meubles = {
     teinte: "#F3C3CC",
     vide: "Ton prochain coup de cœur mode ira ici.",
     articles: [
-      // Les premières vraies envies de Pauline (19 octobre 2026), prix relevés ce jour-là ; aucune n'est en promotion
+      // Les premiers vrais articles de Pauline (19 octobre 2026), prix relevés ce jour-là ; aucune n'est en promotion
       { id: "zara-bomber-8490709", image: "images/zara-bomber.jpg", fond: "#F0F0F0", marque: "Zara", nom: "Veste bomber en matière synthétique, noir", prix: "25,99 €",
         lien: "https://www.zara.com/fr/fr/veste-bomber-en-matiere-synthetique-p08490709.html?v1=545485930&v2=2419737" },
       { id: "cos-bob-1361189003", image: "images/cos-chapeau.jpg", fond: "#EBE9E7", marque: "COS", nom: "Chapeau seau en laine mélangée imprimé léopard, brun", prix: "59 €",
@@ -26,7 +26,7 @@ const meubles = {
     teinte: "#D9A877",
     vide: "Le prochain livre qui te fait envie ira ici.",
     articles: [
-      // Les vraies envies de Pauline (19 octobre 2026), prix relevés ce jour-là
+      // Les vrais articles de Pauline (19 octobre 2026), prix relevés ce jour-là
       { id: "hobonichi-techo-2027-tiesheep", image: "images/hobonichi-techo.jpg", fond: "#FFFFFF", marque: "Hobonichi", nom: "Agenda Techo 2027 Weeks, couverture Bow & Tie : Sheep Sheep Sheep", prix: "34 à 35 €",
         lien: "https://www.1101.com/store/techo/en/2027/pc/detail_cover/wb27_tiesheep/" },
       { id: "fnac-yellowface-21544319", image: "images/fnac-yellowface.jpg", fond: "#FFFFFF", marque: "Rebecca F. Kuang", nom: "Yellowface, en poche", prix: "8,60 €",
@@ -40,7 +40,7 @@ const meubles = {
     teinte: "#A9B9F0",
     vide: "Ta prochaine trouvaille déco ira ici.",
     articles: [
-      // Les vraies envies de Pauline (19 octobre 2026), prix relevés ce jour-là
+      // Les vrais articles de Pauline (19 octobre 2026), prix relevés ce jour-là
       { id: "diptyque-figuier-fi600", image: "images/diptyque-figuier.jpg", fond: "#F8F8F8", marque: "Diptyque", nom: "Bougie grand modèle Figuier, 600 g", prix: "190 €",
         lien: "https://diptyqueparis.com/fr-fr/products/bougie-grand-modele-figuier-fi600" },
       { id: "themasie-vase-malik-151875", image: "images/themasie-malik.jpg", fond: "#EDECEB", marque: "Themasie", nom: "Vase Malik haut en dolomite galvanisée, gris chromé, 29,5 cm", prix: "16,95 €",
@@ -53,7 +53,7 @@ const meubles = {
     teinte: "#C98A52",
     vide: "Tout ce qui ne va dans aucun meuble ira ici.",
     articles: [
-      // Les vraies envies de Pauline (19 octobre 2026), prix relevés ce jour-là
+      // Les vrais articles de Pauline (19 octobre 2026), prix relevés ce jour-là
       { id: "hm-plaid-0995539095", image: "images/hm-plaid.jpg", fond: "#F9F9F9", marque: "H&M Home", nom: "Plaid en tissu polaire à motif, crème", prix: "9,99 €",
         lien: "https://www2.hm.com/fr_fr/productpage.0995539095.html" },
       { id: "ikea-stockholm-40586508", image: "images/ikea-stockholm.jpg", fond: "#FFFFFF", marque: "IKEA", nom: "Banc TV STOCKHOLM 2025 à portes coulissantes, plaqué chêne", prix: "369 €",
@@ -101,10 +101,10 @@ function afficherCompteurs() {
     const meuble = meubles[element.dataset.meuble];
     const promo = meuble.articles.some(function (a) { return a.remise; });
     element.setAttribute("aria-label", "Ouvrir " + meuble.nom.toLowerCase() + ", " + libelleNombre(meuble.articles.length).toLowerCase()
-      + (promo ? ", dont une envie en promotion" : ""));
+      + (promo ? ", dont un article en promotion" : ""));
     element.classList.toggle("est-vide", meuble.articles.length === 0);
   });
-  // La pièce dorée « % » : sur l'épingle du meuble et sur sa case dans la barre, s'il contient une envie remisée
+  // La pièce dorée « % » : sur l'épingle du meuble et sur sa case dans la barre, s'il contient un article remisé
   document.querySelectorAll("[data-meuble]").forEach(function (element) {
     element.classList.toggle("en-promo", meubles[element.dataset.meuble].articles.some(function (a) { return a.remise; }));
   });
@@ -114,7 +114,7 @@ function afficherCompteurs() {
 const panneau = document.getElementById("panneau");
 const liste = document.getElementById("articles");
 const vide = document.getElementById("vide");
-let meubleOuvert = null;  // le meuble dont le panneau est ouvert, où l'on range une nouvelle envie
+let meubleOuvert = null;  // le meuble dont le panneau est ouvert, proposé pour ranger un nouvel article
 
 function fiche(article) {
   const ligne = document.createElement("li");
@@ -196,7 +196,7 @@ function fiche(article) {
     ligne.replaceWith(nouvelle);
     nouvelle.querySelector(".bouton-achete").focus();
   });
-  // Une envie ajoutée à la main peut être retirée
+  // Un article ajouté à la main peut être retiré
   if (article.ajoute) {
     const actions = document.createElement("div");
     actions.className = "article-actions";
@@ -325,8 +325,9 @@ function appliquerMoment() {
 appliquerMoment();
 setInterval(appliquerMoment, 60000);
 
-// Ranger une envie à la main (issue n° 2, 19 octobre 2026) : un formulaire dans le panneau ; l'envie
-// apparaît en tête du meuble, le compteur se met à jour, et une envie ajoutée peut être retirée.
+// Ranger un article à la main (issue n° 2, 19 octobre 2026) : un formulaire dans le panneau ; l'article
+// apparaît en tête du meuble choisi, le compteur se met à jour, et un article ajouté peut être retiré.
+// « Ranger dans » est réglé sur le meuble ouvert et se change avant de valider.
 // Elle ne survit pas encore à un rechargement : l'enregistrement d'une visite à l'autre est la suite.
 const boutonAjouter = document.getElementById("ajouter");
 const formulaire = document.getElementById("formulaire-ajout");
@@ -336,8 +337,10 @@ const CHAMPS = {
   nom: document.getElementById("champ-nom"),
   marque: document.getElementById("champ-marque"),
   prix: document.getElementById("champ-prix"),
-  photo: document.getElementById("champ-photo")
+  photo: document.getElementById("champ-photo"),
+  meuble: document.getElementById("champ-meuble")
 };
+Object.keys(meubles).forEach(function (cle) { CHAMPS.meuble.add(new Option(meubles[cle].nom, cle)); });
 
 function adresseWeb(texte) {
   try {
@@ -362,6 +365,7 @@ function ouvrirFormulaire(ouvert) {
   boutonAjouter.setAttribute("aria-expanded", ouvert ? "true" : "false");
   if (ouvert) {
     formulaire.reset();
+    CHAMPS.meuble.value = meubleOuvert;
     ["lien", "nom", "photo"].forEach(function (cle) { montrerErreur(cle, ""); });
     CHAMPS.lien.focus();
   }
@@ -388,7 +392,7 @@ formulaire.addEventListener("submit", function (evenement) {
   const photo = CHAMPS.photo.value.trim();
   const erreurs = {
     lien: !lien ? "Colle le lien de la page du produit." : (!adresseWeb(lien) ? "Ce lien ne fonctionne pas : il doit commencer par https://" : ""),
-    nom: !nom ? "Donne un nom à ton envie." : "",
+    nom: !nom ? "Donne un nom à ton article." : "",
     photo: photo && !adresseWeb(photo) ? "Cette adresse ne fonctionne pas : elle doit commencer par https://" : ""
   };
   Object.keys(erreurs).forEach(function (cle) { montrerErreur(cle, erreurs[cle]); });
@@ -397,6 +401,8 @@ formulaire.addEventListener("submit", function (evenement) {
     CHAMPS[premiere].focus();
     return;
   }
+  // Le panneau passe au meuble choisi, pour que l'article se voie là où il est rangé
+  meubleOuvert = CHAMPS.meuble.value;
   const meuble = meubles[meubleOuvert];
   const article = {
     id: "ajout-" + Date.now(), ajoute: true, meuble: meubleOuvert,
@@ -406,16 +412,16 @@ formulaire.addEventListener("submit", function (evenement) {
   ouvrirFormulaire(false);
   remplirPanneau(meubleOuvert);
   afficherCompteurs();
-  annonce.textContent = "« " + nom + " » est rangée dans " + meuble.nom.toLowerCase() + ".";
+  annonce.textContent = "« " + nom + " » est rangé dans " + meuble.nom.toLowerCase() + ".";
   liste.querySelector(".article-texte").focus();
 });
 
-// Retirer une envie ajoutée : elle quitte le meuble, le compteur se met à jour
+// Retirer un article ajouté : elle quitte le meuble, le compteur se met à jour
 function retirer(article) {
   const meuble = meubles[article.meuble];
   meuble.articles.splice(meuble.articles.indexOf(article), 1);
   remplirPanneau(article.meuble);
   afficherCompteurs();
-  annonce.textContent = "« " + article.nom + " » est retirée.";
+  annonce.textContent = "« " + article.nom + " » est retiré.";
   boutonAjouter.focus();
 }

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tiny Studio</title>
-  <meta name="description" content="Une pièce à vivre illustrée où l'on range ses envies repérées en ligne.">
+  <meta name="description" content="Une pièce à vivre illustrée où l'on range les articles repérés en ligne.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
 
   <header class="entete">
     <p class="marque">Tiny Studio</p>
-    <p class="accroche">Toutes tes envies, rangées au même endroit.</p>
+    <p class="accroche">Tous tes articles, rangés au même endroit.</p>
   </header>
 
   <main class="scene">
@@ -46,7 +46,7 @@
         <section class="volet" role="tabpanel" id="volet-accueil" aria-labelledby="onglet-accueil">
           <span class="ruban" aria-hidden="true"><svg><use href="#ic-maison" /></svg></span>
           <h2>Bienvenue chez toi</h2>
-          <p>Touche un meuble pour voir les objets que tu y as rangés.</p>
+          <p>Touche un meuble pour voir les articles que tu y as rangés.</p>
         </section>
 
         <section class="volet" role="tabpanel" id="volet-boutique" aria-labelledby="onglet-boutique" hidden>
@@ -102,11 +102,11 @@
       <button class="fermer" id="fermer" type="button" aria-label="Fermer le panneau">×</button>
     </div>
     <div class="panneau-corps">
-      <!-- Ranger une envie à la main (issue n° 2, 19 octobre 2026) -->
+      <!-- Ranger un article à la main (issue n° 2, 19 octobre 2026) -->
       <div class="ajout">
-        <button class="bouton-ajouter" id="ajouter" type="button" aria-expanded="false" aria-controls="formulaire-ajout"><span aria-hidden="true">+</span> Ajouter une envie</button>
+        <button class="bouton-ajouter" id="ajouter" type="button" aria-expanded="false" aria-controls="formulaire-ajout"><span aria-hidden="true">+</span> Ajouter un article</button>
         <form class="formulaire-ajout" id="formulaire-ajout" hidden novalidate>
-          <p class="ajout-titre" id="ajout-titre">Une nouvelle envie</p>
+          <p class="ajout-titre" id="ajout-titre">Un nouvel article</p>
           <div class="champ">
             <label for="champ-lien">Lien du produit</label>
             <input id="champ-lien" name="lien" type="url" inputmode="url" autocomplete="off" placeholder="https://" required aria-describedby="erreur-lien">
@@ -116,6 +116,10 @@
             <label for="champ-nom">Nom</label>
             <input id="champ-nom" name="nom" type="text" autocomplete="off" required aria-describedby="erreur-nom">
             <p class="erreur" id="erreur-nom" hidden></p>
+          </div>
+          <div class="champ">
+            <label for="champ-meuble">Ranger dans</label>
+            <select id="champ-meuble" name="meuble"></select>
           </div>
           <div class="champs-duo">
             <div class="champ">
@@ -134,7 +138,7 @@
             <p class="erreur" id="erreur-photo" hidden></p>
           </div>
           <div class="ajout-actions">
-            <button class="bouton-ranger" type="submit">Ranger l'envie</button>
+            <button class="bouton-ranger" type="submit">Ranger l'article</button>
             <button class="bouton-annuler" id="annuler" type="button">Annuler</button>
           </div>
         </form>
@@ -145,7 +149,7 @@
       <p class="vide-titre">Rien ici pour l'instant</p>
       <p id="vide-texte"></p>
     </div>
-    <p class="panneau-note" id="panneau-note">Exemples fictifs, en attendant tes vraies envies.</p>
+    <p class="panneau-note" id="panneau-note">Exemples fictifs, en attendant tes vrais articles.</p>
     </div>
   </dialog>
 
