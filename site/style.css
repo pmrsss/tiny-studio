@@ -280,6 +280,8 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 /* Les packshots des produits : entiers et centrés, avec une marge, sur la couleur du fond de leur photo (19 octobre 2026) */
 .visuel { position: relative; }
 .visuel img { position: absolute; inset: 8px; width: calc(100% - 16px); height: calc(100% - 16px); object-fit: contain; }
+/* Une photo ajoutée dont le fond n'est pas uni, ou illisible : elle remplit la case, sans vide */
+.visuel.visuel-plein img { inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .article-texte { min-width: 0; color: inherit; text-decoration: none; }
 a.article-texte:hover .article-nom { color: var(--rose-texte); }
 a.article-texte:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; border-radius: 8px; }

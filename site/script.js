@@ -141,6 +141,39 @@ const liste = document.getElementById("articles");
 const vide = document.getElementById("vide");
 let meubleOuvert = null;  // le meuble dont le panneau est ouvert, proposé pour ranger un nouvel article
 
+// La couleur du fond d'une photo ajoutée (19 octobre 2026) : l'app lit huit points sur les bords de
+// la photo. Si cinq au moins ont la même couleur, c'est un fond de packshot, et la case la reprend. Sinon,
+// ou si le site de la photo interdit cette lecture, la photo remplit toute la case, sans vide.
+function couleurDuFond(adresse, rappel) {
+  const sonde = new Image();
+  sonde.crossOrigin = "anonymous";
+  sonde.addEventListener("load", function () {
+    try {
+      const toile = document.createElement("canvas");
+      toile.width = 40;
+      toile.height = 40;
+      const ctx = toile.getContext("2d");
+      ctx.drawImage(sonde, 0, 0, 40, 40);
+      const points = [[1, 1], [38, 1], [1, 38], [38, 38], [20, 1], [20, 38], [1, 20], [38, 20]].map(function (p) {
+        return Array.from(ctx.getImageData(p[0], p[1], 1, 1).data.slice(0, 3));
+      });
+      // Le fond, c'est la couleur que partagent au moins cinq des huit points : le produit peut
+      // toucher un bord, et un fond de studio a souvent un léger dégradé
+      const proches = function (p, q) { return Math.max(Math.abs(p[0] - q[0]), Math.abs(p[1] - q[1]), Math.abs(p[2] - q[2])) <= 16; };
+      const groupes = points.map(function (p) { return points.filter(function (q) { return proches(p, q); }); });
+      const groupe = groupes.reduce(function (a, g) { return g.length > a.length ? g : a; });
+      const moyenne = [0, 1, 2].map(function (i) {
+        return Math.round(groupe.reduce(function (s, p) { return s + p[i]; }, 0) / groupe.length);
+      });
+      rappel(groupe.length >= 5 ? "#" + moyenne.map(function (v) { return v.toString(16).padStart(2, "0"); }).join("").toUpperCase() : null);
+    } catch (e) {
+      rappel(null);
+    }
+  });
+  sonde.addEventListener("error", function () { rappel(null); });
+  sonde.src = adresse;
+}
+
 function fiche(article) {
   const ligne = document.createElement("li");
   const achete = estAchete(article);
@@ -161,6 +194,20 @@ function fiche(article) {
   if (article.image) {
     // La case prend la couleur du fond de la photo : le produit y flotte, centré, sans toucher les bords
     visuel.style.background = article.fond || "#FFFFFF";
+    visuel.classList.toggle("visuel-plein", Boolean(article.plein));
+    // Une photo ajoutée à la main : sa couleur de fond se lit une fois, puis s'enregistre avec l'article
+    if (!article.fond && !article.plein) {
+      couleurDuFond(article.image, function (couleur) {
+        if (couleur) {
+          article.fond = couleur;
+          visuel.style.background = couleur;
+        } else {
+          article.plein = true;
+          visuel.classList.add("visuel-plein");
+        }
+        enregistrerArticles();
+      });
+    }
     const img = document.createElement("img");
     img.src = article.image;
     img.alt = "";
