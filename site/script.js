@@ -402,6 +402,17 @@ function ouvrir(cle) {
   document.getElementById("panneau-titre").focus();
 }
 
+// Survoler une case de la barre soulève le meuble correspondant dans la pièce (19 octobre 2026)
+document.querySelectorAll(".barre-meubles [data-meuble]").forEach(function (bouton) {
+  const meubleDansLaPiece = document.querySelector('.meuble[data-meuble="' + bouton.dataset.meuble + '"]');
+  ["mouseenter", "focus"].forEach(function (type) {
+    bouton.addEventListener(type, function () { meubleDansLaPiece.classList.add("survole"); });
+  });
+  ["mouseleave", "blur"].forEach(function (type) {
+    bouton.addEventListener(type, function () { meubleDansLaPiece.classList.remove("survole"); });
+  });
+});
+
 // Un clic, ou Entrée et Espace au clavier, ouvre le meuble
 document.querySelectorAll("[data-meuble]").forEach(function (element) {
   element.addEventListener("click", function () { ouvrir(element.dataset.meuble); });
