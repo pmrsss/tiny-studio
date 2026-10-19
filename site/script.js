@@ -117,6 +117,10 @@ function afficherCompteurs() {
   document.getElementById("accueil-texte").textContent = studioVide
     ? "Ton studio attend tes premiers articles. Touche un meuble, puis « Ajouter un article », et colle le lien d'un produit repéré en ligne."
     : "Touche un meuble pour voir les articles que tu y as rangés.";
+  // Le nombre d'articles en toutes lettres, dans la liste des meubles de la bulle (ordinateur)
+  document.querySelectorAll("[data-compte-texte]").forEach(function (element) {
+    element.textContent = libelleNombre(meubles[element.dataset.compteTexte].articles.length);
+  });
   document.querySelectorAll("[data-compte]").forEach(function (element) {
     const n = meubles[element.dataset.compte].articles.length;
     element.textContent = studioVide && element.closest(".badge") ? "+" : n;
@@ -402,8 +406,8 @@ function ouvrir(cle) {
   document.getElementById("panneau-titre").focus();
 }
 
-// Survoler une case de la barre soulève le meuble correspondant dans la pièce (19 octobre 2026)
-document.querySelectorAll(".barre-meubles [data-meuble]").forEach(function (bouton) {
+// Survoler une case de la barre, ou un meuble de la liste, soulève le meuble dans la pièce (19 octobre 2026)
+document.querySelectorAll(".barre-meubles [data-meuble], .liste-meubles [data-meuble]").forEach(function (bouton) {
   const meubleDansLaPiece = document.querySelector('.meuble[data-meuble="' + bouton.dataset.meuble + '"]');
   ["mouseenter", "focus"].forEach(function (type) {
     bouton.addEventListener(type, function () { meubleDansLaPiece.classList.add("survole"); });

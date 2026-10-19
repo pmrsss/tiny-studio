@@ -50,6 +50,15 @@
           <span class="ruban" aria-hidden="true"></span>
           <h2>Bienvenue chez toi</h2>
           <p id="accueil-texte">Touche un meuble pour voir les articles que tu y as rangés.</p>
+          <!-- Sur ordinateur, les meubles en liste dans la bulle, à la place de la barre (piste B, choisie
+               par Pauline le 19 octobre 2026). Sur tablette et téléphone, c'est la barre du bas -->
+          <ul class="liste-meubles" aria-label="Les meubles">
+            <li><button type="button" data-meuble="dressing"><span class="tuile"><svg><use href="#ic-dressing" /></svg></span><span class="nom">Dressing</span><span class="compte-ligne" data-compte-texte="dressing"></span></button></li>
+            <li><button type="button" data-meuble="bibliotheque"><span class="tuile"><svg><use href="#ic-bibliotheque" /></svg></span><span class="nom">Bibliothèque</span><span class="compte-ligne" data-compte-texte="bibliotheque"></span></button></li>
+            <li><button type="button" data-meuble="deco"><span class="tuile"><svg><use href="#ic-deco" /></svg></span><span class="nom">Commode</span><span class="compte-ligne" data-compte-texte="deco"></span></button></li>
+            <li><button type="button" data-meuble="coiffeuse"><span class="tuile"><svg><use href="#ic-coiffeuse" /></svg></span><span class="nom">Coiffeuse</span><span class="compte-ligne" data-compte-texte="coiffeuse"></span></button></li>
+            <li><button type="button" data-meuble="coffre"><span class="tuile"><svg><use href="#ic-coffre" /></svg></span><span class="nom">Coffre</span><span class="compte-ligne" data-compte-texte="coffre"></span></button></li>
+          </ul>
         </section>
 
         <section class="volet" role="tabpanel" id="volet-boutique" aria-labelledby="onglet-boutique" hidden>
