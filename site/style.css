@@ -438,7 +438,7 @@ body::after {
 /* La bulle : un contour un peu irrégulier, une couture à l'intérieur, une queue vers l'onglet */
 .bulle {
   position: relative; flex: 1;
-  padding: 46px 22px 22px;
+  padding: 60px 22px 22px;  /* de l'air sous le signet (retour de Pauline, 19 octobre 2026) */
   background: var(--carte); border: 3px solid var(--brun);
   border-radius: 34px 30px 36px 28px / 30px 34px 28px 36px;
   box-shadow: 0 7px 0 rgba(74, 51, 40, 0.2);
@@ -510,16 +510,16 @@ body::after {
   .accroche { display: none; }
   .alerte-stockage { flex-basis: 100%; margin: 6px 0 0; }
   .scene { position: static; display: flex; flex-direction: column; margin-top: 0; padding-bottom: 118px; }
-  .menu { position: static; margin: 26px 0 0; width: 100%; }
+  .menu { position: static; margin: 20px 0 0; width: 100%; }
   .onglets { position: absolute; top: 14px; right: 16px; gap: 10px; }
   .onglet { width: 46px; height: 46px; border-radius: 15px; border-width: 2.5px; }
   .onglet svg { width: 28px; height: 28px; }
   .onglet[aria-selected="true"] { transform: none; box-shadow: 0 4px 0 var(--brun); }
-  .bulle { padding: 30px 18px 14px; }
+  .bulle { padding: 44px 18px 16px; }
   .bulle h2 { font-size: 16px; margin-bottom: 4px; }
   .bulle p { font-size: 13.5px; line-height: 1.45; }
   .ruban { width: 38px; height: 40px; top: -12px; }
-  .cadre-piece { flex: 1; display: flex; align-items: center; width: calc(100% + 24px); margin: 12px -12px 0; }
+  .cadre-piece { flex: 1; display: flex; align-items: center; width: calc(100% + 24px); margin: 4px -12px 0; }
   .pied { display: none; }
   /* La boutique tient dans une bulle basse : ses quatre nouveautés sur une seule ligne */
   .boutique-liste { grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
