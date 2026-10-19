@@ -101,12 +101,52 @@
       </div>
       <button class="fermer" id="fermer" type="button" aria-label="Fermer le panneau">×</button>
     </div>
-    <ul class="articles" id="articles"></ul>
+    <div class="panneau-corps">
+      <!-- Ranger une envie à la main (issue n° 2, 19 octobre 2026) -->
+      <div class="ajout">
+        <button class="bouton-ajouter" id="ajouter" type="button" aria-expanded="false" aria-controls="formulaire-ajout"><span aria-hidden="true">+</span> Ajouter une envie</button>
+        <form class="formulaire-ajout" id="formulaire-ajout" hidden novalidate>
+          <p class="ajout-titre" id="ajout-titre">Une nouvelle envie</p>
+          <div class="champ">
+            <label for="champ-lien">Lien du produit</label>
+            <input id="champ-lien" name="lien" type="url" inputmode="url" autocomplete="off" placeholder="https://" required aria-describedby="erreur-lien">
+            <p class="erreur" id="erreur-lien" hidden></p>
+          </div>
+          <div class="champ">
+            <label for="champ-nom">Nom</label>
+            <input id="champ-nom" name="nom" type="text" autocomplete="off" required aria-describedby="erreur-nom">
+            <p class="erreur" id="erreur-nom" hidden></p>
+          </div>
+          <div class="champs-duo">
+            <div class="champ">
+              <label for="champ-marque">Marque <span class="facultatif">facultatif</span></label>
+              <input id="champ-marque" name="marque" type="text" autocomplete="off">
+            </div>
+            <div class="champ">
+              <label for="champ-prix">Prix <span class="facultatif">facultatif</span></label>
+              <input id="champ-prix" name="prix" type="text" inputmode="decimal" autocomplete="off" placeholder="29,90">
+            </div>
+          </div>
+          <div class="champ">
+            <label for="champ-photo">Adresse de la photo <span class="facultatif">facultatif</span></label>
+            <input id="champ-photo" name="photo" type="url" inputmode="url" autocomplete="off" placeholder="https://" aria-describedby="aide-photo erreur-photo">
+            <p class="aide" id="aide-photo">Sur la page du produit, clic droit sur la photo, puis « Copier l'adresse de l'image ».</p>
+            <p class="erreur" id="erreur-photo" hidden></p>
+          </div>
+          <div class="ajout-actions">
+            <button class="bouton-ranger" type="submit">Ranger l'envie</button>
+            <button class="bouton-annuler" id="annuler" type="button">Annuler</button>
+          </div>
+        </form>
+      </div>
+      <p class="annonce" id="annonce" aria-live="polite"></p>
+      <ul class="articles" id="articles"></ul>
     <div class="vide" id="vide" hidden>
       <p class="vide-titre">Rien ici pour l'instant</p>
       <p id="vide-texte"></p>
     </div>
     <p class="panneau-note" id="panneau-note">Exemples fictifs, en attendant tes vraies envies.</p>
+    </div>
   </dialog>
 
   <footer class="pied">Tiny Studio · maquette</footer>

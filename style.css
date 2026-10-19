@@ -195,7 +195,52 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .fermer:hover { color: var(--rose); border-color: var(--brun); }
 .fermer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
 
-.articles { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+/* Le corps du panneau défile d'un bloc : le formulaire d'ajout, puis les fiches */
+.panneau-corps { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 16px -6px 0; padding: 4px 6px 6px; display: flex; flex-direction: column; }
+.articles { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+
+/* Ranger une envie à la main (issue n° 2, 19 octobre 2026) */
+.bouton-ajouter {
+  align-self: stretch; display: flex; align-items: center; justify-content: center; gap: 8px;
+  font: 700 16px Fredoka, Nunito, sans-serif; color: #FFFFFF; cursor: pointer;
+  background: var(--rose); border: 0; border-radius: 18px; padding: 12px 16px;
+  box-shadow: 0 4px 0 var(--rose-ombre); transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.bouton-ajouter { width: 100%; }
+.bouton-ajouter[hidden] { display: none; }  /* sa règle display l'emporterait sur l'attribut hidden */
+.bouton-ajouter span { font-size: 22px; line-height: 1; }
+.bouton-ajouter:hover { transform: translateY(-1px); }
+.bouton-ajouter:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--rose-ombre); }
+.bouton-ajouter:focus-visible, .bouton-ranger:focus-visible, .bouton-annuler:focus-visible, .bouton-retirer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
+.formulaire-ajout { background: var(--carte); border: 2px solid var(--brun); border-radius: 22px; padding: 16px; box-shadow: 0 4px 0 var(--carte-ombre); }
+.ajout-titre { margin: 0 0 10px; font: 700 18px Fredoka, Nunito, sans-serif; }
+.champ { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; min-width: 0; }
+.champ label { font: 800 13px Nunito, sans-serif; color: var(--brun); }
+.facultatif { font-weight: 700; color: var(--brun-doux); font-size: 12px; }
+.champ input {
+  font: 600 15px Nunito, sans-serif; color: var(--brun); background: var(--creme);
+  border: 2px solid var(--carte-ombre); border-radius: 12px; padding: 9px 11px; min-width: 0; width: 100%;
+}
+.champ input:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-pale); }
+.champ input[aria-invalid="true"] { border-color: var(--rose-texte); }
+.champs-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
+.aide { margin: 0; font-size: 12px; color: var(--brun-doux); line-height: 1.4; }
+.erreur { margin: 0; font: 700 12.5px Nunito, sans-serif; color: var(--rose-texte); }
+.ajout-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+.bouton-ranger {
+  font: 700 15px Fredoka, Nunito, sans-serif; color: #FFFFFF; cursor: pointer;
+  background: var(--rose); border: 0; border-radius: 99px; padding: 9px 18px; box-shadow: 0 3px 0 var(--rose-ombre);
+}
+.bouton-annuler, .bouton-retirer {
+  font: 800 13px Nunito, sans-serif; color: var(--brun-doux); cursor: pointer;
+  background: transparent; border: 1.5px solid var(--carte-ombre); border-radius: 99px; padding: 8px 14px;
+}
+.bouton-retirer { padding: 6px 12px; }
+.bouton-annuler:hover, .bouton-retirer:hover { color: var(--rose-texte); border-color: var(--rose-texte); }
+.article-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.vignette-neutre { width: 56% !important; height: 56% !important; opacity: 0.45; }
+/* L'annonce pour les lecteurs d'écran : invisible à l'œil */
+.annonce { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
 
 /* Une fiche : le visuel, la marque, le nom exact, le prix, le lien, puis le bouton « Acheté » */
 .article {

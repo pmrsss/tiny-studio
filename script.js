@@ -114,6 +114,7 @@ function afficherCompteurs() {
 const panneau = document.getElementById("panneau");
 const liste = document.getElementById("articles");
 const vide = document.getElementById("vide");
+let meubleOuvert = null;  // le meuble dont le panneau est ouvert, où l'on range une nouvelle envie
 
 function fiche(article) {
   const ligne = document.createElement("li");
@@ -130,6 +131,8 @@ function fiche(article) {
     visuel.rel = "noopener";
     visuel.tabIndex = -1;  // le nom porte déjà le lien au clavier
   }
+  // Sans photo, ou si la photo ne se charge pas : une vignette neutre, l'icône du meuble
+  const neutre = '<svg class="vignette-neutre"><use href="#ic-' + (article.meuble || "coffre") + '" /></svg>';
   if (article.image) {
     // La case prend la couleur du fond de la photo : le produit y flotte, centré, sans toucher les bords
     visuel.style.background = article.fond || "#FFFFFF";
@@ -137,9 +140,10 @@ function fiche(article) {
     img.src = article.image;
     img.alt = "";
     img.loading = "lazy";
+    img.addEventListener("error", function () { visuel.style.background = ""; visuel.innerHTML = neutre; });
     visuel.appendChild(img);
   } else {
-    visuel.innerHTML = dessins[article.dessin] || "";
+    visuel.innerHTML = dessins[article.dessin] || neutre;
   }
   visuel.setAttribute("aria-hidden", "true");
   ligne.appendChild(visuel);
@@ -192,7 +196,21 @@ function fiche(article) {
     ligne.replaceWith(nouvelle);
     nouvelle.querySelector(".bouton-achete").focus();
   });
-  ligne.appendChild(bouton);
+  // Une envie ajoutée à la main peut être retirée
+  if (article.ajoute) {
+    const actions = document.createElement("div");
+    actions.className = "article-actions";
+    const retrait = document.createElement("button");
+    retrait.type = "button";
+    retrait.className = "bouton-retirer";
+    retrait.textContent = "Retirer";
+    retrait.setAttribute("aria-label", "Retirer « " + article.nom + " »");
+    retrait.addEventListener("click", function () { retirer(article); });
+    actions.append(bouton, retrait);
+    ligne.appendChild(actions);
+  } else {
+    ligne.appendChild(bouton);
+  }
   return ligne;
 }
 
@@ -213,6 +231,8 @@ function remplirPanneau(cle) {
 }
 
 function ouvrir(cle) {
+  meubleOuvert = cle;
+  ouvrirFormulaire(false);
   remplirPanneau(cle);
   panneau.showModal();
 }
@@ -233,6 +253,9 @@ document.querySelectorAll("[data-meuble]").forEach(function (element) {
 // Fermer : le bouton, la touche Échap (gérée par le navigateur) ou un clic à côté du panneau
 document.getElementById("fermer").addEventListener("click", function () { panneau.close(); });
 panneau.addEventListener("click", function (evenement) {
+  // Seul un clic sur le fond lui-même compte : un clic lancé au clavier (Entrée, Espace) arrive en
+  // (0, 0) et passerait pour un clic à côté (corrigé le 19 octobre 2026)
+  if (evenement.target !== panneau) return;
   const cadre = panneau.getBoundingClientRect();
   const dehors = evenement.clientX < cadre.left || evenement.clientX > cadre.right ||
                  evenement.clientY < cadre.top || evenement.clientY > cadre.bottom;
@@ -301,3 +324,98 @@ function appliquerMoment() {
 
 appliquerMoment();
 setInterval(appliquerMoment, 60000);
+
+// Ranger une envie à la main (issue n° 2, 19 octobre 2026) : un formulaire dans le panneau ; l'envie
+// apparaît en tête du meuble, le compteur se met à jour, et une envie ajoutée peut être retirée.
+// Elle ne survit pas encore à un rechargement : l'enregistrement d'une visite à l'autre est la suite.
+const boutonAjouter = document.getElementById("ajouter");
+const formulaire = document.getElementById("formulaire-ajout");
+const annonce = document.getElementById("annonce");
+const CHAMPS = {
+  lien: document.getElementById("champ-lien"),
+  nom: document.getElementById("champ-nom"),
+  marque: document.getElementById("champ-marque"),
+  prix: document.getElementById("champ-prix"),
+  photo: document.getElementById("champ-photo")
+};
+
+function adresseWeb(texte) {
+  try {
+    const url = new URL(texte);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch (e) {
+    return false;
+  }
+}
+
+function montrerErreur(cle, message) {
+  const champ = CHAMPS[cle];
+  const erreur = document.getElementById("erreur-" + cle);
+  champ.setAttribute("aria-invalid", message ? "true" : "false");
+  erreur.textContent = message || "";
+  erreur.hidden = !message;
+}
+
+function ouvrirFormulaire(ouvert) {
+  formulaire.hidden = !ouvert;
+  boutonAjouter.hidden = ouvert;
+  boutonAjouter.setAttribute("aria-expanded", ouvert ? "true" : "false");
+  if (ouvert) {
+    formulaire.reset();
+    ["lien", "nom", "photo"].forEach(function (cle) { montrerErreur(cle, ""); });
+    CHAMPS.lien.focus();
+  }
+}
+
+// Un prix tapé en chiffres seuls prend le symbole de l'euro : « 29,9 » devient « 29,90 € », « 29 » devient « 29 € »
+function prixAffiche(texte) {
+  const propre = texte.trim();
+  if (!/^\d+([.,]\d{1,2})?$/.test(propre)) return propre;
+  const [euros, centimes] = propre.replace(".", ",").split(",");
+  return centimes ? euros + "," + centimes.padEnd(2, "0") + " €" : euros + " €";
+}
+
+boutonAjouter.addEventListener("click", function () { ouvrirFormulaire(true); });
+document.getElementById("annuler").addEventListener("click", function () {
+  ouvrirFormulaire(false);
+  boutonAjouter.focus();
+});
+
+formulaire.addEventListener("submit", function (evenement) {
+  evenement.preventDefault();
+  const lien = CHAMPS.lien.value.trim();
+  const nom = CHAMPS.nom.value.trim();
+  const photo = CHAMPS.photo.value.trim();
+  const erreurs = {
+    lien: !lien ? "Colle le lien de la page du produit." : (!adresseWeb(lien) ? "Ce lien ne fonctionne pas : il doit commencer par https://" : ""),
+    nom: !nom ? "Donne un nom à ton envie." : "",
+    photo: photo && !adresseWeb(photo) ? "Cette adresse ne fonctionne pas : elle doit commencer par https://" : ""
+  };
+  Object.keys(erreurs).forEach(function (cle) { montrerErreur(cle, erreurs[cle]); });
+  const premiere = ["lien", "nom", "photo"].find(function (cle) { return erreurs[cle]; });
+  if (premiere) {
+    CHAMPS[premiere].focus();
+    return;
+  }
+  const meuble = meubles[meubleOuvert];
+  const article = {
+    id: "ajout-" + Date.now(), ajoute: true, meuble: meubleOuvert,
+    marque: CHAMPS.marque.value.trim(), nom: nom, prix: prixAffiche(CHAMPS.prix.value), lien: lien, image: photo || ""
+  };
+  meuble.articles.unshift(article);
+  ouvrirFormulaire(false);
+  remplirPanneau(meubleOuvert);
+  afficherCompteurs();
+  annonce.textContent = "« " + nom + " » est rangée dans " + meuble.nom.toLowerCase() + ".";
+  liste.querySelector(".article-texte").focus();
+});
+
+// Retirer une envie ajoutée : elle quitte le meuble, le compteur se met à jour
+function retirer(article) {
+  const meuble = meubles[article.meuble];
+  meuble.articles.splice(meuble.articles.indexOf(article), 1);
+  remplirPanneau(article.meuble);
+  afficherCompteurs();
+  annonce.textContent = "« " + article.nom + " » est retirée.";
+  boutonAjouter.focus();
+}
