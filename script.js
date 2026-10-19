@@ -68,6 +68,52 @@ const meubles = {
   }
 };
 
+// Les articles enregistrés dans le navigateur (issue n° 3, 19 octobre 2026) : à la première visite,
+// les articles de départ ci-dessus ; ensuite, ce que l'on a rangé, retiré ou déplacé. Les photos
+// restent enregistrées par leur adresse, comme prévu dans le choix technique du 15 octobre 2026.
+const CLE_ARTICLES = "tiny-studio-articles";
+let stockageOk = true;
+
+function lireArticles() {
+  try {
+    localStorage.setItem("tiny-studio-essai", "1");
+    localStorage.removeItem("tiny-studio-essai");
+    const enregistres = JSON.parse(localStorage.getItem(CLE_ARTICLES));
+    if (!enregistres) return;
+    Object.keys(meubles).forEach(function (cle) {
+      if (Array.isArray(enregistres[cle])) meubles[cle].articles = enregistres[cle];
+    });
+  } catch (e) {
+    stockageOk = false;
+  }
+}
+
+function enregistrerArticles() {
+  const contenu = {};
+  Object.keys(meubles).forEach(function (cle) { contenu[cle] = meubles[cle].articles; });
+  try {
+    localStorage.setItem(CLE_ARTICLES, JSON.stringify(contenu));
+    stockageOk = true;
+  } catch (e) {
+    stockageOk = false;
+  }
+  signalerStockage();
+}
+
+// Si le navigateur refuse d'enregistrer (navigation privée, stockage plein), un message discret le
+// dit sous l'accroche ; l'app reste utilisable le temps de la visite
+function signalerStockage() {
+  document.getElementById("alerte-stockage").hidden = stockageOk;
+}
+
+// Le meuble qui contient un article : les articles de départ ne portent pas le champ « meuble »
+function meubleDe(article) {
+  return Object.keys(meubles).find(function (cle) { return meubles[cle].articles.indexOf(article) !== -1; });
+}
+
+lireArticles();
+signalerStockage();
+
 // Le tag « Acheté » : il se coche et se décoche sur chaque fiche, et le navigateur s'en souvient
 const CLE_ACHATS = "tiny-studio-achats";
 
@@ -76,7 +122,8 @@ function lireAchats() {
 }
 
 function enregistrerAchats(achats) {
-  try { localStorage.setItem(CLE_ACHATS, JSON.stringify(achats)); } catch (e) { /* le choix ne sera pas retenu */ }
+  try { localStorage.setItem(CLE_ACHATS, JSON.stringify(achats)); } catch (e) { stockageOk = false; }
+  signalerStockage();
 }
 
 let achats = lireAchats();
@@ -196,21 +243,55 @@ function fiche(article) {
     ligne.replaceWith(nouvelle);
     nouvelle.querySelector(".bouton-achete").focus();
   });
-  // Un article ajouté à la main peut être retiré
-  if (article.ajoute) {
-    const actions = document.createElement("div");
-    actions.className = "article-actions";
-    const retrait = document.createElement("button");
-    retrait.type = "button";
-    retrait.className = "bouton-retirer";
-    retrait.textContent = "Retirer";
-    retrait.setAttribute("aria-label", "Retirer « " + article.nom + " »");
-    retrait.addEventListener("click", function () { retirer(article); });
-    actions.append(bouton, retrait);
-    ligne.appendChild(actions);
-  } else {
-    ligne.appendChild(bouton);
+  // Tout article peut être déplacé vers un autre meuble, ou retiré (issue n° 3, 19 octobre 2026)
+  const actions = document.createElement("div");
+  actions.className = "article-actions";
+  const deplacement = document.createElement("button");
+  deplacement.type = "button";
+  deplacement.className = "bouton-retirer bouton-deplacer";
+  deplacement.textContent = "Déplacer";
+  deplacement.setAttribute("aria-label", "Déplacer « " + article.nom + " »");
+  deplacement.setAttribute("aria-expanded", "false");
+  const retrait = document.createElement("button");
+  retrait.type = "button";
+  retrait.className = "bouton-retirer";
+  retrait.textContent = "Retirer";
+  retrait.setAttribute("aria-label", "Retirer « " + article.nom + " »");
+  retrait.addEventListener("click", function () { retirer(article); });
+  actions.append(bouton, deplacement, retrait);
+  ligne.appendChild(actions);
+
+  // Le choix du meuble d'arrivée : les autres meubles, et « Annuler »
+  const choix = document.createElement("div");
+  choix.className = "choix-meuble";
+  choix.setAttribute("role", "group");
+  choix.setAttribute("aria-label", "Déplacer « " + article.nom + " » vers");
+  choix.hidden = true;
+  choix.innerHTML = '<span class="choix-titre" aria-hidden="true">Vers :</span>';
+  Object.keys(meubles).forEach(function (cle) {
+    if (meubles[cle].articles.indexOf(article) !== -1) return;
+    const vers = document.createElement("button");
+    vers.type = "button";
+    vers.className = "bouton-meuble";
+    vers.innerHTML = '<svg aria-hidden="true"><use href="#ic-' + cle + '" /></svg><span></span>';
+    vers.querySelector("span").textContent = meubles[cle].nom;
+    vers.addEventListener("click", function () { deplacer(article, cle); });
+    choix.appendChild(vers);
+  });
+  const renoncer = document.createElement("button");
+  renoncer.type = "button";
+  renoncer.className = "bouton-retirer";
+  renoncer.textContent = "Annuler";
+  choix.appendChild(renoncer);
+  ligne.appendChild(choix);
+
+  function montrerChoix(ouvert) {
+    choix.hidden = !ouvert;
+    deplacement.setAttribute("aria-expanded", ouvert ? "true" : "false");
+    (ouvert ? choix.querySelector(".bouton-meuble") : deplacement).focus();
   }
+  deplacement.addEventListener("click", function () { montrerChoix(choix.hidden); });
+  renoncer.addEventListener("click", function () { montrerChoix(false); });
   return ligne;
 }
 
@@ -409,6 +490,7 @@ formulaire.addEventListener("submit", function (evenement) {
     marque: CHAMPS.marque.value.trim(), nom: nom, prix: prixAffiche(CHAMPS.prix.value), lien: lien, image: photo || ""
   };
   meuble.articles.unshift(article);
+  enregistrerArticles();
   ouvrirFormulaire(false);
   remplirPanneau(meubleOuvert);
   afficherCompteurs();
@@ -416,12 +498,33 @@ formulaire.addEventListener("submit", function (evenement) {
   liste.querySelector(".article-texte").focus();
 });
 
-// Retirer un article ajouté : elle quitte le meuble, le compteur se met à jour
-function retirer(article) {
-  const meuble = meubles[article.meuble];
-  meuble.articles.splice(meuble.articles.indexOf(article), 1);
-  remplirPanneau(article.meuble);
+// Sortir un article de son meuble : le panneau se redessine, et le focus va à l'article qui prend
+// sa place, ou au bouton d'ajout s'il n'y en a plus
+function sortir(article) {
+  const cle = meubleDe(article);
+  const rang = meubles[cle].articles.indexOf(article);
+  meubles[cle].articles.splice(rang, 1);
+  remplirPanneau(cle);
   afficherCompteurs();
+  const suivants = liste.querySelectorAll(".article-texte");
+  (suivants[Math.min(rang, suivants.length - 1)] || boutonAjouter).focus();
+}
+
+// Retirer un article, ajouté ou de départ : il quitte le meuble, et ne revient pas au rechargement
+function retirer(article) {
+  delete achats[article.id];
+  enregistrerAchats(achats);
+  sortir(article);
+  enregistrerArticles();
   annonce.textContent = "« " + article.nom + " » est retiré.";
-  boutonAjouter.focus();
+}
+
+// Déplacer un article : il quitte le meuble ouvert et se range en tête du meuble choisi
+function deplacer(article, cle) {
+  sortir(article);
+  article.meuble = cle;
+  meubles[cle].articles.unshift(article);
+  afficherCompteurs();
+  enregistrerArticles();
+  annonce.textContent = "« " + article.nom + " » est déplacé dans " + meubles[cle].nom.toLowerCase() + ".";
 }

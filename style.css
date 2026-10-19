@@ -211,7 +211,7 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .bouton-ajouter span { font-size: 22px; line-height: 1; }
 .bouton-ajouter:hover { transform: translateY(-1px); }
 .bouton-ajouter:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--rose-ombre); }
-.bouton-ajouter:focus-visible, .bouton-ranger:focus-visible, .bouton-annuler:focus-visible, .bouton-retirer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
+.bouton-ajouter:focus-visible, .bouton-ranger:focus-visible, .bouton-annuler:focus-visible, .bouton-retirer:focus-visible, .bouton-deplacer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
 .formulaire-ajout { background: var(--carte); border: 2px solid var(--brun); border-radius: 22px; padding: 16px; box-shadow: 0 4px 0 var(--carte-ombre); }
 .ajout-titre { margin: 0 0 10px; font: 700 18px Fredoka, Nunito, sans-serif; }
 .champ { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; min-width: 0; }
@@ -240,6 +240,21 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .bouton-retirer { padding: 6px 12px; }
 .bouton-annuler:hover, .bouton-retirer:hover { color: var(--rose-texte); border-color: var(--rose-texte); }
 .article-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.bouton-deplacer[aria-expanded="true"] { color: var(--brun); border-color: var(--brun-doux); }
+/* Déplacer un article (issue n° 3, 19 octobre 2026) : les autres meubles, en petites pastilles */
+.choix-meuble { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.choix-meuble[hidden] { display: none; }
+.choix-titre { font: 800 12.5px Nunito, sans-serif; color: var(--brun-doux); }
+.bouton-meuble {
+  display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+  font: 800 13px Nunito, sans-serif; color: var(--brun);
+  background: var(--creme); border: 1.5px solid var(--carte-ombre); border-radius: 99px; padding: 4px 11px 4px 5px;
+}
+.bouton-meuble svg { width: 22px; height: 22px; }
+.bouton-meuble:hover { border-color: var(--rose); }
+.bouton-meuble:focus-visible { outline: 3px dashed var(--focus); outline-offset: 2px; }
+/* Le navigateur refuse d'enregistrer : un message discret sous l'accroche */
+.alerte-stockage { margin: 8px auto 0; max-width: 34em; font: 700 13px Nunito, sans-serif; color: var(--rose-texte); }
 .vignette-neutre { width: 56% !important; height: 56% !important; opacity: 0.45; }
 /* L'annonce pour les lecteurs d'écran : invisible à l'œil */
 .annonce { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
