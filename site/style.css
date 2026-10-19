@@ -500,8 +500,44 @@ body::after {
 }
 
 /* Sur téléphone, la pièce prend presque toute la largeur de l'écran (retour de Pauline, 19 octobre 2026) */
+/* L'agencement téléphone, retenu par Pauline le 19 octobre 2026 : un bandeau compact (le nom à
+   gauche, les onglets à droite), la bulle d'explication toujours là, et la pièce au milieu de
+   l'espace qui reste entre la bulle et la barre des meubles */
 @media (max-width: 600px) {
-  .cadre-piece { width: calc(100% + 24px); margin: 32px -12px 0; }
+  body { min-height: 100dvh; position: relative; }
+  .entete { display: flex; flex-wrap: wrap; align-items: center; min-height: 60px; padding: 14px 0 0; text-align: left; }
+  .marque { font-size: 28px; }
+  .accroche { display: none; }
+  .alerte-stockage { flex-basis: 100%; margin: 6px 0 0; }
+  .scene { position: static; display: flex; flex-direction: column; margin-top: 0; padding-bottom: 118px; }
+  .menu { position: static; margin: 26px 0 0; width: 100%; }
+  .onglets { position: absolute; top: 14px; right: 16px; gap: 10px; }
+  .onglet { width: 46px; height: 46px; border-radius: 15px; border-width: 2.5px; }
+  .onglet svg { width: 28px; height: 28px; }
+  .onglet[aria-selected="true"] { transform: none; box-shadow: 0 4px 0 var(--brun); }
+  .bulle { padding: 30px 18px 14px; }
+  .bulle h2 { font-size: 16px; margin-bottom: 4px; }
+  .bulle p { font-size: 13.5px; line-height: 1.45; }
+  .ruban { width: 38px; height: 40px; top: -12px; }
+  .cadre-piece { flex: 1; display: flex; align-items: center; width: calc(100% + 24px); margin: 12px -12px 0; }
+  .pied { display: none; }
+  /* La boutique tient dans une bulle basse : ses quatre nouveautés sur une seule ligne */
+  .boutique-liste { grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 10px; }
+  .boutique-liste li { padding: 8px 2px 7px; font-size: 11px; line-height: 1.25; }
+  .boutique-liste svg { width: 28px; height: 28px; margin-bottom: 3px; }
+  .bientot-tag { margin-top: 8px; }
+}
+
+/* Sur ordinateur (19 octobre 2026) : un bandeau fin en haut à gauche, et la pièce dimensionnée sur
+   la hauteur de l'écran, pour qu'elle tienne entière au-dessus de la barre sans défiler */
+@media (min-width: 1081px) {
+  .entete { display: flex; align-items: baseline; gap: 16px; width: calc(100% - 64px); padding: 22px 0 0; text-align: left; }
+  .marque { font-size: 34px; }
+  .accroche { margin: 0; font-size: 15px; }
+  .scene { width: calc(100% - 64px); grid-template-columns: 330px minmax(0, 1fr) 90px; margin-top: 0; }
+  .menu { margin-top: 36px; }
+  .cadre-piece { max-width: none; width: min(100%, calc((100vh - 190px) * 660 / 676)); justify-self: center; }
+  .pied { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
