@@ -85,19 +85,10 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .meuble:hover .badge-fond, .meuble:focus-visible .badge-fond { fill: var(--rose-ombre); }
 .meuble.est-vide .badge-fond, .meuble.est-vide .badge-pointe { fill: #EAD8C6; }
 .meuble.est-vide .badge text { fill: var(--brun-doux); }
-/* Le studio vide (issue n° 4) : les pastilles restent roses, portent un « + » et respirent doucement,
-   l'une après l'autre, pour inviter à toucher un meuble */
+/* Le studio vide (issue n° 4) : les pastilles restent roses et portent un « + », immobiles
+   (choix de Pauline, 19 octobre 2026), pour inviter à toucher un meuble */
 .studio-vide .meuble.est-vide .badge-fond, .studio-vide .meuble.est-vide .badge-pointe { fill: var(--rose); }
 .studio-vide .meuble.est-vide .badge text { fill: #FFFFFF; font-size: 19px; }
-.studio-vide .meuble .badge { transform-box: fill-box; transform-origin: 50% 100%; animation: respire 2.6s ease-in-out infinite; }
-.studio-vide .meuble[data-meuble="bibliotheque"] .badge { animation-delay: 0.5s; }
-.studio-vide .meuble[data-meuble="deco"] .badge { animation-delay: 1s; }
-.studio-vide .meuble[data-meuble="coiffeuse"] .badge { animation-delay: 1.5s; }
-.studio-vide .meuble[data-meuble="coffre"] .badge { animation-delay: 2s; }
-@keyframes respire {
-  0%, 60%, 100% { transform: translateY(0) scale(1); }
-  30% { transform: translateY(-4px) scale(1.12); }
-}
 /* La pièce dorée « % » : un meuble qui contient un article en promotion (19 octobre 2026) */
 .badge-promo { display: none; }
 .meuble.en-promo .badge-promo { display: inline; }
