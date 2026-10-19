@@ -454,7 +454,8 @@ body::after {
   transition: top 0.25s ease;
 }
 
-/* Le ruban : un marque-page rose épinglé en haut de la bulle, avec l'icône de l'onglet */
+/* Le ruban : un marque-page rose épinglé en haut de la bulle, vide depuis le 19 octobre 2026 :
+   l'icône de l'onglet, juste au-dessus, y faisait doublon (choix de Pauline) */
 .ruban {
   --ic-accent: #F4C6D4; --ic-fond: #FFFFFF; --ic-bois: #F3D9C2; --ic-trait: #7E2A48;
   --ic-yeux: #3B2418; --ic-oeil: 1.35px; --ic-eclat: 1;  /* des yeux plus grands et brillants dans le signet */

@@ -143,10 +143,13 @@ let meubleOuvert = null;  // le meuble dont le panneau est ouvert, proposé pour
 
 // Les règles de mise en forme des photos (décision de Pauline, 19 octobre 2026) :
 // 1. la case prend la couleur du fond de la photo ;
-// 2. le produit est recadré à son contour, puis centré ;
+// 2. le produit est recadré à son contour, puis centré ; les ombres portées ne comptent pas dans
+//    le contour, sinon le produit paraît décalé du côté opposé à son ombre ;
 // 3. il occupe 80 % de la case dans sa plus grande dimension, la même marge pour tous ;
 // 4. si le fond n'est pas uni, ou si le site interdit de lire la photo, elle remplit toute la case.
-// L'analyse se fait une fois, et ses résultats (« fond », « cadre » ou « plein ») s'enregistrent avec l'article.
+// L'analyse se fait une fois, et ses résultats (« fond », « cadre » ou « plein ») s'enregistrent avec
+// l'article, avec le numéro de la règle (« analyse ») : quand la règle change, la photo est relue.
+const VERSION_ANALYSE = 2;  // 2 : les ombres ne comptent plus dans le contour (19 octobre 2026)
 function analyserPhoto(adresse, rappel) {
   const sonde = new Image();
   sonde.crossOrigin = "anonymous";
@@ -174,11 +177,18 @@ function analyserPhoto(adresse, rappel) {
       const fond = [0, 1, 2].map(function (i) {
         return Math.round(groupe.reduce(function (s, p) { return s + p[i]; }, 0) / groupe.length);
       });
-      // Le contour du produit : tout ce qui s'écarte nettement du fond
+      // Le contour du produit : tout ce qui s'écarte nettement du fond, sauf les ombres. Une ombre est
+      // grise (ses trois couleurs restent proches), plus sombre que le fond, mais de peu
+      const lum = function (p) { return (p[0] + p[1] + p[2]) / 3; };
+      const ombre = function (p) {
+        const assombri = lum(fond) - lum(p);
+        return assombri > 0 && assombri < 70 && Math.max(p[0], p[1], p[2]) - Math.min(p[0], p[1], p[2]) < 20;
+      };
       let x0 = w, y0 = h, x1 = -1, y1 = -1;
       for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
-          if (ecart(pixel(x, y), fond) > 28) {
+          const p = pixel(x, y);
+          if (ecart(p, fond) > 28 && !ombre(p)) {
             if (x < x0) x0 = x;
             if (x > x1) x1 = x;
             if (y < y0) y0 = y;
@@ -236,14 +246,18 @@ function fiche(article) {
     visuel.classList.toggle("visuel-plein", Boolean(article.plein));
     const img = document.createElement("img");
     img.src = article.image;
-    if (article.cadre) cadrer(img, article.cadre);
-    // La photo n'a pas encore été analysée : elle l'est une fois, et le résultat s'enregistre
-    if (!article.cadre && !article.plein) {
+    const aJour = article.analyse === VERSION_ANALYSE;
+    if (article.cadre && aJour) cadrer(img, article.cadre);
+    // La photo n'a pas encore été analysée, ou avec une règle plus ancienne : elle l'est, et le résultat s'enregistre
+    if (!aJour) {
       analyserPhoto(article.image, function (resultat) {
+        article.analyse = VERSION_ANALYSE;
+        delete article.plein;
         if (resultat) {
           article.fond = resultat.fond;
           article.cadre = resultat.cadre;
           visuel.style.background = resultat.fond;
+          visuel.classList.remove("visuel-plein");
           cadrer(img, resultat.cadre);
         } else {
           article.plein = true;
