@@ -557,9 +557,9 @@ body::after {
   /* Les onglets descendent un peu : la pointe de la bulle, qui suit l'onglet choisi, tombait dans
      l'arrondi du coin et faisait un accroc (retour de Pauline, 19 octobre 2026) */
   .onglets { margin-top: 26px; }
-  /* Les onglets et la bulle, centrés dans la hauteur de la pièce, loin du nom de l'app (retour de
-     Pauline, 19 octobre 2026) */
-  .menu { grid-row: 1 / span 2; align-self: center; margin-top: 0; }
+  /* Les onglets et la bulle, descendus loin du nom de l'app, un peu au-dessus du centre de la pièce
+     (retours de Pauline, 19 octobre 2026) */
+  .menu { grid-row: 1 / span 2; align-self: start; margin-top: 90px; }
   .cadre-piece { max-width: none; width: min(100%, calc((100vh - 110px) * 660 / 676)); justify-self: center; }
   .pied { display: none; }
 }
