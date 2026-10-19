@@ -1,64 +1,34 @@
-// Les visuels des articles : le packshot du produit (champ « image »), téléchargé dans images/ pour
-// s'afficher partout ; à défaut, un dessin dans le style de la pièce (champ « dessin »).
+// Les visuels des articles : la photo du produit (champ « image »), par son adresse ; à défaut,
+// une vignette neutre, l'icône du meuble.
 const dessins = {};  // les dessins des premiers articles, remplacés par les packshots le 19 octobre 2026, sont dans l'historique Git
 
-// Les cinq meubles et les vrais articles de Pauline (19 octobre 2026), chacune avec « lien », la
-// page du produit. La coiffeuse est vide exprès, pour montrer un meuble qui n'a encore rien.
-// Chaque meuble donne sa teinte à son panneau.
+// Les cinq meubles, vides au départ : en ligne, le studio s'ouvre vide (décision de Pauline,
+// 19 octobre 2026). Chaque meuble donne sa teinte à son panneau.
 
 const meubles = {
   dressing: {
     nom: "Le dressing",
     teinte: "#F3C3CC",
     vide: "Ton prochain coup de cœur mode ira ici.",
-    articles: [
-      // Les premiers vrais articles de Pauline (19 octobre 2026), prix relevés ce jour-là ; aucune n'est en promotion
-      { id: "zara-bomber-8490709", image: "images/zara-bomber.jpg", fond: "#F0F0F0", marque: "Zara", nom: "Veste bomber en matière synthétique, noir", prix: "25,99 €",
-        lien: "https://www.zara.com/fr/fr/veste-bomber-en-matiere-synthetique-p08490709.html?v1=545485930&v2=2419737" },
-      { id: "cos-bob-1361189003", image: "images/cos-chapeau.jpg", fond: "#EBE9E7", marque: "COS", nom: "Chapeau seau en laine mélangée imprimé léopard, brun", prix: "59 €",
-        lien: "https://www.cos.com/fr-fr/women/accessories/hatsscarvesgloves/bucket-hats/product/sculpted-wool-bucket-hat-brown-leopard-print-1361189003" },
-      { id: "ganni-sac-kat-A6997", image: "images/ganni-sac-kat.jpg", fond: "#F6F6F6", marque: "Ganni", nom: "Grand sac Kat en fausse fourrure, Foxtrot", prix: "1 095 €",
-        lien: "https://www.ganni.com/fr-fr/grand-sac-kat-fausse-fourrure-A6997.html" }
-    ]
+    articles: []
   },
   bibliotheque: {
     nom: "La bibliothèque",
     teinte: "#D9A877",
     vide: "Le prochain livre qui te fait envie ira ici.",
-    articles: [
-      // Les vrais articles de Pauline (19 octobre 2026), prix relevés ce jour-là
-      { id: "hobonichi-techo-2027-tiesheep", image: "images/hobonichi-techo.jpg", fond: "#FFFFFF", marque: "Hobonichi", nom: "Agenda Techo 2027 Weeks, couverture Bow & Tie : Sheep Sheep Sheep", prix: "34 à 35 €",
-        lien: "https://www.1101.com/store/techo/en/2027/pc/detail_cover/wb27_tiesheep/" },
-      { id: "fnac-yellowface-21544319", image: "images/fnac-yellowface.jpg", fond: "#FFFFFF", marque: "Rebecca F. Kuang", nom: "Yellowface, en poche", prix: "8,60 €",
-        lien: "https://www.fnac.com/a21544319/Rebecca-F-Kuang-Yellowface-poche" },
-      { id: "amazon-purgatoire-2266246240", image: "images/amazon-purgatoire.jpg", fond: "#FFFFFF", marque: "Karine Giebel", nom: "Purgatoire des innocents, en poche", prix: "9,60 €",
-        lien: "https://www.amazon.fr/dp/2266246240" }
-    ]
+    articles: []
   },
   deco: {
     nom: "La commode déco",
     teinte: "#A9B9F0",
     vide: "Ta prochaine trouvaille déco ira ici.",
-    articles: [
-      // Les vrais articles de Pauline (19 octobre 2026), prix relevés ce jour-là
-      { id: "diptyque-figuier-fi600", image: "images/diptyque-figuier.jpg", fond: "#F8F8F8", marque: "Diptyque", nom: "Bougie grand modèle Figuier, 600 g", prix: "190 €",
-        lien: "https://diptyqueparis.com/fr-fr/products/bougie-grand-modele-figuier-fi600" },
-      { id: "themasie-vase-malik-151875", image: "images/themasie-malik.jpg", fond: "#EDECEB", marque: "Themasie", nom: "Vase Malik haut en dolomite galvanisée, gris chromé, 29,5 cm", prix: "16,95 €",
-        prixBarre: "18,95 €", remise: "-10 %", precision: "Précommande, envoi dès le 30 décembre",
-        lien: "https://www.themasie.com/fr/acheter-vases/151875-grand-vase-en-dolomite-galvanisee-malik.html" }
-    ]
+    articles: []
   },
   coffre: {
     nom: "Le coffre fourre-tout",
     teinte: "#C98A52",
     vide: "Tout ce qui ne va dans aucun meuble ira ici.",
-    articles: [
-      // Les vrais articles de Pauline (19 octobre 2026), prix relevés ce jour-là
-      { id: "hm-plaid-0995539095", image: "images/hm-plaid.jpg", fond: "#F9F9F9", marque: "H&M Home", nom: "Plaid en tissu polaire à motif, crème", prix: "9,99 €",
-        lien: "https://www2.hm.com/fr_fr/productpage.0995539095.html" },
-      { id: "ikea-stockholm-40586508", image: "images/ikea-stockholm.jpg", fond: "#FFFFFF", marque: "IKEA", nom: "Banc TV STOCKHOLM 2025 à portes coulissantes, plaqué chêne", prix: "369 €",
-        lien: "https://www.ikea.com/fr/fr/p/stockholm-2025-banc-tv-portes-coulissantes-plaque-chene-40586508/" }
-    ]
+    articles: []
   },
   coiffeuse: {
     nom: "La coiffeuse",
@@ -67,6 +37,7 @@ const meubles = {
     articles: []
   }
 };
+
 
 // Les articles enregistrés dans le navigateur (issue n° 3, 19 octobre 2026) : à la première visite,
 // les articles de départ ci-dessus ; ensuite, ce que l'on a rangé, retiré ou déplacé. Les photos
