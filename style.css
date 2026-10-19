@@ -1,0 +1,429 @@
+/* Tiny Studio, la maquette. Une pièce en vue isométrique, comme une maison de poupée
+   ouverte, posée sur un fond doux de fin de journée.
+   La palette « rose poudré et noyer doux », retenue par Pauline le 19 octobre 2026 : l'interface
+   prend ses couleurs dans la pièce. L'accent est le rose des pois du mur, en plus profond pour
+   rester lisible ; le texte est un brun cacao ; les neutres sont crème. 60 % de neutres, 30 % de
+   bois et de matières, 10 % d'accent, réservé à ce qui se touche. */
+:root {
+  --carte: #FFFBF5;
+  --carte-ombre: #EAD8C6;
+  --creme: #FAF3E8;
+  --filet: rgba(74, 51, 40, 0.08);
+  --brun: #4A3328;
+  --brun-doux: #85674F;
+  --rose: #C9557C;
+  --rose-ombre: #A83E63;
+  --rose-pale: #F7E1E8;
+  --rose-texte: #A83E63;
+  --vert-pale: #E0F0E6;
+  --vert-texte: #28694F;
+  --focus: #A83E63;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--brun);
+  font-family: Nunito, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 600;
+}
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* ---------- Les icônes du projet ----------
+   La direction « Kawaii », retenue par Pauline le 19 octobre 2026 : des formes dodues sans angle,
+   un trait brun épais et rond, des aplats pastel, et de petits visages aux joues roses.
+   Les couleurs passent par des variables : chaque bouton peut les changer. */
+.ic { stroke: var(--ic-trait, #4A3328); stroke-width: 1.9; stroke-linejoin: round; stroke-linecap: round; }
+.ic-f { fill: var(--ic-fond, #FFF8EF); }
+.ic-a, .ic-pois { fill: var(--ic-accent, #EE9DB4); }
+.ic-b { fill: var(--ic-bois, #E2B58C); }
+.ic-v { fill: var(--ic-vert, #C9C97E); }
+.ic-verre { fill: #DCE9F2; }
+.ic-fauve { fill: #E0A060; } .ic-fauve-fonce { fill: #B9773E; } .ic-fauve-clair { fill: #F5D2A6; }
+.ic-trait { fill: none; stroke: var(--ic-trait, #4A3328); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.ic-tige { fill: none; stroke: #7FA05E; stroke-width: 1.9; stroke-linecap: round; }
+.ic-rayure { fill: none; stroke: var(--ic-fond, #FFF8EF); stroke-width: 1.6; stroke-linecap: round; }
+.ic-lame { fill: none; stroke: color-mix(in srgb, var(--ic-bois, #E2B58C) 60%, #4A3328); stroke-width: 1.4; stroke-linecap: round; }
+.ic-reflet { fill: none; stroke: #FFFFFF; stroke-width: 1.5; stroke-linecap: round; }
+.ic-yeux { fill: var(--ic-yeux, var(--ic-trait, #4A3328)); }
+circle.ic-yeux { r: var(--ic-oeil, 1px); }
+.ic-eclat { fill: #FFFFFF; opacity: var(--ic-eclat, 0); }
+.ic-joue { fill: #F49BB1; opacity: 0.8; }
+.ic-bouche { fill: none; stroke: var(--ic-trait, #4A3328); stroke-width: 0.9; stroke-linecap: round; }
+.ic-collier { fill: none; stroke: var(--ic-accent, #EE9DB4); stroke-width: 2.4; stroke-linecap: round; }
+.ic-medaille { fill: #F3D27A; }
+
+/* ---------- L'en-tête ---------- */
+.entete { width: min(1000px, calc(100% - 32px)); margin: 0 auto; padding: 30px 0 0; text-align: center; }
+.marque { margin: 0; font: 700 clamp(38px, 7vw, 56px) / 1.05 Fredoka, Nunito, sans-serif; color: var(--brun); }
+.accroche { margin: 8px 0 0; font-size: 18px; color: var(--brun-doux); }
+
+/* ---------- La scène ---------- */
+.scene { position: relative; width: min(1000px, calc(100% - 32px)); margin: 12px auto 0; flex: 1; }
+
+.studio {
+  display: block; width: 100%; height: auto; overflow: visible;
+  filter: drop-shadow(0 28px 30px rgba(120, 80, 70, 0.22));
+}
+
+/* Les meubles : ils se soulèvent un peu au survol, comme un objet qu'on prend en main */
+.meuble { cursor: pointer; transition: transform 0.2s ease, filter 0.2s ease; transform-box: fill-box; transform-origin: center bottom; }
+.meuble:hover, .meuble:focus-visible { transform: translateY(-6px); filter: drop-shadow(0 8px 6px rgba(74, 51, 40, 0.2)); }
+.meuble:focus { outline: none; }
+.meuble:focus-visible { outline: 3px dashed var(--focus); outline-offset: 6px; }
+
+/* Le nombre d'envies : une épingle rose, comme un repère sur une carte de jeu */
+.badge { filter: drop-shadow(0 3px 0 rgba(74, 51, 40, 0.28)); }
+.badge-fond, .badge-pointe { fill: var(--rose); stroke: #FFFFFF; stroke-width: 2.5; stroke-linejoin: round; }
+.badge text { fill: #FFFFFF; font: 800 14px Nunito, sans-serif; text-anchor: middle; }
+.meuble:hover .badge-fond, .meuble:focus-visible .badge-fond { fill: var(--rose-ombre); }
+.meuble.est-vide .badge-fond, .meuble.est-vide .badge-pointe { fill: #EAD8C6; }
+.meuble.est-vide .badge text { fill: var(--brun-doux); }
+/* La pièce dorée « % » : un meuble qui contient une envie en promotion (19 octobre 2026) */
+.badge-promo { display: none; }
+.meuble.en-promo .badge-promo { display: inline; }
+.piece-fond { fill: #F3D27A; stroke: #FFFFFF; stroke-width: 2; }
+.badge .badge-promo text { fill: #7A5A1A; font: 800 10.5px Nunito, sans-serif; }
+.barre-meubles .en-promo .tuile::after {
+  content: "%"; position: absolute; top: -7px; left: -7px; width: 20px; height: 20px; border-radius: 50%;
+  display: grid; place-items: center; background: #F3D27A; color: #7A5A1A; border: 2px solid #FFFFFF;
+  font: 800 10.5px Nunito, sans-serif; box-shadow: 0 2px 0 rgba(74, 51, 40, 0.2);
+}
+
+/* La guirlande en haut des murs : les boules brillent doucement, chacune à son rythme */
+.ampoule { filter: drop-shadow(0 0 4px #FFD36B) drop-shadow(0 0 2px #FFE7A3); animation: scintille 3s ease-in-out infinite; }
+.ampoule:nth-of-type(2n) { animation-delay: -1s; }
+.ampoule:nth-of-type(3n) { animation-delay: -2s; }
+@keyframes scintille { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+/* Le moment de la journée, choisi d'après l'heure de l'utilisateur (script.js) : la fenêtre et
+   l'ambiance de la pièce n'en montrent qu'un. Sans réglage, c'est le jour. */
+.vue-soir, .vue-nuit { display: none; }
+[data-moment="soir"] .vue-jour, [data-moment="nuit"] .vue-jour { display: none; }
+[data-moment="soir"] .vue-soir, [data-moment="nuit"] .vue-nuit { display: inline; }
+[data-moment="nuit"] .ampoule { filter: drop-shadow(0 0 9px #FFC560) drop-shadow(0 0 4px #FFE2A0); }
+.etoile { animation: scintille 2.6s ease-in-out infinite; }
+/* Les meubles et les objets suivent le moment (19 octobre 2026) : le soir, une lumière chaude et un
+   peu plus basse ; la nuit, ils s'assombrissent. Les épingles gardent leur éclat. */
+[data-moment="soir"] .objets { filter: brightness(0.93) sepia(0.14) saturate(1.08); }
+[data-moment="soir"] .objets .badge { filter: brightness(1.07) drop-shadow(0 3px 0 rgba(74, 51, 40, 0.28)); }
+[data-moment="nuit"] .objets { filter: brightness(0.82) sepia(0.28) saturate(1.1); }
+[data-moment="nuit"] .objets .badge { filter: brightness(1.22) saturate(0.95) drop-shadow(0 3px 0 rgba(74, 51, 40, 0.28)); }
+[data-moment="nuit"] .ombre-mur { display: none; }
+.etoile:nth-of-type(2n) { animation-delay: -0.9s; }
+.etoile:nth-of-type(3n) { animation-delay: -1.7s; }
+
+/* ---------- La barre des meubles ----------
+   Posée en bas de l'écran et toujours visible, comme l'inventaire d'un jeu : on n'a pas
+   besoin de faire défiler la page pour la trouver. Les nombres deviennent des pastilles
+   roses sur les icônes, comme les épingles de la pièce. */
+.barre-meubles {
+  position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 40;
+  display: flex; gap: 4px; padding: 8px 10px 6px;
+  background: var(--carte); border: 3px solid var(--brun); border-radius: 30px;
+  box-shadow: 0 5px 0 var(--brun), 0 22px 34px -14px rgba(74, 51, 40, 0.5);
+}
+.barre-meubles button {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  width: 84px; padding: 6px 2px 4px; border: 0; border-radius: 20px; background: transparent;
+  font: 800 12.5px Nunito, sans-serif; color: var(--brun); cursor: pointer;
+}
+.barre-meubles button:hover { background: var(--rose-pale); }
+.barre-meubles button:focus-visible { outline: 3px dashed var(--focus); outline-offset: 1px; }
+.barre-meubles .tuile {
+  position: relative; width: 52px; height: 52px; border-radius: 18px;
+  background: var(--creme); box-shadow: inset 0 -4px 0 var(--carte-ombre);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.barre-meubles .tuile svg { width: 38px; height: 38px; }
+/* Au survol, l'icône saute un peu et penche, comme un objet qu'on attrape */
+.barre-meubles button:hover .tuile, .barre-meubles button:focus-visible .tuile { transform: translateY(-4px) rotate(-5deg); }
+.barre-meubles button:active .tuile { transform: translateY(1px) scale(0.95); }
+.barre-meubles .nom { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.barre-meubles .nombre {
+  position: absolute; top: -7px; right: -9px; min-width: 22px; padding: 1px 6px;
+  font-size: 12px; color: #FFFFFF; background: var(--rose); border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 0 rgba(74, 51, 40, 0.25);
+}
+.barre-meubles .nombre.zero { background: #EAD8C6; color: var(--brun-doux); }
+.tuile {
+  flex: 0 0 auto; width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--creme);
+}
+.tuile svg { width: 26px; height: 26px; }
+.nombre { min-width: 24px; text-align: center; font-size: 12px; color: var(--rose-texte); background: var(--rose-pale); border-radius: 99px; padding: 2px 8px; }
+
+/* ---------- Le panneau d'un meuble ---------- */
+.panneau {
+  margin: 0 0 0 auto;
+  width: min(440px, 100%);
+  max-width: 100vw;
+  height: 100%;
+  max-height: none;
+  border: 0;
+  padding: 26px 22px 20px;
+  background: var(--creme);
+  color: var(--brun);
+  box-shadow: -18px 0 50px -26px rgba(74, 51, 40, 0.5);
+  border-radius: 32px 0 0 32px;
+}
+.panneau[open] { display: flex; flex-direction: column; animation: glisse 0.28s ease; }
+.panneau::backdrop { background: rgba(74, 51, 40, 0.25); backdrop-filter: blur(2px); }
+@keyframes glisse { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.panneau-haut { display: flex; align-items: center; gap: 14px; }
+.tuile-grande {
+  width: 58px; height: 58px; border-radius: 18px;
+  background: var(--carte); border: 3px solid var(--brun); box-shadow: 0 4px 0 var(--brun);
+}
+.tuile-grande svg { width: 40px; height: 40px; }
+.panneau-haut h2 { margin: 0; font: 700 26px / 1.1 Fredoka, Nunito, sans-serif; }
+.panneau-compte { margin: 3px 0 0; font-size: 14px; color: var(--brun-doux); }
+.fermer {
+  margin-left: auto; flex: 0 0 auto;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 2px solid rgba(74, 51, 40, 0.14); background: var(--carte); color: var(--brun);
+  font-size: 24px; line-height: 1; cursor: pointer;
+  box-shadow: 0 3px 0 var(--carte-ombre);
+}
+.fermer:hover { color: var(--rose); border-color: var(--brun); }
+.fermer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
+
+.articles { list-style: none; margin: 22px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+
+/* Une fiche : le visuel, la marque, le nom exact, le prix, le lien, puis le bouton « Acheté » */
+.article {
+  background: var(--carte); border: 1px solid var(--filet); border-radius: 22px;
+  padding: 12px; box-shadow: 0 4px 0 var(--carte-ombre);
+  display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 4px 14px; align-items: center;
+}
+.visuel {
+  grid-row: span 2;
+  width: 84px; height: 84px; border-radius: 16px; overflow: hidden;
+  background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--filet);
+  display: grid; place-items: center;
+}
+.visuel img, .visuel svg { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Les packshots des produits : entiers et centrés, avec une marge, sur la couleur du fond de leur photo (19 octobre 2026) */
+.visuel { position: relative; }
+.visuel img { position: absolute; inset: 8px; width: calc(100% - 16px); height: calc(100% - 16px); object-fit: contain; }
+.article-texte { min-width: 0; color: inherit; text-decoration: none; }
+a.article-texte:hover .article-nom { color: var(--rose-texte); }
+a.article-texte:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; border-radius: 8px; }
+.article-marque { margin: 0; font: 800 11.5px Nunito, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brun-doux); }
+.article-nom { margin: 2px 0 0; font: 700 16.5px / 1.25 Fredoka, Nunito, sans-serif; color: var(--brun); }
+.article-ligne { margin: 4px 0 0; font-size: 13.5px; color: var(--brun-doux); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.article-prix { font-weight: 800; color: var(--brun); font-size: 15px; }
+.article-lien { color: var(--rose-texte); font-weight: 800; }
+.article-exemple { font-style: italic; color: var(--brun-doux); }
+/* Les remises, retenues par Pauline le 19 octobre 2026 : le prix du moment en rose, l'ancien barré,
+   une pastille « -10 % » (l'étiquette en biais sur la vignette, essayée le même jour, est retirée) */
+.prix-promo { color: var(--rose-texte); }
+.prix-barre { color: var(--brun-doux); text-decoration: line-through; text-decoration-thickness: 1.5px; font-weight: 700; }
+.remise { font: 800 12px Nunito, sans-serif; background: var(--rose-pale); color: var(--rose-texte); border-radius: 99px; padding: 2px 9px; }
+.precision { flex-basis: 100%; font-size: 12.5px; color: var(--brun-doux); }
+
+.bouton-achete {
+  justify-self: start;
+  font: 800 13px Nunito, sans-serif; color: var(--brun-doux); cursor: pointer;
+  background: transparent; border: 1.5px dashed var(--carte-ombre); border-radius: 99px;
+  padding: 6px 12px;
+}
+.bouton-achete:hover { border-color: #5FA884; color: var(--vert-texte); }
+.bouton-achete[aria-pressed="true"] { background: var(--vert-pale); border: 1.5px solid #A9D6BE; color: var(--vert-texte); }
+.bouton-achete:focus-visible { outline: 3px dashed var(--focus); outline-offset: 2px; }
+.article.achete .visuel { opacity: 0.55; }
+.article.achete .article-nom { color: var(--brun-doux); }
+
+.vide { margin-top: 22px; padding: 26px 20px; text-align: center; background: var(--carte); border: 2px dashed var(--carte-ombre); border-radius: 24px; }
+.vide-titre { margin: 0 0 6px; font: 700 19px Fredoka, Nunito, sans-serif; }
+.vide p:last-child { margin: 0; color: var(--brun-doux); line-height: 1.5; }
+
+.panneau-note { margin: auto 0 0; padding-top: 18px; font-size: 13px; color: var(--brun-doux); text-align: center; }
+
+/* ---------- Le pied de page ---------- */
+/* La marge du bas laisse la place à la barre des meubles, qui ne cache donc jamais rien */
+.pied { margin: 34px auto 130px; font-size: 13px; color: var(--brun-doux); text-align: center; }
+
+/* ---------- Écrans moyens et téléphone ---------- */
+@media (max-width: 640px) {
+  .entete { padding-top: 22px; }
+  /* La barre prend toute la largeur, chaque meuble une part égale */
+  .barre-meubles { left: 8px; right: 8px; bottom: 8px; transform: none; padding: 6px 4px 4px; border-radius: 24px; gap: 0; }
+  .barre-meubles button { flex: 1 1 0; width: auto; min-width: 0; font-size: 10.5px; padding: 6px 1px 3px; }
+  .barre-meubles .tuile { width: 44px; height: 44px; border-radius: 15px; }
+  .barre-meubles .tuile svg { width: 32px; height: 32px; }
+  .barre-meubles .nombre { right: -7px; font-size: 11px; min-width: 20px; padding: 0 5px; }
+  .pied { margin-bottom: 110px; }
+  /* Le panneau monte du bas de l'écran */
+  .panneau {
+    margin: auto 0 0; width: 100%; height: fit-content; max-height: 85vh;
+    border-radius: 28px 28px 0 0; padding: 22px 16px 16px;
+  }
+  .panneau[open] { animation-name: monte; }
+  @keyframes monte { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .article { grid-template-columns: 72px minmax(0, 1fr); }
+  .visuel { width: 72px; height: 72px; }
+}
+
+/* =====================================================================
+   LES STYLES DE DÉCORATION
+   Inspirés de pièces d'Animal Crossing. Chaque style donne une couleur à
+   chaque surface, choisit le motif des deux murs et du sol, et allume ses
+   propres objets (lampe, lanterne, cactus, applique). Les volumes reçoivent
+   leur teinte par --c et en déduisent trois faces : le dessus plus clair,
+   la face éclairée telle quelle, la face à l'ombre plus sombre.
+   ===================================================================== */
+/* Zen : cloisons shoji, tatamis, bois sombre, coussins en patchwork indigo */
+:root, [data-ambiance="zen"] {
+  /* La palette « rose poudré et noyer doux » (19 octobre 2026) : le fond, l'épaisseur des murs, le socle */
+  --fond-1: #F3EADF; --fond-2: #E3D2BE;
+  --mur-g: #F5EEDF;
+  --mur-d: #EFE2CB;
+  --tranche: #FAF3E8; --socle: #73472D;
+  --sol: #7A5636;
+  --ciel-1: #CFE3E0; --ciel-2: #F3E6CF;
+}
+
+/* Le fond de page suit le style, avec un léger vignettage */
+body {
+  background:
+    radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(90, 50, 30, 0.10) 100%),
+    linear-gradient(175deg, var(--fond-1) 0%, var(--fond-2) 100%) fixed;
+  transition: background 0.4s ease;
+}
+
+/* Un grain photo très léger sur toute la page, comme dans l'inspiration */
+body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50;
+  opacity: 0.07; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23g)'/></svg>");
+}
+
+/* =====================================================================
+   LE RENDU DE LA PIÈCE
+   ===================================================================== */
+/* Un trait de la couleur de la face, aux angles arrondis : les volumes perdent leurs coins
+   vifs et prennent l'air moelleux des meubles du jeu */
+.v.clair { fill: var(--c); stroke: var(--c); }
+.v.haut { fill: color-mix(in srgb, var(--c) 72%, #FFFFFF); stroke: color-mix(in srgb, var(--c) 72%, #FFFFFF); }
+.v.ombre { fill: color-mix(in srgb, var(--c) 78%, #4A2A17); stroke: color-mix(in srgb, var(--c) 78%, #4A2A17); }
+.v { stroke-width: 1.6; stroke-linejoin: round; }
+
+.voile-lumiere { fill: url(#g-lumiere); pointer-events: none; }
+.voile-ombre { fill: url(#g-ombre); pointer-events: none; }
+
+/* Le sol et ses motifs */
+.sol { fill: var(--sol); }
+
+/* Les murs et leurs motifs : p1 la structure, p2 le fond, p3 les détails */
+.mur-g { fill: var(--mur-g); }
+.mur-d { fill: var(--mur-d); }
+.tranche-haut { fill: var(--tranche); }
+.tranche-g { fill: color-mix(in srgb, var(--tranche) 90%, #4A2A17); }
+.tranche-d { fill: color-mix(in srgb, var(--tranche) 82%, #4A2A17); }
+
+.ciel-haut { stop-color: var(--ciel-1); }
+.ciel-bas { stop-color: var(--ciel-2); }
+
+/* =====================================================================
+   LES ONGLETS ET LA BULLE
+   Une colonne d'onglets à gauche, comme dans un jeu, et une bulle cousue qui
+   change de contenu : l'accueil, les styles de décoration, puis la boutique.
+   ===================================================================== */
+.scene { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 0 10px; align-items: start; }
+.cadre-piece { width: 100%; max-width: 720px; margin: 0; grid-column: 2; grid-row: 1 / span 2; }
+.menu { grid-column: 1; grid-row: 1; display: flex; align-items: flex-start; gap: 16px; margin-top: 70px; position: relative; z-index: 2; }
+
+/* Les onglets : des tuiles épaisses. Celle qui est choisie s'allume et avance vers la bulle */
+.onglets { display: flex; flex-direction: column; gap: 12px; }
+.onglet {
+  --ic-accent: #E7BFCC; --ic-fond: #F7EFE5; --ic-bois: #E3CBB5; --ic-trait: #9A7E6A;
+  width: 58px; height: 58px; border-radius: 18px; cursor: pointer; padding: 0;
+  display: grid; place-items: center;
+  background: rgba(255, 253, 248, 0.6);
+  border: 3px solid rgba(74, 51, 40, 0.2);
+  box-shadow: 0 4px 0 rgba(74, 51, 40, 0.12);
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.15s ease;
+}
+.onglet svg { width: 34px; height: 34px; }
+.onglet:hover { background: var(--carte); transform: translateY(-2px); }
+.onglet[aria-selected="true"] {
+  --ic-accent: #EE9DB4; --ic-fond: #FFF8EF; --ic-bois: #E2B58C; --ic-trait: var(--brun);
+  background: var(--carte); border-color: var(--brun); box-shadow: 0 5px 0 var(--brun);
+  transform: translateX(4px);
+}
+.onglet:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--brun); }
+.onglet:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
+
+/* La bulle : un contour un peu irrégulier, une couture à l'intérieur, une queue vers l'onglet */
+.bulle {
+  position: relative; flex: 1;
+  padding: 46px 22px 22px;
+  background: var(--carte); border: 3px solid var(--brun);
+  border-radius: 34px 30px 36px 28px / 30px 34px 28px 36px;
+  box-shadow: 0 7px 0 rgba(74, 51, 40, 0.2);
+}
+.bulle::after {
+  content: ""; position: absolute; inset: 7px; pointer-events: none;
+  border: 2px dashed var(--carte-ombre);
+  border-radius: 27px 23px 29px 21px / 23px 27px 21px 29px;
+}
+.bulle::before {
+  content: ""; position: absolute; left: -14px; top: var(--queue, 20px);
+  width: 22px; height: 22px; background: var(--carte);
+  border-left: 3px solid var(--brun); border-bottom: 3px solid var(--brun);
+  transform: rotate(45deg); border-radius: 0 0 0 6px;
+  transition: top 0.25s ease;
+}
+
+/* Le ruban : un marque-page rose épinglé en haut de la bulle, avec l'icône de l'onglet */
+.ruban {
+  --ic-accent: #F4C6D4; --ic-fond: #FFFFFF; --ic-bois: #F3D9C2; --ic-trait: #7E2A48;
+  --ic-yeux: #3B2418; --ic-oeil: 1.35px; --ic-eclat: 1;  /* des yeux plus grands et brillants dans le signet */
+  position: absolute; top: -16px; left: 50%; transform: translateX(-50%); z-index: 1;
+  width: 54px; height: 56px; display: grid; justify-items: center; padding-top: 7px;
+  filter: drop-shadow(0 3px 0 var(--rose-ombre));
+}
+.ruban::before {
+  content: ""; position: absolute; inset: 0; background: var(--rose);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+}
+.ruban svg { position: relative; width: 30px; height: 30px; }
+
+
+.bulle h2 { margin: 0 0 8px; text-align: center; font: 700 20px / 1.2 Fredoka, Nunito, sans-serif; color: var(--brun); }
+.bulle p { margin: 0; text-align: center; font: 700 15px / 1.5 Nunito, sans-serif; color: var(--brun-doux); }
+.volet[hidden] { display: none; }
+
+/* La boutique, annoncée */
+.boutique-liste { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.boutique-liste li {
+  background: var(--creme); border: 2px dashed var(--carte-ombre); border-radius: 16px; padding: 10px 8px 9px;
+  text-align: center; font: 700 13px / 1.3 Nunito, sans-serif; color: var(--brun);
+}
+.boutique-liste svg { display: block; width: 36px; height: 36px; margin: 0 auto 4px; }
+.bientot-tag { display: inline-block; margin-top: 12px; font: 800 11px Nunito, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--rose-texte); background: var(--rose-pale); border-radius: 99px; padding: 4px 10px; }
+.centre { text-align: center; }
+
+/* Sur un écran moyen : les onglets passent en ligne, au-dessus de la bulle et de la pièce */
+@media (max-width: 1080px) {
+  .scene { grid-template-columns: minmax(0, 1fr); }
+  .menu { grid-column: 1; grid-row: 1; flex-direction: column; align-items: center; gap: 30px; margin: 20px auto 0; width: min(420px, 100%); }
+  .onglets { flex-direction: row; }
+  .onglet[aria-selected="true"] { transform: translateY(4px); }
+  .bulle { width: 100%; }
+  /* Les onglets sont juste au-dessus : la queue de la bulle n'est plus utile */
+  .bulle::before { display: none; }
+  .cadre-piece { grid-column: 1; grid-row: 2; margin: 0 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
