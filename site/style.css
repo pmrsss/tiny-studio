@@ -490,12 +490,13 @@ body::after {
   .bulle { width: 100%; }
   /* Les onglets sont juste au-dessus : la queue de la bulle n'est plus utile */
   .bulle::before { display: none; }
-  .cadre-piece { grid-column: 1; grid-row: 2; margin: 0 auto; }
+  /* De l'air entre la bulle d'accueil et la pièce (retour de Pauline, 19 octobre 2026) */
+  .cadre-piece { grid-column: 1; grid-row: 2; margin: 36px auto 0; }
 }
 
 /* Sur téléphone, la pièce prend presque toute la largeur de l'écran (retour de Pauline, 19 octobre 2026) */
 @media (max-width: 600px) {
-  .cadre-piece { width: calc(100% + 24px); margin: 0 -12px; }
+  .cadre-piece { width: calc(100% + 24px); margin: 32px -12px 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
