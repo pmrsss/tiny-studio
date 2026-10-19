@@ -137,7 +137,7 @@ def piece():
 
 def dessine_svg():
     """La pièce entière, avec ses définitions."""
-    return f'''<svg class="studio" viewBox="0 0 780 690" role="group" aria-label="Le studio en vue isométrique, avec ses cinq meubles">
+    return f'''<svg class="studio" viewBox="60 26 660 676" role="group" aria-label="Le studio en vue isométrique, avec ses cinq meubles">
         <defs>
           <linearGradient id="g-lumiere" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.22" /><stop offset="1" stop-color="#FFFFFF" stop-opacity="0" /></linearGradient>
           <linearGradient id="g-ombre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3B2414" stop-opacity="0" /><stop offset="1" stop-color="#3B2414" stop-opacity="0.18" /></linearGradient>

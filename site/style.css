@@ -406,7 +406,8 @@ body::after {
    change de contenu : l'accueil, les styles de décoration, puis la boutique.
    ===================================================================== */
 .scene { display: grid; grid-template-columns: 330px minmax(0, 1fr); gap: 0 10px; align-items: start; }
-.cadre-piece { width: 100%; max-width: 720px; margin: 0; grid-column: 2; grid-row: 1 / span 2; }
+/* Le cadrage est serré sur la pièce depuis le 19 octobre 2026 : 610 px gardent sa taille d'avant sur ordinateur */
+.cadre-piece { width: 100%; max-width: 610px; margin: 0; grid-column: 2; grid-row: 1 / span 2; }
 .menu { grid-column: 1; grid-row: 1; display: flex; align-items: flex-start; gap: 16px; margin-top: 70px; position: relative; z-index: 2; }
 
 /* Les onglets : des tuiles épaisses. Celle qui est choisie s'allume et avance vers la bulle */
@@ -490,6 +491,11 @@ body::after {
   /* Les onglets sont juste au-dessus : la queue de la bulle n'est plus utile */
   .bulle::before { display: none; }
   .cadre-piece { grid-column: 1; grid-row: 2; margin: 0 auto; }
+}
+
+/* Sur téléphone, la pièce prend presque toute la largeur de l'écran (retour de Pauline, 19 octobre 2026) */
+@media (max-width: 600px) {
+  .cadre-piece { width: calc(100% + 24px); margin: 0 -12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
