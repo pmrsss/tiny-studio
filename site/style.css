@@ -147,9 +147,8 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
   transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .barre-meubles .tuile svg { width: 38px; height: 38px; }
-/* Au survol, la case se soulève, sans pencher (choix de Pauline, 19 octobre 2026), et le meuble
-   correspondant se soulève dans la pièce */
-.barre-meubles button:hover .tuile, .barre-meubles button:focus-visible .tuile { transform: translateY(-4px); box-shadow: inset 0 -4px 0 var(--carte-ombre), 0 6px 8px rgba(74, 51, 40, 0.14); }
+/* Au survol, la case ne bouge pas : le fond rose pâle suffit (choix de Pauline, 19 octobre 2026),
+   et c'est le meuble correspondant qui se soulève dans la pièce */
 .barre-meubles button:active .tuile { transform: translateY(1px) scale(0.95); }
 .barre-meubles .nom { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .barre-meubles .nombre {
