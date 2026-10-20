@@ -286,6 +286,24 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .bouton-icone.bouton-poubelle:hover { background: var(--rose-pale); border-color: var(--rose-texte); }
 .bouton-icone:focus-visible { outline: 3px dashed var(--focus); outline-offset: 2px; }
 .bouton-deplacer[aria-expanded="true"] { background: var(--carte); border-color: var(--brun-doux); }
+.article-actions[hidden] { display: none; }
+/* La confirmation avant de retirer un article (choix de Pauline, 20 octobre 2026) */
+.confirmation-retrait {
+  grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 6px;
+  background: var(--rose-pale); border-radius: 16px; padding: 8px 8px 8px 14px;
+}
+.confirmation-retrait[hidden] { display: none; }
+.confirmation-texte { font: 800 14px Nunito, sans-serif; color: var(--rose-texte); }
+.confirmation-boutons { margin-left: auto; display: flex; gap: 6px; }
+.bouton-confirmer {
+  font: 700 14px Fredoka, Nunito, sans-serif; color: #FFFFFF; background: var(--rose); border: 0;
+  border-radius: 99px; padding: 8px 16px; box-shadow: 0 3px 0 var(--rose-ombre); cursor: pointer;
+}
+.bouton-garder {
+  font: 800 13px Nunito, sans-serif; color: var(--brun-doux); background: var(--carte);
+  border: 1.5px solid var(--carte-ombre); border-radius: 99px; padding: 7px 14px; cursor: pointer;
+}
+.bouton-confirmer:focus-visible, .bouton-garder:focus-visible { outline: 3px dashed var(--focus); outline-offset: 2px; }
 /* Déplacer un article (issue n° 3, 19 octobre 2026) : les autres meubles, en petites pastilles */
 .choix-meuble { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
 .choix-meuble[hidden] { display: none; }

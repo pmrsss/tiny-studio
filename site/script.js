@@ -369,7 +369,7 @@ function fiche(article) {
   const deplacement = boutonIcone("bouton-deplacer", "deplacer", "Déplacer");
   deplacement.setAttribute("aria-expanded", "false");
   const retrait = boutonIcone("bouton-poubelle", "poubelle", "Retirer");
-  retrait.addEventListener("click", function () { retirer(article); });
+  retrait.addEventListener("click", function () { montrerConfirmation(true); });
   const icones = document.createElement("span");
   icones.className = "article-icones";
   icones.append(modification, deplacement, retrait);
@@ -407,6 +407,30 @@ function fiche(article) {
   }
   deplacement.addEventListener("click", function () { montrerChoix(choix.hidden); });
   renoncer.addEventListener("click", function () { montrerChoix(false); });
+
+  // La confirmation avant de retirer (piste A, choisie par Pauline le 20 octobre 2026) : la ligne
+  // d'actions laisse place à la question, « Retirer » ou « Garder » ; le focus va à « Garder »
+  const confirmation = document.createElement("div");
+  confirmation.className = "confirmation-retrait";
+  confirmation.setAttribute("role", "group");
+  confirmation.setAttribute("aria-label", "Retirer « " + article.nom + " » ?");
+  confirmation.hidden = true;
+  confirmation.innerHTML = '<span class="confirmation-texte">Retirer cet article ?</span>'
+    + '<span class="confirmation-boutons"><button class="bouton-confirmer" type="button">Retirer</button>'
+    + '<button class="bouton-garder" type="button">Garder</button></span>';
+  confirmation.querySelector(".bouton-confirmer").addEventListener("click", function () { retirer(article); });
+  confirmation.querySelector(".bouton-garder").addEventListener("click", function () { montrerConfirmation(false); });
+  ligne.appendChild(confirmation);
+
+  function montrerConfirmation(ouvert) {
+    confirmation.hidden = !ouvert;
+    actions.hidden = ouvert;
+    if (ouvert) {
+      choix.hidden = true;
+      deplacement.setAttribute("aria-expanded", "false");
+    }
+    (ouvert ? confirmation.querySelector(".bouton-garder") : retrait).focus();
+  }
   return ligne;
 }
 
