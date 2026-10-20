@@ -164,6 +164,32 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .tuile svg { width: 26px; height: 26px; }
 .nombre { min-width: 24px; text-align: center; font-size: 12px; color: var(--rose-texte); background: var(--rose-pale); border-radius: 99px; padding: 2px 8px; }
 
+/* ---------- La fenêtre d'un article (issue n° 5, 20 octobre 2026) ----------
+   Ranger ou modifier un article : une carte au centre sur ordinateur, une feuille qui monte du bas
+   sur téléphone. Elle passe au-dessus du panneau quand on l'ouvre depuis un meuble */
+.fenetre {
+  width: min(460px, calc(100% - 32px)); max-height: calc(100vh - 48px); overflow-y: auto;
+  border: 3px solid var(--brun); border-radius: 30px; padding: 22px 22px 20px;
+  background: var(--carte); color: var(--brun); box-shadow: 0 7px 0 rgba(74, 51, 40, 0.2);
+}
+.fenetre[open] { animation: apparait 0.22s ease; }
+.fenetre::backdrop { background: rgba(74, 51, 40, 0.3); backdrop-filter: blur(2px); }
+@keyframes apparait { from { transform: translateY(14px); opacity: 0; } to { transform: none; opacity: 1; } }
+.fenetre .formulaire-ajout { border: 0; box-shadow: none; padding: 0; background: transparent; }
+.fenetre .ajout-titre { margin: 0 0 14px; font: 700 22px Fredoka, Nunito, sans-serif; }
+
+/* Le bouton « + » (issue n° 5, piste A choisie par Pauline le 20 octobre 2026) : toujours visible dans le
+   coin de l'écran, il ouvre la fenêtre d'un nouvel article */
+.bouton-plus {
+  position: fixed; right: 28px; bottom: 28px; z-index: 39; width: 58px; height: 58px; border-radius: 50%;
+  padding: 0; cursor: pointer; background: var(--rose); border: 3px solid var(--brun); box-shadow: 0 4px 0 var(--brun);
+  display: grid; place-items: center; transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.bouton-plus svg { width: 34px; height: 34px; }
+.bouton-plus:hover { transform: translateY(-2px); }
+.bouton-plus:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--brun); }
+.bouton-plus:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
+
 /* ---------- Le panneau d'un meuble ---------- */
 .panneau {
   margin: 0 0 0 auto;
@@ -217,7 +243,7 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .bouton-ajouter span { font-size: 22px; line-height: 1; }
 .bouton-ajouter:hover { transform: translateY(-1px); }
 .bouton-ajouter:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--rose-ombre); }
-.bouton-ajouter:focus-visible, .bouton-ranger:focus-visible, .bouton-annuler:focus-visible, .bouton-retirer:focus-visible, .bouton-deplacer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
+.bouton-ajouter:focus-visible, .bouton-ranger:focus-visible, .bouton-annuler:focus-visible, .bouton-retirer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
 .formulaire-ajout { background: var(--carte); border: 2px solid var(--brun); border-radius: 22px; padding: 16px; box-shadow: 0 4px 0 var(--carte-ombre); }
 .ajout-titre { margin: 0 0 10px; font: 700 18px Fredoka, Nunito, sans-serif; }
 .champ { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; min-width: 0; }
@@ -230,7 +256,7 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .champ select { appearance: none; cursor: pointer; padding-right: 34px;
   background: var(--creme) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1.5 1.5 6 6l4.5-4.5' fill='none' stroke='%234A3328' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center; }
 .champ input:focus, .champ select:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-pale); }
-.champ input[aria-invalid="true"] { border-color: var(--rose-texte); }
+.champ input[aria-invalid="true"], .champ select[aria-invalid="true"] { border-color: var(--rose-texte); }
 .champs-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
 .aide { margin: 0; font-size: 12px; color: var(--brun-doux); line-height: 1.4; }
 .erreur { margin: 0; font: 700 12.5px Nunito, sans-serif; color: var(--rose-texte); }
@@ -245,10 +271,23 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 }
 .bouton-retirer { padding: 6px 12px; }
 .bouton-annuler:hover, .bouton-retirer:hover { color: var(--rose-texte); border-color: var(--rose-texte); }
-.article-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.bouton-deplacer[aria-expanded="true"] { color: var(--brun); border-color: var(--brun-doux); }
+/* Les actions d'une fiche (issue n° 5, 20 octobre 2026) : « Marquer comme acheté » en texte, puis trois
+   boutons-icônes ronds de 44 pixels, Modifier, Déplacer et Retirer, sur toute la largeur de la fiche */
+.article-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
+.article-actions .bouton-achete { white-space: nowrap; }
+.article-icones { margin-left: auto; display: flex; gap: 6px; }
+.bouton-icone {
+  width: 44px; height: 44px; border-radius: 50%; padding: 0; cursor: pointer;
+  background: var(--creme); border: 1.5px solid var(--carte-ombre);
+  display: grid; place-items: center; transition: transform 0.12s ease, border-color 0.12s ease;
+}
+.bouton-icone svg { width: 27px; height: 27px; }
+.bouton-icone:hover { border-color: var(--rose); }
+.bouton-icone.bouton-poubelle:hover { background: var(--rose-pale); border-color: var(--rose-texte); }
+.bouton-icone:focus-visible { outline: 3px dashed var(--focus); outline-offset: 2px; }
+.bouton-deplacer[aria-expanded="true"] { background: var(--carte); border-color: var(--brun-doux); }
 /* Déplacer un article (issue n° 3, 19 octobre 2026) : les autres meubles, en petites pastilles */
-.choix-meuble { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.choix-meuble { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
 .choix-meuble[hidden] { display: none; }
 .choix-titre { font: 800 12.5px Nunito, sans-serif; color: var(--brun-doux); }
 .bouton-meuble {
@@ -577,6 +616,22 @@ body::after {
   .menu { grid-row: 1 / span 2; align-self: start; margin-top: 90px; }
   .cadre-piece { max-width: none; width: min(100%, calc((100vh - 110px) * 660 / 676)); justify-self: center; }
   .pied { display: none; }
+}
+
+@media (max-width: 1080px) {
+  .bouton-plus { bottom: 122px; right: 20px; }
+}
+@media (max-width: 600px) {
+  .bouton-plus { right: 16px; bottom: calc(130px + env(safe-area-inset-bottom)); }
+  /* « Marquer comme acheté » et les trois icônes tiennent sur une ligne, même à 375 pixels */
+  .article-actions { gap: 6px; }
+  .article-icones { gap: 4px; }
+  .bouton-icone { width: 42px; height: 42px; }
+  .bouton-icone svg { width: 26px; height: 26px; }
+  .fenetre {
+    margin: auto 0 0; width: 100%; max-width: 100vw; max-height: 92vh;
+    border-width: 3px 0 0; border-radius: 28px 28px 0 0; padding: 20px 16px calc(16px + env(safe-area-inset-bottom));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

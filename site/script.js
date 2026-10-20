@@ -330,22 +330,30 @@ function fiche(article) {
     ligne.replaceWith(nouvelle);
     nouvelle.querySelector(".bouton-achete").focus();
   });
-  // Tout article peut être déplacé vers un autre meuble, ou retiré (issue n° 3, 19 octobre 2026)
+  // Les actions de la fiche (issue n° 5, 20 octobre 2026) : « Marquer comme acheté » en texte, puis
+  // trois boutons-icônes ronds, Modifier, Déplacer et Retirer, chacun nommé pour les lecteurs d'écran
   const actions = document.createElement("div");
   actions.className = "article-actions";
-  const deplacement = document.createElement("button");
-  deplacement.type = "button";
-  deplacement.className = "bouton-retirer bouton-deplacer";
-  deplacement.textContent = "Déplacer";
-  deplacement.setAttribute("aria-label", "Déplacer « " + article.nom + " »");
+  function boutonIcone(classe, icone, action) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "bouton-icone " + classe;
+    b.innerHTML = '<svg aria-hidden="true"><use href="#ic-' + icone + '" /></svg>';
+    b.setAttribute("aria-label", action + " « " + article.nom + " »");
+    b.title = action;
+    return b;
+  }
+  const modification = boutonIcone("bouton-modifier", "crayon", "Modifier");
+  modification.setAttribute("aria-haspopup", "dialog");
+  modification.addEventListener("click", function () { ouvrirFenetre(article, null); });
+  const deplacement = boutonIcone("bouton-deplacer", "deplacer", "Déplacer");
   deplacement.setAttribute("aria-expanded", "false");
-  const retrait = document.createElement("button");
-  retrait.type = "button";
-  retrait.className = "bouton-retirer";
-  retrait.textContent = "Retirer";
-  retrait.setAttribute("aria-label", "Retirer « " + article.nom + " »");
+  const retrait = boutonIcone("bouton-poubelle", "poubelle", "Retirer");
   retrait.addEventListener("click", function () { retirer(article); });
-  actions.append(bouton, deplacement, retrait);
+  const icones = document.createElement("span");
+  icones.className = "article-icones";
+  icones.append(modification, deplacement, retrait);
+  actions.append(bouton, icones);
   ligne.appendChild(actions);
 
   // Le choix du meuble d'arrivée : les autres meubles, et « Annuler »
@@ -400,7 +408,6 @@ function remplirPanneau(cle) {
 
 function ouvrir(cle) {
   meubleOuvert = cle;
-  ouvrirFormulaire(false);
   remplirPanneau(cle);
   panneau.showModal();
   // Le focus va au titre du meuble, pas à la croix : sur téléphone, la croix s'affichait entourée
@@ -507,12 +514,15 @@ function appliquerMoment() {
 appliquerMoment();
 setInterval(appliquerMoment, 60000);
 
-// Ranger un article à la main (issue n° 2, 19 octobre 2026) : un formulaire dans le panneau ; l'article
-// apparaît en tête du meuble choisi, le compteur se met à jour, et un article ajouté peut être retiré.
-// « Ranger dans » est réglé sur le meuble ouvert et se change avant de valider.
-// Elle ne survit pas encore à un rechargement : l'enregistrement d'une visite à l'autre est la suite.
+// La fenêtre d'un article (issue n° 5, 20 octobre 2026) : le formulaire sort du panneau pour servir à
+// trois portes d'entrée. « Ajouter un article » dans un meuble l'ouvre avec ce meuble déjà choisi ;
+// « Modifier » sur une fiche l'ouvre rempli ; le bouton « + » l'ouvre vide, et l'on choisit le meuble.
+// (Le formulaire d'ajout date de l'issue n° 2, le choix « Ranger dans » du 19 octobre 2026.)
 const boutonAjouter = document.getElementById("ajouter");
+const boutonPlus = document.getElementById("bouton-plus");
+const fenetre = document.getElementById("fenetre");
 const formulaire = document.getElementById("formulaire-ajout");
+const boutonValider = document.getElementById("valider");
 const annonce = document.getElementById("annonce");
 const CHAMPS = {
   lien: document.getElementById("champ-lien"),
@@ -522,7 +532,9 @@ const CHAMPS = {
   photo: document.getElementById("champ-photo"),
   meuble: document.getElementById("champ-meuble")
 };
+CHAMPS.meuble.add(new Option("Choisis un meuble", ""));
 Object.keys(meubles).forEach(function (cle) { CHAMPS.meuble.add(new Option(meubles[cle].nom, cle)); });
+let articleModifie = null;  // l'article en cours de modification, ou null pour un nouvel article
 
 function adresseWeb(texte) {
   try {
@@ -541,18 +553,6 @@ function montrerErreur(cle, message) {
   erreur.hidden = !message;
 }
 
-function ouvrirFormulaire(ouvert) {
-  formulaire.hidden = !ouvert;
-  boutonAjouter.hidden = ouvert;
-  boutonAjouter.setAttribute("aria-expanded", ouvert ? "true" : "false");
-  if (ouvert) {
-    formulaire.reset();
-    CHAMPS.meuble.value = meubleOuvert;
-    ["lien", "nom", "photo"].forEach(function (cle) { montrerErreur(cle, ""); });
-    CHAMPS.lien.focus();
-  }
-}
-
 // Un prix tapé en chiffres seuls prend le symbole de l'euro : « 29,9 » devient « 29,90 € », « 29 » devient « 29 € »
 function prixAffiche(texte) {
   const propre = texte.trim();
@@ -561,10 +561,37 @@ function prixAffiche(texte) {
   return centimes ? euros + "," + centimes.padEnd(2, "0") + " €" : euros + " €";
 }
 
-boutonAjouter.addEventListener("click", function () { ouvrirFormulaire(true); });
-document.getElementById("annuler").addEventListener("click", function () {
-  ouvrirFormulaire(false);
-  boutonAjouter.focus();
+// Ouvre la fenêtre : vide pour un nouvel article (le meuble éventuellement déjà choisi), ou remplie
+// avec les informations de l'article à modifier
+function ouvrirFenetre(article, cleMeuble) {
+  articleModifie = article || null;
+  formulaire.reset();
+  ["lien", "nom", "photo", "meuble"].forEach(function (cle) { montrerErreur(cle, ""); });
+  document.getElementById("ajout-titre").textContent = article ? "Modifier l'article" : "Nouvel article";
+  boutonValider.textContent = article ? "Enregistrer" : "Ranger l'article";
+  if (article) {
+    CHAMPS.lien.value = article.lien || "";
+    CHAMPS.nom.value = article.nom || "";
+    CHAMPS.marque.value = article.marque || "";
+    CHAMPS.prix.value = article.prix || "";
+    CHAMPS.photo.value = article.image || "";
+    CHAMPS.meuble.value = meubleDe(article);
+  } else {
+    CHAMPS.meuble.value = cleMeuble || "";
+  }
+  fenetre.showModal();
+  CHAMPS.lien.focus();
+}
+
+boutonAjouter.addEventListener("click", function () { ouvrirFenetre(null, meubleOuvert); });
+boutonPlus.addEventListener("click", function () { ouvrirFenetre(null, ""); });
+document.getElementById("annuler").addEventListener("click", function () { fenetre.close(); });
+// Un clic sur le fond, à côté de la fenêtre, la ferme aussi
+fenetre.addEventListener("click", function (evenement) {
+  if (evenement.target !== fenetre) return;
+  const cadre = fenetre.getBoundingClientRect();
+  if (evenement.clientX < cadre.left || evenement.clientX > cadre.right ||
+      evenement.clientY < cadre.top || evenement.clientY > cadre.bottom) fenetre.close();
 });
 
 formulaire.addEventListener("submit", function (evenement) {
@@ -572,30 +599,62 @@ formulaire.addEventListener("submit", function (evenement) {
   const lien = CHAMPS.lien.value.trim();
   const nom = CHAMPS.nom.value.trim();
   const photo = CHAMPS.photo.value.trim();
+  const cle = CHAMPS.meuble.value;
+  // Une photo des articles de départ a une adresse locale, dans le dossier des photos : elle reste valable telle quelle
+  const photoInchangee = articleModifie && photo === articleModifie.image;
   const erreurs = {
     lien: !lien ? "Colle le lien de la page du produit." : (!adresseWeb(lien) ? "Ce lien ne fonctionne pas : il doit commencer par https://" : ""),
     nom: !nom ? "Donne un nom à ton article." : "",
-    photo: photo && !adresseWeb(photo) ? "Cette adresse ne fonctionne pas : elle doit commencer par https://" : ""
+    meuble: !cle ? "Choisis le meuble où le ranger." : "",
+    photo: photo && !photoInchangee && !adresseWeb(photo) ? "Cette adresse ne fonctionne pas : elle doit commencer par https://" : ""
   };
-  Object.keys(erreurs).forEach(function (cle) { montrerErreur(cle, erreurs[cle]); });
-  const premiere = ["lien", "nom", "photo"].find(function (cle) { return erreurs[cle]; });
+  Object.keys(erreurs).forEach(function (champ) { montrerErreur(champ, erreurs[champ]); });
+  const premiere = ["lien", "nom", "meuble", "photo"].find(function (champ) { return erreurs[champ]; });
   if (premiere) {
     CHAMPS[premiere].focus();
     return;
   }
-  // Le panneau passe au meuble choisi, pour que l'article se voie là où il est rangé
-  meubleOuvert = CHAMPS.meuble.value;
-  const meuble = meubles[meubleOuvert];
-  const article = {
-    id: "ajout-" + Date.now(), ajoute: true, meuble: meubleOuvert,
-    marque: CHAMPS.marque.value.trim(), nom: nom, prix: prixAffiche(CHAMPS.prix.value), lien: lien, image: photo || ""
-  };
-  meuble.articles.unshift(article);
+  const infos = { lien: lien, nom: nom, marque: CHAMPS.marque.value.trim(), prix: prixAffiche(CHAMPS.prix.value), image: photo };
+
+  if (articleModifie) {
+    // Modifier : la fiche est mise à jour à sa place ; si le meuble change, l'article s'y déplace
+    const article = articleModifie;
+    const depart = meubleDe(article);
+    if (article.image !== photo) {
+      // Une nouvelle photo est relue selon les règles de mise en forme
+      delete article.fond; delete article.cadre; delete article.plein; delete article.analyse;
+    }
+    Object.assign(article, infos);
+    if (cle !== depart) {
+      meubles[depart].articles.splice(meubles[depart].articles.indexOf(article), 1);
+      article.meuble = cle;
+      meubles[cle].articles.unshift(article);
+    }
+    enregistrerArticles();
+    fenetre.close();
+    remplirPanneau(meubleOuvert);
+    afficherCompteurs();
+    if (cle !== depart) {
+      annonce.textContent = "« " + nom + " » est modifié et déplacé dans " + meubles[cle].nom.toLowerCase() + ".";
+      (liste.querySelector(".article-texte") || boutonAjouter).focus();
+    } else {
+      annonce.textContent = "« " + nom + " » est modifié.";
+      const rang = meubles[cle].articles.indexOf(article);
+      liste.querySelectorAll(".bouton-modifier")[rang].focus();
+    }
+    return;
+  }
+
+  // Ranger un nouvel article : il se range en tête du meuble choisi, et le panneau de ce meuble s'ouvre
+  const article = Object.assign({ id: "ajout-" + Date.now(), ajoute: true, meuble: cle }, infos);
+  meubles[cle].articles.unshift(article);
   enregistrerArticles();
-  ouvrirFormulaire(false);
-  remplirPanneau(meubleOuvert);
+  fenetre.close();
+  meubleOuvert = cle;
+  remplirPanneau(cle);
   afficherCompteurs();
-  annonce.textContent = "« " + nom + " » est rangé dans " + meuble.nom.toLowerCase() + ".";
+  if (!panneau.open) panneau.showModal();
+  annonce.textContent = "« " + nom + " » est rangé dans " + meubles[cle].nom.toLowerCase() + ".";
   liste.querySelector(".article-texte").focus();
 });
 
