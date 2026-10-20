@@ -609,9 +609,12 @@ body::after {
      exactement la hauteur de l'écran, et la pièce rétrécit pour tenir entre la bulle et le tiroir, au lieu
      de passer dessous (retour de Pauline sur iPhone, 20 octobre 2026) */
   body { height: 100dvh; min-height: 0; overflow: hidden; }
-  /* Sous la page, derrière la barre de Safari : du miel en bas, comme le tiroir, et le beige de la page en
-     haut (la bande du bas était grise, puis blanche ; retours de Pauline, 20 octobre 2026) */
-  html { background: linear-gradient(to bottom, #F3EADF 50%, #F6E4C9 50%); }
+  /* Derrière les barres de Safari (iOS 26) : Safari les colore avec la couleur de fond pleine de la page,
+     ou celle d'un élément fixé au bord de l'écran ; un dégradé ne compte pas, d'où le blanc. La page prend
+     donc le miel du tiroir comme couleur de fond (sous ses dégradés beiges), et une fine bande beige fixée
+     en haut garde le haut de l'écran beige (retours de Pauline, 20 octobre 2026) */
+  html, body { background-color: #F6E4C9; }
+  body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 2px; background: #F3EADF; z-index: 1; pointer-events: none; }
   .entete { padding-top: 10px; min-height: 54px; }
   .scene { flex: 1; min-height: 0; padding-bottom: 100px; }
   .menu { margin-top: 16px; }
