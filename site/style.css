@@ -616,11 +616,12 @@ body::after {
   html, body { background-color: #F6E4C9; }
   body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 2px; background: #F3EADF; z-index: 1; pointer-events: none; }
   .entete { padding-top: 10px; min-height: 54px; }
-  .scene { flex: 1; min-height: 0; padding-bottom: 100px; }
+  /* De l'air autour de la pièce : elle ne touche plus le tiroir (retour de Pauline, 20 octobre 2026) */
+  .scene { flex: 1; min-height: 0; padding-bottom: 128px; }
   .menu { margin-top: 16px; }
   .bulle { padding: 44px 18px 14px; }
-  .cadre-piece { flex: 1; min-height: 0; justify-content: center; margin-top: 6px; }
-  .cadre-piece .studio { width: 100%; height: auto; }
+  .cadre-piece { flex: 1; min-height: 0; justify-content: center; width: 100%; margin: 18px 0 0; }
+  .cadre-piece .studio { width: 92%; height: auto; margin: 0 auto; }
 }
 
 /* La liste des meubles dans la bulle : seulement sur ordinateur, où elle remplace la barre du bas */
