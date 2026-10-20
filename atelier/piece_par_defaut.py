@@ -126,10 +126,19 @@ def ombre_portee(x0, x1, y0, y1, hauteur=2.0, opacite=0.2):
 
 
 def ombre_mur(y_bord, hauteur, profondeur=0.9, opacite=0.07):
-    """L'ombre douce d'un meuble haut adossé au mur de gauche, posée sur le mur juste à côté de lui,
-    côté +y (à l'écran, à sa gauche) : la lumière de la fenêtre arrive de l'autre côté."""
-    pts = [(0.006, y_bord, 0), (0.006, y_bord + profondeur, 0), (0.006, y_bord + profondeur * 0.45, hauteur), (0.006, y_bord, hauteur)]
-    OMBRES_MUR.append('<g class="ombre-mur">' + face(pts, "#5A3A26", r=10, extra=f' opacity="{opacite * 1.9:.3f}"') + '</g>')
+    """L'ombre douce d'un meuble proche du mur de gauche, posée sur le mur juste à côté de lui,
+    côté +y (à l'écran, à sa gauche) : la lumière de la fenêtre arrive de l'autre côté. Elle part de
+    derrière le meuble et s'efface en dégradé, sans bord net ; le trapèze plein qu'elle était jusqu'au
+    20 octobre 2026 faisait une tache peu naturelle (retour de Pauline)."""
+    gid = f"ombre-mur-{len(OMBRES_MUR)}"
+    debut = y_bord - 0.3  # caché derrière le meuble, pour que l'ombre n'ait pas de bord de départ
+    (ax, ay), (bx, by) = p(0, debut, 0), p(0, y_bord + profondeur, 0)
+    DEFS.append(f'<linearGradient id="{gid}" gradientUnits="userSpaceOnUse" x1="{ax:.1f}" y1="{ay:.1f}" x2="{bx:.1f}" y2="{by:.1f}">'
+                f'<stop offset="0" stop-color="#5A3A26" stop-opacity="{opacite * 1.7:.3f}" />'
+                f'<stop offset="0.35" stop-color="#5A3A26" stop-opacity="{opacite * 1.1:.3f}" />'
+                '<stop offset="1" stop-color="#5A3A26" stop-opacity="0" /></linearGradient>')
+    pts = [(0.006, debut, 0), (0.006, y_bord + profondeur, 0), (0.006, y_bord + profondeur * 0.5, hauteur * 0.92), (0.006, debut, hauteur)]
+    OMBRES_MUR.append('<g class="ombre-mur">' + face(pts, f"url(#{gid})", r=10) + '</g>')
     return ""
 
 
@@ -279,7 +288,7 @@ def coiffeuse(meuble, badge):
     B = M("droite")  # en teck jusqu'au 17 octobre 2026, puis en laque crème
     x0, x1, y0, y1 = 8.95, 11.65, 0.1, 1.3
     z_plateau, ep = 2.3 - 1.4 * (1 - N["tasse"]), N["ep"]
-    out = [ombre_portee(x0, x1, y0, y1 + 1.4, 2.4)]
+    out = [ombre_portee(x0, x1, y0, y1, 2.4)]
     # Le miroir, contre le mur, derrière la table
     xm, ym, zm, rm = (x0 + x1) / 2, 0.3, z_plateau + ep + 1.35, 0.92
     for px in (xm - 0.75, xm + 0.75):
@@ -310,6 +319,9 @@ def coiffeuse(meuble, badge):
     # Le tabouret, devant
     tx0, tx1, ty0, ty1 = 9.75, 10.85, 1.75, 2.65
     gt = N["tabouret"] + 0.06
+    # Son ombre à lui, plus légère que celle de la table : jusqu'au 20 octobre 2026, l'ombre de la
+    # coiffeuse s'allongeait pour le couvrir, et faisait un grand pavé sombre sous les deux
+    out.append(ombre_portee(tx0 + 0.06, tx1 - 0.06, ty0 + 0.06, ty1 - 0.06, 1.3, 0.15))
     for (px, py) in ((tx0 + 0.08, ty0 + 0.08), (tx1 - 0.08 - gt, ty0 + 0.08), (tx0 + 0.08, ty1 - 0.08 - gt), (tx1 - 0.08 - gt, ty1 - 0.08 - gt)):
         out.append(boite(px, px + gt, py, py + gt, 0, 1.1, tons(B), r=N["rp"] + 2))
     out.append(boite(tx0, tx1, ty0, ty1, 1.1, 1.26, tons(B), r=N["rp"] + 1))
@@ -832,7 +844,9 @@ def dressing_ouvert(meuble, badge):
     zl, zt = N["pied"], 1.05
     zr = 4.4                       # la tringle, assez haut pour que les vêtements ne touchent pas le meuble
     xm = 0.66                      # l'axe des cintres, à distance du mur
-    out = [ombre_portee(0, dep, y0, y1, 1.4), ombre_mur(y1, 4.6, 1.0, 0.06)]
+    # L'ombre au mur s'arrête à hauteur du meuble bas : la tringle et les vêtements sont loin du mur
+    # (elle montait à 4,6 jusqu'au 20 octobre 2026, une grande tache sans raison)
+    out = [ombre_portee(0, dep, y0, y1, 1.4), ombre_mur(y1 + 0.08, zt + 0.25, 0.7, 0.06)]
     # Le meuble bas : ses pieds, son corps arrondi, deux tiroirs à boutons de bois, un plateau qui déborde
     for (px, py) in ((0.3, y1 - 0.3), (dep - 0.3, y0 + 0.3), (dep - 0.3, y1 - 0.3)):
         out.append(pied(px, py, zl + 0.04, B))
@@ -943,30 +957,34 @@ def biblio_festons(meuble, badge):
     Sur les tablettes, des livres debout (les couchés faisaient des piles de pulls) ; dessus, un portrait encadré."""
     B = M("gauche")
     T = tons(B)
-    dep, y0, y1 = 1.0, 4.7, 7.9
+    # Décollée du mur de 0,2 et avancée de 0,25 vers le dressing : elle était plaquée au mur et
+    # collée au fauteuil (retour de Pauline, 20 octobre 2026)
+    dx = 0.2
+    dep, y0, y1 = 1.0, 4.45, 7.65
     ep = 0.2
     niveaux = (0.4, 1.5, 2.6, 3.7)
     zh = niveaux[-1] + ep
-    out = [ombre_portee(0, dep, y0, y1, 4.1, 0.16), ombre_mur(y1, 4.1, 1.1, 0.07)]
+    out = [ombre_portee(dx, dx + dep, y0, y1, 4.1, 0.16), ombre_mur(y1, 3.6, 1.0, 0.07)]
     # Plus de fond : on voit le papier peint entre les livres (19 octobre 2026). Les colonnes sont
     # posées sur les coins des tablettes ; celles des coins de côté, tout au bord, pour tomber
     # exactement sur la pointe des planches comme les autres
-    for (cx, cy) in ((0.14, y0 + 0.14), (0.03, y1 - 0.03)):
+    for (cx, cy) in ((dx + 0.14, y0 + 0.14), (dx + 0.03, y1 - 0.03)):
         out.append(bobine(cx, cy, 0, zh + 0.3, B))
     yi0, yi1 = y0 + 0.3, y1 - 0.3
-    rangs = [lambda z: livres_debout(0.12, dep - 0.1, yi0, yi0 + 1.5, z, 0.76, 31) + livres_debout(0.12, dep - 0.1, yi0 + 1.85, yi1, z, 0.7, 35),
-             lambda z: livres_debout(0.12, dep - 0.1, yi0 + 0.5, yi1 - 0.4, z, 0.74, 32),
-             lambda z: livres_debout(0.12, dep - 0.1, yi0, yi0 + 1.2, z, 0.74, 34) + livres_debout(0.12, dep - 0.1, yi1 - 0.9, yi1, z, 0.7, 36)]
+    xa, xb = dx + 0.12, dx + dep - 0.1
+    rangs = [lambda z: livres_debout(xa, xb, yi0, yi0 + 1.5, z, 0.76, 31) + livres_debout(xa, xb, yi0 + 1.85, yi1, z, 0.7, 35),
+             lambda z: livres_debout(xa, xb, yi0 + 0.5, yi1 - 0.4, z, 0.74, 32),
+             lambda z: livres_debout(xa, xb, yi0, yi0 + 1.2, z, 0.74, 34) + livres_debout(xa, xb, yi1 - 0.9, yi1, z, 0.7, 36)]
     for k, zk in enumerate(niveaux):
-        out.append(boite(0, dep, y0, y1, zk, zk + ep, T, r=2))  # des coins presque vifs, pour que les planches touchent les colonnes
-        out.append(trait([(dep, y0 + 0.25, zk + ep), (dep, y0 + 1.9, zk + ep)], B["reflet"], 2.0, 0.85))
+        out.append(boite(dx, dx + dep, y0, y1, zk, zk + ep, T, r=2))  # des coins presque vifs, pour que les planches touchent les colonnes
+        out.append(trait([(dx + dep, y0 + 0.25, zk + ep), (dx + dep, y0 + 1.9, zk + ep)], B["reflet"], 2.0, 0.85))
         if k < 3:
             out.append(rangs[k](zk + ep))  # des livres, rien d'autre (19 octobre 2026)
-    for (cx, cy) in ((dep - 0.05, y0 + 0.05), (dep - 0.14, y1 - 0.14)):
+    for (cx, cy) in ((dx + dep - 0.05, y0 + 0.05), (dx + dep - 0.14, y1 - 0.14)):
         out.append(bobine(cx, cy, 0, zh + 0.3, B))
     # Les tablettes restent libres ; dessus, le seul portrait (tri de la déco, 19 octobre 2026)
-    out.append(cadre(0.45, y1 - 0.85, zh))
-    out.append(badge("bibliotheque", 0.5, (y0 + y1) / 2, zh + 1.7))
+    out.append(cadre(dx + 0.45, y1 - 0.85, zh))
+    out.append(badge("bibliotheque", dx + 0.5, (y0 + y1) / 2, zh + 1.7))
     return meuble("bibliotheque", "".join(out))
 
 
@@ -1423,7 +1441,7 @@ def dessine(meuble, badge):
     motifs_tissu("pois", pois_motif(), 0.9, 0.9, echelle=0.45)  # le léopard, remplacé par des pois le 17 octobre 2026
     meubles = [((0.0, 1.4, 0.68, 3.6), dressing_ouvert(meuble, badge)),
                ((3.0, 7.6, 0.1, 1.45), enfilade_tiroirs(meuble, badge)),
-               ((0.0, 1.1, 4.62, 7.98), biblio_festons(meuble, badge)),
+               ((0.2, 1.3, 4.37, 7.73), biblio_festons(meuble, badge)),
                ((0.35, 1.95, 8.6, 10.6), fauteuil_rose()),
                ((0.4, 1.2, 10.85, 11.65), table_toupie(0.8, 11.25)),
                ((8.89, 11.71, 0.1, 2.65), coiffeuse(meuble, badge)),
