@@ -592,7 +592,7 @@ body::after {
   .barre-meubles {
     left: 0; right: 0; bottom: 0; border-radius: 26px 26px 0 0; border-width: 3px 0 0;
     background: #F6E4C9; box-shadow: 0 -6px 18px rgba(74, 51, 40, 0.12);
-    padding: 10px 6px calc(10px + env(safe-area-inset-bottom));
+    padding: 5px 6px calc(6px + env(safe-area-inset-bottom));
   }
   /* Le miel continue sous le tiroir jusqu'en bas de l'écran : sur iPhone, le fond de la page apparaissait
      en bande grise entre le tiroir et la barre de Safari (retour de Pauline, 20 octobre 2026) */
@@ -610,21 +610,20 @@ body::after {
      de Pauline sur iPhone, 20 octobre 2026 : elle rétrécissait au changement d'onglet) */
   body { min-height: 100dvh; }
   /* Derrière les barres de Safari (iOS 26) : Safari les colore avec la couleur de fond pleine de la page,
-     ou celle d'un élément fixé au bord de l'écran ; un dégradé ne compte pas, d'où le blanc. La page prend
-     donc le miel du tiroir comme couleur de fond (sous ses dégradés beiges), et une fine bande beige fixée
-     en haut garde le haut de l'écran beige (retours de Pauline, 20 octobre 2026) */
-  html, body { background-color: #F6E4C9; }
-  body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 4px; background: #F3EADF; z-index: 60; pointer-events: none; }
+     ou celle d'un grand élément fixé au bord de l'écran ; un dégradé ne compte pas, d'où le blanc du début.
+     La page a le gris-beige de son fond comme couleur pleine, pour le haut ; en bas, c'est le tiroir, fixé
+     au bord, qui donne le miel (retours de Pauline, 20 octobre 2026) */
+  html, body { background-color: #F3EADF; }
   /* Le grain photo est un voile fixé qui couvre tout l'écran, au-dessus du tiroir : Safari s'en servait
      pour colorer ses barres, d'où le gris en bas en défilant et le miel en haut. Il est retiré sur
      téléphone, où il était presque invisible (retour de Pauline, 20 octobre 2026) */
   body::after { display: none; }
   .entete { padding-top: 10px; min-height: 54px; }
   /* De l'air autour de la pièce : elle ne touche plus le tiroir (retour de Pauline, 20 octobre 2026) */
-  .scene { flex: 1; min-height: 0; padding-bottom: 128px; }
-  .menu { margin-top: 16px; }
+  .scene { flex: 1; min-height: 0; padding-bottom: 122px; }
+  .menu { margin-top: 26px; }
   .bulle { padding: 44px 18px 14px; }
-  .cadre-piece { flex: 1; min-height: 0; justify-content: center; width: 100%; margin: 10px 0 0; }
+  .cadre-piece { flex: 1; min-height: 0; justify-content: center; width: 100%; margin: 24px 0 0; }
   .cadre-piece .studio { width: 97%; height: auto; margin: 0 auto; }
 }
 
@@ -668,7 +667,7 @@ body::after {
   .bouton-plus { bottom: 122px; right: 20px; }
 }
 @media (max-width: 600px) {
-  .bouton-plus { right: 16px; bottom: calc(108px + env(safe-area-inset-bottom)); }
+  .bouton-plus { right: 16px; bottom: calc(100px + env(safe-area-inset-bottom)); }
   /* « Marquer comme acheté » et les trois icônes tiennent sur une ligne, même à 375 pixels */
   .article-actions { gap: 6px; }
   .article-icones { gap: 4px; }
