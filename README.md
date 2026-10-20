@@ -15,8 +15,8 @@ Le projet veut offrir un endroit à soi, joli et un peu ludique, où l'on range 
 ## MVP
 La première version permet de :
 - Parcourir son studio : une pièce illustrée avec cinq meubles cliquables, le dressing, la bibliothèque, la commode déco, la coiffeuse et le coffre fourre-tout. Un clic sur un meuble ouvre un panneau avec les articles qu'on y a rangés
-- Ranger un article : l'ajouter à la main, avec son lien, son nom, sa marque, son prix et sa photo, dans le meuble choisi
-- Retrouver et mettre à jour ses articles : ils restent enregistrés d'une visite à l'autre ; on peut les déplacer, les retirer et cocher « Acheté »
+- Ranger un article : l'ajouter à la main, avec son lien, son nom, sa marque, son prix et sa photo, dans le meuble choisi, depuis un meuble ou le bouton « + »
+- Retrouver et mettre à jour ses articles : ils restent enregistrés d'une visite à l'autre ; on peut les modifier, les déplacer, les retirer et cocher « Acheté »
 
 ## Comment c'est construit
 - HTML, CSS et JavaScript, sans framework
@@ -25,7 +25,6 @@ La première version permet de :
 - `atelier/` : les scripts Python qui dessinent la pièce en SVG
 
 ## Et ensuite
-- Modifier un article déjà rangé (#5)
 - Remplir un article à partir de son seul lien
 - Un favori « Ranger dans Tiny Studio » pour le navigateur
 - Plus tard : une app iPhone, avec le partage depuis Safari
@@ -41,4 +40,4 @@ La première version permet de :
 - [x] MVP défini
 - [x] Première version construite
 - [x] Testée avec une ou plusieurs personnes
-- [ ] Améliorée
+- [x] Améliorée
