@@ -620,7 +620,7 @@ body::after {
   /* De l'air autour de la pièce : elle ne touche plus le tiroir (retour de Pauline, 20 octobre 2026) */
   .scene { flex: 1; min-height: 0; padding-bottom: 122px; }
   .menu { margin-top: 26px; }
-  .bulle { padding: 44px 18px 14px; }
+  .bulle { padding: 44px 18px 24px; }  /* de l'air sous le texte (retour de Pauline, 20 octobre 2026) */
   .cadre-piece { flex: 1; min-height: 0; justify-content: center; width: 100%; margin: 24px 0 0; }
   .cadre-piece .studio { width: 97%; height: auto; margin: 0 auto; }
 }
