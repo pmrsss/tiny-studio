@@ -624,8 +624,8 @@ body::after {
   .scene { flex: 1; min-height: 0; padding-bottom: 128px; }
   .menu { margin-top: 16px; }
   .bulle { padding: 44px 18px 14px; }
-  .cadre-piece { flex: 1; min-height: 0; justify-content: center; width: 100%; margin: 18px 0 0; }
-  .cadre-piece .studio { width: 92%; height: auto; margin: 0 auto; }
+  .cadre-piece { flex: 1; min-height: 0; justify-content: center; width: 100%; margin: 10px 0 0; }
+  .cadre-piece .studio { width: 97%; height: auto; margin: 0 auto; }
 }
 
 /* La liste des meubles dans la bulle : seulement sur ordinateur, où elle remplace la barre du bas */
