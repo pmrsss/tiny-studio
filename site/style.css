@@ -605,10 +605,10 @@ body::after {
   .barre-meubles .tuile svg { width: 36px; height: 36px; }
   .barre-meubles .nom { font-size: 11px; margin-top: 2px; }
 
-  /* Tout tient dans la hauteur visible, même quand la barre de Safari en prend une partie : la page fait
-     exactement la hauteur de l'écran, et la pièce rétrécit pour tenir entre la bulle et le tiroir, au lieu
-     de passer dessous (retour de Pauline sur iPhone, 20 octobre 2026) */
-  body { height: 100dvh; min-height: 0; overflow: hidden; }
+  /* La pièce garde toujours sa taille, pleine largeur, d'un onglet à l'autre ; quand la bulle de la
+     boutique prend plus de place, la page défile, et le bas de la pièce reste au-dessus du tiroir (retours
+     de Pauline sur iPhone, 20 octobre 2026 : elle rétrécissait au changement d'onglet) */
+  body { min-height: 100dvh; }
   /* Derrière les barres de Safari (iOS 26) : Safari les colore avec la couleur de fond pleine de la page,
      ou celle d'un élément fixé au bord de l'écran ; un dégradé ne compte pas, d'où le blanc. La page prend
      donc le miel du tiroir comme couleur de fond (sous ses dégradés beiges), et une fine bande beige fixée
@@ -620,7 +620,7 @@ body::after {
   .menu { margin-top: 16px; }
   .bulle { padding: 44px 18px 14px; }
   .cadre-piece { flex: 1; min-height: 0; justify-content: center; margin-top: 6px; }
-  .cadre-piece .studio { width: auto; height: 100%; max-width: 100%; }
+  .cadre-piece .studio { width: 100%; height: auto; }
 }
 
 /* La liste des meubles dans la bulle : seulement sur ordinateur, où elle remplace la barre du bas */
