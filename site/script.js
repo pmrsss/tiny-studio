@@ -110,12 +110,12 @@ function libelleNombre(n) {
 
 // Les pastilles de nombre, sur les meubles et sur les boutons
 function afficherCompteurs() {
-  // Le studio vide (issue n° 4) : l'accueil dit quoi faire, et les pastilles des meubles passent
-  // en rose avec un « + », pour inviter à toucher. Dès le premier article, tout redevient normal.
+  // Le studio vide (issue n° 4) : l'accueil dit quoi faire et désigne le bouton « + », seul appel à
+  // l'action ; les pastilles des meubles restent à « 0 » (20 octobre 2026)
   const studioVide = Object.keys(meubles).every(function (cle) { return meubles[cle].articles.length === 0; });
   document.documentElement.classList.toggle("studio-vide", studioVide);
   document.getElementById("accueil-texte").textContent = studioVide
-    ? "Ton studio attend tes premiers articles. Touche un meuble, puis « Ajouter un article », et colle le lien d'un produit repéré en ligne."
+    ? "Ton studio attend tes premiers articles. Touche le bouton + et colle le lien d'un produit repéré en ligne."
     : "Touche un meuble pour voir les articles que tu y as rangés.";
   // Le nombre d'articles en toutes lettres, dans la liste des meubles de la bulle (ordinateur) ;
   // « Vide » plutôt qu'« Aucun article » (choix de Pauline, 19 octobre 2026)
@@ -125,7 +125,7 @@ function afficherCompteurs() {
   });
   document.querySelectorAll("[data-compte]").forEach(function (element) {
     const n = meubles[element.dataset.compte].articles.length;
-    element.textContent = studioVide && element.closest(".badge") ? "+" : n;
+    element.textContent = n;
     element.classList.toggle("zero", n === 0);
   });
   document.querySelectorAll(".meuble").forEach(function (element) {

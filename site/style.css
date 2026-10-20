@@ -86,10 +86,8 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .meuble:hover .badge-fond, .meuble:focus-visible .badge-fond, .meuble.survole .badge-fond { fill: var(--rose-ombre); }
 .meuble.est-vide .badge-fond, .meuble.est-vide .badge-pointe { fill: #EAD8C6; }
 .meuble.est-vide .badge text { fill: var(--brun-doux); }
-/* Le studio vide (issue n° 4) : les pastilles restent roses et portent un « + », immobiles
-   (choix de Pauline, 19 octobre 2026), pour inviter à toucher un meuble */
-.studio-vide .meuble.est-vide .badge-fond, .studio-vide .meuble.est-vide .badge-pointe { fill: var(--rose); }
-.studio-vide .meuble.est-vide .badge text { fill: #FFFFFF; font-size: 19px; }
+/* Le studio vide : les pastilles restent discrètes, « 0 » en beige ; les « + » roses qu'elles portaient
+   faisaient doublon avec le bouton « + » (choix de Pauline, 20 octobre 2026) */
 /* La pièce dorée « % » : un meuble qui contient un article en promotion (19 octobre 2026) */
 .badge-promo { display: none; }
 .meuble.en-promo .badge-promo { display: inline; }
@@ -250,7 +248,7 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .champ label { font: 800 13px Nunito, sans-serif; color: var(--brun); }
 .facultatif { font-weight: 700; color: var(--brun-doux); font-size: 12px; }
 .champ input, .champ select {
-  font: 600 15px Nunito, sans-serif; color: var(--brun); background: var(--creme);
+  font: 600 16px Nunito, sans-serif;  /* 16 px : sous cette taille, Safari sur iPhone zoome dans le champ */ color: var(--brun); background: var(--creme);
   border: 2px solid var(--carte-ombre); border-radius: 12px; padding: 9px 11px; min-width: 0; width: 100%;
 }
 .champ select { appearance: none; cursor: pointer; padding-right: 34px;
@@ -577,7 +575,7 @@ body::after {
   .onglet[aria-selected="true"] { transform: none; box-shadow: 0 4px 0 var(--brun); }
   .bulle { padding: 44px 18px 16px; }
   .bulle h2 { font-size: 16px; margin-bottom: 4px; }
-  .bulle p { font-size: 13.5px; line-height: 1.45; }
+  .bulle p { font-size: 14.5px; line-height: 1.45; }
   .ruban { width: 38px; height: 40px; top: -12px; }
   .cadre-piece { flex: 1; display: flex; align-items: center; width: calc(100% + 24px); margin: 4px -12px 0; }
   .pied { display: none; }
