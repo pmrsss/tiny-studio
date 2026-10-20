@@ -322,9 +322,9 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .visuel img { position: absolute; inset: 8px; width: calc(100% - 16px); height: calc(100% - 16px); object-fit: contain; }
 /* Une photo ajoutée dont le fond n'est pas uni, ou illisible : elle remplit la case, sans vide */
 .visuel.visuel-plein img { inset: 0; width: 100%; height: 100%; object-fit: cover; }
-/* Un livre, un carnet (bibliothèque) : la couverture entière, centrée sur fond blanc, avec une ombre
-   douce comme un livre posé (règle du 20 octobre 2026) */
-.visuel.visuel-livre img { inset: 12%; width: 76%; height: 76%; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(74, 51, 40, 0.28)); }
+/* Un livre, un carnet (bibliothèque) : la couverture entière, centrée sur fond blanc, sans ombre (elle
+   ne marchait pas sur toutes les photos, celle de Hobonichi par exemple ; règle du 20 octobre 2026) */
+.visuel.visuel-livre img { inset: 12%; width: 76%; height: 76%; object-fit: contain; }
 /* Une photo recadrée à son produit : sa taille et sa place sont calculées par cadrer() */
 .visuel img.cadree { inset: auto; max-width: none; object-fit: fill; }
 .article-texte { min-width: 0; color: inherit; text-decoration: none; }
@@ -591,6 +591,9 @@ body::after {
      exactement la hauteur de l'écran, et la pièce rétrécit pour tenir entre la bulle et le tiroir, au lieu
      de passer dessous (retour de Pauline sur iPhone, 20 octobre 2026) */
   body { height: 100dvh; min-height: 0; overflow: hidden; }
+  /* Sous la page, derrière la barre de Safari : du miel en bas, comme le tiroir, et le beige de la page en
+     haut (la bande du bas était grise, puis blanche ; retours de Pauline, 20 octobre 2026) */
+  html { background: linear-gradient(to bottom, #F3EADF 50%, #F6E4C9 50%); }
   .entete { padding-top: 10px; min-height: 54px; }
   .scene { flex: 1; min-height: 0; padding-bottom: 100px; }
   .menu { margin-top: 16px; }
