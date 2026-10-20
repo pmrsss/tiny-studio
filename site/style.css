@@ -526,6 +526,21 @@ body::after {
   .boutique-liste li { padding: 8px 2px 7px; font-size: 11px; line-height: 1.25; }
   .boutique-liste svg { width: 28px; height: 28px; margin-bottom: 3px; }
   .bientot-tag { margin-top: 8px; }
+  /* La barre des meubles devient un tiroir miel pleine largeur, arrondi en haut, inspiré d'une app de
+     stickers (choix de Pauline, 20 octobre 2026) ; des cases plus grandes aux contours fins, et la
+     marge de sécurité de l'iPhone en bas */
+  .barre-meubles {
+    left: 0; right: 0; bottom: 0; border-radius: 26px 26px 0 0; border-width: 3px 0 0;
+    background: #F6E4C9; box-shadow: 0 -6px 18px rgba(74, 51, 40, 0.12);
+    padding: 12px 6px calc(16px + env(safe-area-inset-bottom));
+  }
+  .barre-meubles button:hover { background: transparent; }
+  .barre-meubles .tuile {
+    width: 56px; height: 56px; border-radius: 19px; background: #FFFBF5;
+    border: 1.5px solid rgba(74, 51, 40, 0.28); box-shadow: inset 0 -4px 0 #EBD3B0, 0 2px 0 rgba(74, 51, 40, 0.1);
+  }
+  .barre-meubles .tuile svg { width: 40px; height: 40px; }
+  .barre-meubles .nom { font-size: 11px; margin-top: 2px; }
 }
 
 /* La liste des meubles dans la bulle : seulement sur ordinateur, où elle remplace la barre du bas */
