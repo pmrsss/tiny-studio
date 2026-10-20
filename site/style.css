@@ -322,6 +322,9 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .visuel img { position: absolute; inset: 8px; width: calc(100% - 16px); height: calc(100% - 16px); object-fit: contain; }
 /* Une photo ajoutée dont le fond n'est pas uni, ou illisible : elle remplit la case, sans vide */
 .visuel.visuel-plein img { inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Un livre, un carnet (bibliothèque) : la couverture entière, centrée sur fond blanc, avec une ombre
+   douce comme un livre posé (règle du 20 octobre 2026) */
+.visuel.visuel-livre img { inset: 12%; width: 76%; height: 76%; object-fit: contain; filter: drop-shadow(0 3px 3px rgba(74, 51, 40, 0.28)); }
 /* Une photo recadrée à son produit : sa taille et sa place sont calculées par cadrer() */
 .visuel img.cadree { inset: auto; max-width: none; object-fit: fill; }
 .article-texte { min-width: 0; color: inherit; text-decoration: none; }
@@ -571,15 +574,29 @@ body::after {
   .barre-meubles {
     left: 0; right: 0; bottom: 0; border-radius: 26px 26px 0 0; border-width: 3px 0 0;
     background: #F6E4C9; box-shadow: 0 -6px 18px rgba(74, 51, 40, 0.12);
-    padding: 12px 6px calc(16px + env(safe-area-inset-bottom));
+    padding: 10px 6px calc(10px + env(safe-area-inset-bottom));
   }
+  /* Le miel continue sous le tiroir jusqu'en bas de l'écran : sur iPhone, le fond de la page apparaissait
+     en bande grise entre le tiroir et la barre de Safari (retour de Pauline, 20 octobre 2026) */
+  .barre-meubles::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 300px; background: #F6E4C9; }
   .barre-meubles button:hover { background: transparent; }
   .barre-meubles .tuile {
-    width: 56px; height: 56px; border-radius: 19px; background: #FFFBF5;
+    width: 50px; height: 50px; border-radius: 17px; background: #FFFBF5;
     border: 1.5px solid rgba(74, 51, 40, 0.28); box-shadow: inset 0 -4px 0 #EBD3B0, 0 2px 0 rgba(74, 51, 40, 0.1);
   }
-  .barre-meubles .tuile svg { width: 40px; height: 40px; }
+  .barre-meubles .tuile svg { width: 36px; height: 36px; }
   .barre-meubles .nom { font-size: 11px; margin-top: 2px; }
+
+  /* Tout tient dans la hauteur visible, même quand la barre de Safari en prend une partie : la page fait
+     exactement la hauteur de l'écran, et la pièce rétrécit pour tenir entre la bulle et le tiroir, au lieu
+     de passer dessous (retour de Pauline sur iPhone, 20 octobre 2026) */
+  body { height: 100dvh; min-height: 0; overflow: hidden; }
+  .entete { padding-top: 10px; min-height: 54px; }
+  .scene { flex: 1; min-height: 0; padding-bottom: 100px; }
+  .menu { margin-top: 16px; }
+  .bulle { padding: 44px 18px 14px; }
+  .cadre-piece { flex: 1; min-height: 0; justify-content: center; margin-top: 6px; }
+  .cadre-piece .studio { width: auto; height: 100%; max-width: 100%; }
 }
 
 /* La liste des meubles dans la bulle : seulement sur ordinateur, où elle remplace la barre du bas */
@@ -622,7 +639,7 @@ body::after {
   .bouton-plus { bottom: 122px; right: 20px; }
 }
 @media (max-width: 600px) {
-  .bouton-plus { right: 16px; bottom: calc(130px + env(safe-area-inset-bottom)); }
+  .bouton-plus { right: 16px; bottom: calc(108px + env(safe-area-inset-bottom)); }
   /* « Marquer comme acheté » et les trois icônes tiennent sur une ligne, même à 375 pixels */
   .article-actions { gap: 6px; }
   .article-icones { gap: 4px; }

@@ -152,10 +152,15 @@ let meubleOuvert = null;  // le meuble dont le panneau est ouvert, proposé pour
 // 2. le produit est recadré à son contour, puis centré ; les ombres portées ne comptent pas dans
 //    le contour, sinon le produit paraît décalé du côté opposé à son ombre ;
 // 3. il occupe 80 % de la case dans sa plus grande dimension, la même marge pour tous ;
-// 4. si le fond n'est pas uni, ou si le site interdit de lire la photo, elle remplit toute la case.
+// 4. si le fond n'est pas uni, ou si le site interdit de lire la photo, elle remplit toute la case ;
+// 5. si le produit touche deux bords de la photo ou plus, la photo est déjà cadrée serré : elle est
+//    montrée entière, centrée, sans recadrage (20 octobre 2026) ;
+// 6. les articles de la bibliothèque (livres, BD, carnets, agendas, papeterie) sont montrés comme un
+//    livre posé : la couverture entière, centrée, sur fond blanc, sans analyse (20 octobre 2026).
 // L'analyse se fait une fois, et ses résultats (« fond », « cadre » ou « plein ») s'enregistrent avec
 // l'article, avec le numéro de la règle (« analyse ») : quand la règle change, la photo est relue.
-const VERSION_ANALYSE = 2;  // 2 : les ombres ne comptent plus dans le contour (19 octobre 2026)
+const VERSION_ANALYSE = 3;  // 2 : les ombres ne comptent plus dans le contour (19 octobre 2026) ;
+                            // 3 : une photo déjà cadrée serré n'est plus recadrée (20 octobre 2026)
 function analyserPhoto(adresse, rappel) {
   const sonde = new Image();
   sonde.crossOrigin = "anonymous";
@@ -202,7 +207,11 @@ function analyserPhoto(adresse, rappel) {
           }
         }
       }
-      const cadre = x1 < 0 ? [0, 0, 1, 1] : [x0 / w, y0 / h, (x1 + 1) / w, (y1 + 1) / h].map(function (v) { return Math.round(v * 1000) / 1000; });
+      // Le produit touche deux bords ou plus : la photo est déjà cadrée serré, et un produit clair sur
+      // un fond clair ne se distingue que par ses motifs ; on la garde entière
+      const marge = 0.03;  // à 3 % près du bord
+      const bords = (x0 <= w * marge) + (y0 <= h * marge) + (x1 >= w * (1 - marge) - 1) + (y1 >= h * (1 - marge) - 1);
+      const cadre = x1 < 0 || bords >= 2 ? [0, 0, 1, 1] : [x0 / w, y0 / h, (x1 + 1) / w, (y1 + 1) / h].map(function (v) { return Math.round(v * 1000) / 1000; });
       rappel({ fond: "#" + fond.map(function (v) { return v.toString(16).padStart(2, "0"); }).join("").toUpperCase(), cadre: cadre });
     } catch (e) {
       rappel(null);
@@ -245,8 +254,19 @@ function fiche(article) {
     visuel.tabIndex = -1;  // le nom porte déjà le lien au clavier
   }
   // Sans photo, ou si la photo ne se charge pas : une vignette neutre, l'icône du meuble
-  const neutre = '<svg class="vignette-neutre"><use href="#ic-' + (article.meuble || "coffre") + '" /></svg>';
-  if (article.image) {
+  const cleMeuble = article.meuble || meubleDe(article) || "coffre";
+  const neutre = '<svg class="vignette-neutre"><use href="#ic-' + cleMeuble + '" /></svg>';
+  if (article.image && cleMeuble === "bibliotheque") {
+    // Un livre, un carnet : la couverture entière, centrée, posée sur fond blanc, avec une ombre douce
+    visuel.style.background = "#FFFFFF";
+    visuel.classList.add("visuel-livre");
+    const img = document.createElement("img");
+    img.src = article.image;
+    img.alt = "";
+    img.loading = "lazy";
+    img.addEventListener("error", function () { visuel.style.background = ""; visuel.classList.remove("visuel-livre"); visuel.innerHTML = neutre; });
+    visuel.appendChild(img);
+  } else if (article.image) {
     // La case prend la couleur du fond de la photo : le produit y flotte, centré, sans toucher les bords
     visuel.style.background = article.fond || "#FFFFFF";
     visuel.classList.toggle("visuel-plein", Boolean(article.plein));
