@@ -114,9 +114,12 @@ function afficherCompteurs() {
   // l'action ; les pastilles des meubles restent à « 0 » (20 octobre 2026)
   const studioVide = Object.keys(meubles).every(function (cle) { return meubles[cle].articles.length === 0; });
   document.documentElement.classList.toggle("studio-vide", studioVide);
+  // Les mêmes mots que la porte d'entrée (repérer, coller son lien, organiser), et le bon geste :
+  // « touche » sur un écran tactile, « clique » à la souris (21 octobre 2026)
+  const geste = window.matchMedia("(pointer: coarse)").matches ? "touche" : "clique sur";
   document.getElementById("accueil-texte").textContent = studioVide
-    ? "Ton studio attend tes premiers articles. Touche le bouton + et colle le lien d'un produit repéré en ligne."
-    : "Touche un meuble pour voir les articles que tu y as rangés.";
+    ? "Ton studio attend tes premiers articles. Repère un article en ligne, puis " + geste + " le bouton + et colle son lien."
+    : geste[0].toUpperCase() + geste.slice(1) + " un meuble pour voir les articles que tu y as rangés.";
   // Le nombre d'articles en toutes lettres, dans la liste des meubles de la bulle (ordinateur) ;
   // « Vide » plutôt qu'« Aucun article » (choix de Pauline, 19 octobre 2026)
   document.querySelectorAll("[data-compte-texte]").forEach(function (element) {
