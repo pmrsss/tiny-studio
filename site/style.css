@@ -223,7 +223,7 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 }
 .fermer:hover { color: var(--rose); border-color: var(--brun); }
 .fermer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
-#panneau-titre:focus { outline: none; }  /* il reçoit le focus à l'ouverture, sans cadre */
+#panneau-titre:focus, #ajout-titre:focus { outline: none; }  /* ils reçoivent le focus à l'ouverture, sans cadre */
 
 /* Le corps du panneau défile d'un bloc : le formulaire d'ajout, puis les fiches */
 .panneau-corps { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 16px -6px 0; padding: 4px 6px 6px; display: flex; flex-direction: column; }
@@ -676,6 +676,145 @@ body::after {
     border-width: 3px 0 0; border-radius: 28px 28px 0 0; padding: 20px 16px calc(16px + env(safe-area-inset-bottom));
   }
 }
+
+/* ---------- La navigation sur téléphone (issue n° 7, 21 octobre 2026) ----------
+   Mise au point avec Pauline dans planches/navigation.html : une porte d'entrée à la première
+   ouverture, le studio sans bulle, la boutique en page à part. Sur ordinateur et sur tablette, rien
+   ne change : la bulle et ses onglets restent */
+.vitrine, .indice-vide { display: none; }
+.porte[hidden] { display: none !important; }
+
+@media (max-width: 600px) {
+  /* Plus de bulle : la pièce au centre. En haut à droite, une seule icône, celle de l'autre page */
+  .bulle { display: none; }
+  .menu { margin: 0 !important; }
+  .onglet[aria-selected="true"] { display: none; }
+  .onglet {
+    --ic-accent: #EE9DB4; --ic-fond: #FFF8EF; --ic-bois: #E2B58C; --ic-trait: var(--brun);
+    background: var(--carte); border-color: var(--brun); box-shadow: 0 4px 0 var(--brun); transform: none;
+  }
+  .marque { cursor: pointer; }
+  /* La pièce prend toute la largeur de l'écran, sans rien couper : rognée au bord de la page, elle
+     perdait l'épaisseur du mur de gauche et le coin du socle, et son ombre finissait en ligne droite
+     (retour de Pauline sur iPhone, 21 octobre 2026) */
+  .cadre-piece { width: 100vw; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); overflow: visible; }
+  .cadre-piece .studio { flex: none; width: 93%; max-width: none; margin: 0 auto; }  /* un peu d'air sur les côtés (retour de Pauline, 21 octobre 2026) */
+  /* Le studio vide : un mot en haut, sous le bandeau, à la place de la bulle (en bas, il passait
+     sous le bouton « + ») */
+  .studio-vide:not(.vue-boutique) .indice-vide {
+    display: block; order: -1; margin: 30px 28px 0; text-align: center; text-wrap: balance;
+    font: 700 14.5px / 1.45 Nunito, sans-serif; color: var(--brun-doux);
+  }
+  .indice-vide h2 { margin: 0 0 6px; font: 700 18px / 1.2 Fredoka, Nunito, sans-serif; color: var(--brun); }
+  .indice-vide p { margin: 0; }
+
+  /* La boutique, en page à part : ni pièce, ni tiroir, ni « + », une vitrine sous un store */
+  .vue-boutique .cadre-piece, .vue-boutique .barre-meubles, .vue-boutique .bouton-plus { display: none !important; }
+  .vue-boutique .scene { padding-bottom: 24px; }
+  .vue-boutique .vitrine { display: block; }
+  .vitrine { margin: 32px 0 0; width: 100%; }
+  .store { position: relative; z-index: 1; }
+  .store svg { display: block; width: 100%; height: auto; }
+  /* Le haut de la vitrine tombe pile sous le bas de la toile (24 unités sur 348) : les festons passent
+     devant, et l'ombre du store part de là */
+  .vitrine-corps {
+    margin: calc(-100% * 24 / 348) 14px 0; padding: 38px 16px 20px; text-align: center;
+    background: linear-gradient(rgba(74, 51, 40, 0.14), rgba(74, 51, 40, 0) 36px), var(--carte);
+    border: 3px solid var(--brun); border-top: 0; border-radius: 0 0 28px 28px; box-shadow: 0 6px 0 rgba(74, 51, 40, 0.16);
+  }
+  .vitrine-corps h2 { margin: 0; font: 700 21px / 1.2 Fredoka, Nunito, sans-serif; color: var(--brun); }
+  .vitrine-corps > p { text-wrap: balance; margin: 8px 0 0; font: 700 14.5px / 1.45 Nunito, sans-serif; color: var(--brun-doux); }
+  .rayons { list-style: none; margin: 24px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .rayons li {
+    display: flex; flex-direction: column; align-items: center; padding: 14px 10px;
+    background: var(--creme); border: 1.5px solid rgba(74, 51, 40, 0.22); border-radius: 20px;
+    box-shadow: inset 0 -4px 0 #EBD3B0;
+  }
+  .rayons .tuile { width: 52px; height: 52px; border-radius: 17px; background: #FFFBF5; display: grid; place-items: center; box-shadow: none; }
+  .rayons .tuile svg { width: 38px; height: 38px; }
+  .rayons b { margin-top: 8px; font: 700 15px / 1.2 Fredoka, Nunito, sans-serif; color: var(--brun); }
+  .rayons .bientot-tag { margin-top: 8px; font-size: 10px; padding: 3px 8px; }
+
+  /* Pendant la porte d'entrée, le fond de la page prend le rose de l'immeuble (Safari en colore ses
+     barres), et la page ne défile pas */
+  .porte-ouverte, .porte-ouverte body { background-color: #F3D9D2; overflow: hidden; }
+  /* Le tiroir, fixé au bas de l'écran, donnait son miel à la barre de Safari, même caché sous la
+     porte : il n'existe pas tant que la porte est là (retour de Pauline sur iPhone, 21 octobre 2026) */
+  .porte-ouverte .barre-meubles { display: none; }
+  .entree, .entree body { transition: background-color 0.35s ease; }
+}
+
+/* La porte d'entrée */
+.porte {
+  position: fixed; inset: 0; z-index: 100; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  padding: 24px 22px calc(24px + env(safe-area-inset-bottom)); text-align: center;
+}
+/* Le fond de la porte : un halo clair au milieu, et en haut comme en bas exactement le rose du fond
+   de la page, dont Safari colore ses barres ; sans ce raccord, une bande de couleur dépassait sous
+   l'heure et la batterie (retour de Pauline sur iPhone, 21 octobre 2026) */
+.porte::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(#F3D9D2 0, rgba(243, 217, 210, 0) 110px),
+    linear-gradient(to top, #F3D9D2 0, rgba(243, 217, 210, 0) 110px),
+    radial-gradient(120% 70% at 50% 42%, #FCEEEA 0, #F4DAD3 58%, #F3D9D2 100%);
+  background-color: #F3D9D2;
+  transition: opacity 0.45s ease;
+}
+.porte:focus { outline: none; }
+.porte-titre { display: flex; flex-direction: column; gap: 8px; }
+.porte-marque { margin: 0; font: 700 40px / 1 Fredoka, Nunito, sans-serif; color: var(--brun); }
+.porte-accroche { margin: 0; font: 700 15px / 1.4 Nunito, sans-serif; color: var(--brun-doux); }
+.porte-piece { width: 82%; }
+.porte-piece svg { display: block; width: 100%; height: auto; overflow: visible; }  /* ses transitions, phase par phase, sont posées par le script */
+.porte-piece * { pointer-events: none; }
+.porte-etapes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.porte-etapes li { display: flex; align-items: center; gap: 12px; font: 700 14.5px / 1.3 Nunito, sans-serif; color: var(--brun); }
+.porte-etapes span {
+  flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--brun); color: #FFF8EF; font: 700 14px Fredoka, Nunito, sans-serif;
+}
+.porte-entrer {
+  width: 100%; max-width: 300px; cursor: pointer;
+  font: 700 20px Fredoka, Nunito, sans-serif; color: #FFFFFF;
+  background: var(--rose); border: 3px solid var(--brun); border-radius: 22px; padding: 13px 20px;
+  box-shadow: 0 5px 0 var(--brun); transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.porte-entrer:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--brun); }
+.porte-entrer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
+
+/* L'entrée, en 1,5 seconde environ (21 octobre 2026) : les battants s'ouvrent, la vue ne bouge pas,
+   puis la façade et le toit s'effacent et dévoilent le studio ; la pièce prend sa place avec ses murs et
+   son sol, les meubles arrivent pendant la fin du mouvement, enfin le tiroir monte et le « + » apparaît */
+.porte > :not(.porte-piece) { transition: opacity 0.2s ease, transform 0.2s ease; }
+.porte.sortie { pointer-events: none; }
+.porte.sortie > :not(.porte-piece) { opacity: 0; transform: translateY(10px); }
+.porte.fondu::before { opacity: 0; }
+/* Les deux battants pivotent sur leurs gonds, vers l'intérieur, en vraie perspective isométrique :
+   le script calcule leur position angle par angle (21 octobre 2026) */
+.porte-piece .battant-g, .porte-piece .battant-d { transform-box: fill-box; }
+.porte-piece .battant-g { transform-origin: 0% 0%; }
+.porte-piece .battant-d { transform-origin: 100% 0%; }
+.porte-piece .ext-sol, .porte-piece .ext-murs, .porte-piece .ext-battant, .porte-piece .ext-marche, .porte-piece .ext-toit {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
+}
+.porte.devoile .ext-toit { transform: translateY(-80px); opacity: 0; }
+.porte.devoile .ext-murs, .porte.devoile .ext-battant, .porte.devoile .ext-marche, .porte.devoile .ext-sol { transform: translateY(60px); opacity: 0; }
+.porte-piece .objets > *, .porte-piece .ombre-mur, .porte-piece [clip-path="url(#sol-parquet)"] [fill="#6E4426"] {
+  transition: opacity 0.26s ease, transform 0.32s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.porte:not(.meubles) .porte-piece .objets > * { opacity: 0; transform: translateY(-10px); }
+.porte:not(.meubles) .porte-piece .ombre-mur, .porte:not(.meubles) .porte-piece [clip-path="url(#sol-parquet)"] [fill="#6E4426"] { opacity: 0; }
+/* La pièce du studio reste cachée tant que celle de la porte n'est pas posée sur elle ; en opacité,
+   pas en visibilité, qui cacherait aussi les motifs (le papier peint) que la pièce de la porte réutilise */
+.piece-cachee .cadre-piece .studio { opacity: 0; }
+.entree .barre-meubles { transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.2, 1) 0.55s; }
+.entree .bouton-plus { transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1) 0.75s; }
+.entree .onglets { transition: opacity 0.25s ease 0.6s; }
+.avant-entree .barre-meubles { transform: translateY(115%); }
+.avant-entree .bouton-plus { transform: scale(0); }
+.avant-entree .onglets { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }

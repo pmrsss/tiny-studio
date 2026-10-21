@@ -114,15 +114,21 @@ function afficherCompteurs() {
   // l'action ; les pastilles des meubles restent à « 0 » (20 octobre 2026)
   const studioVide = Object.keys(meubles).every(function (cle) { return meubles[cle].articles.length === 0; });
   document.documentElement.classList.toggle("studio-vide", studioVide);
-  // Les mêmes mots que la porte d'entrée (repérer, coller son lien, organiser), et le bon geste :
-  // « touche » sur un écran tactile, « clique » à la souris (21 octobre 2026)
-  // Sur ordinateur, le studio vide dit seulement où cliquer (choix de Pauline, 21 octobre 2026)
+  // Le studio vide dit seulement où toucher ou cliquer, le même texte partout, au bon geste près :
+  // « touche » sur un écran tactile, « clique sur » à la souris (choix de Pauline, 21 octobre 2026)
   const tactile = window.matchMedia("(pointer: coarse)").matches;
   const geste = tactile ? "touche" : "clique sur";
+  const Geste = geste[0].toUpperCase() + geste.slice(1);
   document.getElementById("accueil-texte").textContent = studioVide
-    ? (tactile ? "Ton studio attend tes premiers articles. Repère un article en ligne, puis touche le bouton + et colle son lien."
-               : "Ton studio attend tes premiers articles. Clique sur le bouton + pour en ajouter un.")
-    : geste[0].toUpperCase() + geste.slice(1) + " un meuble pour voir les articles que tu y as rangés.";
+    ? "Ton studio attend tes premiers articles. " + Geste + " le bouton + pour en ajouter un."
+    : Geste + " un meuble pour voir les articles que tu y as rangés.";
+  // Sur téléphone, sans la bulle, le même accueil s'affiche sous le bandeau quand le studio est vide,
+  // avec son titre (issue n° 7)
+  const indice = document.getElementById("indice-vide");
+  if (indice) {
+    indice.hidden = false;
+    document.getElementById("indice-texte").textContent = studioVide ? document.getElementById("accueil-texte").textContent : "";
+  }
   // Le nombre d'articles en toutes lettres, dans la liste des meubles de la bulle (ordinateur) ;
   // « Vide » plutôt qu'« Aucun article » (choix de Pauline, 19 octobre 2026)
   document.querySelectorAll("[data-compte-texte]").forEach(function (element) {
@@ -504,6 +510,7 @@ panneau.addEventListener("click", function (evenement) {
 // Les onglets du menu : un clic ou les flèches du clavier changent le contenu de la bulle,
 // et la queue de la bulle se place en face de l'onglet choisi
 const onglets = Array.from(document.querySelectorAll('[role="tab"]'));
+const surTelephone = window.matchMedia("(max-width: 600px)");
 const bulle = document.getElementById("bulle");
 
 function placerQueue(onglet) {
@@ -522,15 +529,22 @@ function choisirOnglet(onglet, donnerFocus) {
   });
   if (donnerFocus) onglet.focus();
   placerQueue(onglet);
+  // Sur téléphone, la boutique est une page à part, et l'icône du haut ramène au studio (issue n° 7)
+  document.documentElement.classList.toggle("vue-boutique", onglet.id === "onglet-boutique");
+  if (surTelephone.matches) window.scrollTo(0, 0);
 }
 
 onglets.forEach(function (onglet, rang) {
-  onglet.addEventListener("click", function () { choisirOnglet(onglet, false); });
+  onglet.addEventListener("click", function () {
+    choisirOnglet(onglet, false);
+    // Sur téléphone, l'icône touchée disparaît (on est sur sa page) : le focus passe à l'autre
+    if (surTelephone.matches) onglets.find(function (o) { return o !== onglet; }).focus();
+  });
   onglet.addEventListener("keydown", function (evenement) {
     const pas = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[evenement.key];
     if (pas) {
       evenement.preventDefault();
-      choisirOnglet(onglets[(rang + pas + onglets.length) % onglets.length], true);
+      choisirOnglet(onglets[(rang + pas + onglets.length) % onglets.length], !surTelephone.matches);
     } else if (evenement.key === "Home" || evenement.key === "End") {
       evenement.preventDefault();
       choisirOnglet(onglets[evenement.key === "Home" ? 0 : onglets.length - 1], true);
@@ -630,7 +644,11 @@ function ouvrirFenetre(article, cleMeuble) {
     CHAMPS.meuble.value = cleMeuble || "";
   }
   fenetre.showModal();
-  CHAMPS.lien.focus();
+  // Sur un écran tactile, le clavier ne s'ouvre qu'au toucher d'un champ : le focus va au titre de la
+  // fenêtre, pas au champ du lien (retour de Pauline sur iPhone, 21 octobre 2026). À la souris, le
+  // curseur attend dans le champ du lien, prêt pour le collage
+  if (window.matchMedia("(pointer: coarse)").matches) document.getElementById("ajout-titre").focus();
+  else CHAMPS.lien.focus();
 }
 
 boutonAjouter.addEventListener("click", function () { ouvrirFenetre(null, meubleOuvert); });
@@ -738,3 +756,178 @@ function deplacer(article, cle) {
   enregistrerArticles();
   annonce.textContent = "« " + article.nom + " » est déplacé dans " + meubles[cle].nom.toLowerCase() + ".";
 }
+
+
+// ---------- La navigation sur téléphone (issue n° 7, 21 octobre 2026) ----------
+// Mise au point avec Pauline dans planches/navigation.html.
+
+// Le store de la boutique : une toile rayée en pente, tendue sous une barre de bois, qui finit en
+// festons, un par rayure ; un pli d'ombre sous la barre, un reflet au milieu
+function dessinerStore() {
+  const L = 340, N = 10, haut = 12, bas = 52, retrait = 16, creux = 14;
+  const couleurs = ["var(--rose)", "#FFF6EA"];
+  let rayures = "", festons = "", ombres = "";
+  for (let i = 0; i < N; i++) {
+    const h0 = retrait + i * (L - 2 * retrait) / N, h1 = retrait + (i + 1) * (L - 2 * retrait) / N;
+    const b0 = i * L / N, b1 = (i + 1) * L / N, c = couleurs[i % 2];
+    rayures += '<polygon points="' + h0 + "," + haut + " " + h1 + "," + haut + " " + b1 + "," + bas + " " + b0 + "," + bas + '" fill="' + c + '" />';
+    const feston = "M" + b0 + " " + bas + " L" + b1 + " " + bas + " Q" + (b0 + b1) / 2 + " " + (bas + 2 * creux) + " " + b0 + " " + bas + " Z";
+    ombres += '<path d="' + feston + '" transform="translate(0 4)" fill="rgba(74, 51, 40, 0.18)" />';
+    festons += '<path d="' + feston + '" fill="' + c + '" stroke="var(--brun)" stroke-width="2.5" stroke-linejoin="round" />';
+  }
+  const toile = retrait + "," + haut + " " + (L - retrait) + "," + haut + " " + L + "," + bas + " 0," + bas;
+  document.getElementById("store").innerHTML = '<svg viewBox="-4 0 348 ' + (bas + creux + 10) + '">'
+    + '<defs><linearGradient id="pli" x1="0" y1="' + haut + '" x2="0" y2="' + bas + '" gradientUnits="userSpaceOnUse">'
+    + '<stop offset="0" stop-color="#4A3328" stop-opacity="0.32" /><stop offset="0.3" stop-color="#4A3328" stop-opacity="0" />'
+    + '<stop offset="0.62" stop-color="#FFFFFF" stop-opacity="0.22" /><stop offset="0.8" stop-color="#FFFFFF" stop-opacity="0" />'
+    + '<stop offset="1" stop-color="#4A3328" stop-opacity="0.12" /></linearGradient></defs>'
+    + ombres + festons + rayures
+    + '<polygon points="' + toile + '" fill="url(#pli)" />'
+    + '<polygon points="' + toile + '" fill="none" stroke="var(--brun)" stroke-width="2.5" stroke-linejoin="round" />'
+    + '<rect x="6" y="5" width="328" height="10" rx="5" fill="#7A5134" stroke="var(--brun)" stroke-width="2.5" />'
+    + '<rect x="14" y="7.5" width="300" height="2.5" rx="1.25" fill="#FFFFFF" opacity="0.25" />'
+    + '<circle cx="6" cy="10" r="6" fill="#7A5134" stroke="var(--brun)" stroke-width="2.5" />'
+    + '<circle cx="334" cy="10" r="6" fill="#7A5134" stroke="var(--brun)" stroke-width="2.5" /></svg>';
+}
+dessinerStore();
+
+// La porte d'entrée : à la première ouverture sur téléphone, puis quand on touche le nom de l'app
+const CLE_PORTE = "tiny-studio-porte-vue";
+const porte = document.getElementById("porte");
+const racine = document.documentElement;
+
+function porteDejaVue() {
+  try { return localStorage.getItem(CLE_PORTE) === "1"; } catch (erreur) { return false; }
+}
+
+function retenirPorte() {
+  try { localStorage.setItem(CLE_PORTE, "1"); } catch (erreur) { /* le navigateur refuse : elle reviendra */ }
+}
+
+// La pièce de la porte : une copie de la pièce du studio, et par-dessus elle, au même repère,
+// l'immeuble vu de dehors. Les meubles y attendent, cachés, la fin du glissement
+function preparerPorte() {
+  const cadre = document.getElementById("porte-piece");
+  cadre.textContent = "";
+  const piece = document.querySelector(".cadre-piece svg.studio").cloneNode(true);
+  piece.removeAttribute("role");
+  piece.removeAttribute("aria-label");
+  piece.querySelectorAll("[tabindex], [role]").forEach(function (element) {
+    element.removeAttribute("tabindex");
+    element.removeAttribute("role");
+  });
+  const immeuble = document.getElementById("immeuble").content.querySelector(".ext").cloneNode(true);
+  piece.appendChild(immeuble);
+  piece.setAttribute("viewBox", immeuble.getAttribute("data-viewbox"));
+  // Le décor arrive d'un bloc, les meubles l'un après l'autre, de près
+  let rang = 0;
+  piece.querySelectorAll(".objets > *").forEach(function (objet) {
+    objet.style.transitionDelay = objet.classList.contains("meuble") ? (0.04 + 0.03 * rang++) + "s" : "0s";
+  });
+  cadre.appendChild(piece);
+  porte.classList.remove("sortie", "ouverte", "devoile", "fondu", "meubles");
+}
+
+function ouvrirPorte() {
+  if (!surTelephone.matches) return;
+  choisirOnglet(onglets[0], false);
+  preparerPorte();
+  racine.classList.add("porte-ouverte", "avant-entree", "piece-cachee", "entree");
+  porte.hidden = false;
+  window.scrollTo(0, 0);
+  // Le focus va à la porte elle-même, sans contour : sur le bouton « Entrer », Safari dessinait un
+  // cadre en pointillés (retour de Pauline sur iPhone, 21 octobre 2026)
+  porte.focus({ preventScroll: true });
+}
+
+function fermerPorte() {
+  porte.hidden = true;
+  document.getElementById("porte-piece").textContent = "";
+  racine.classList.remove("porte-ouverte", "avant-entree", "piece-cachee");
+  setTimeout(function () { racine.classList.remove("entree"); }, 1200);
+}
+
+function entrer() {
+  retenirPorte();
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    fermerPorte();
+    return;
+  }
+  const piece = porte.querySelector(".porte-piece svg");
+  const a = piece.getBoundingClientRect();
+  const b = document.querySelector(".cadre-piece svg.studio").getBoundingClientRect();
+  const vb = piece.getAttribute("viewBox").split(" ").map(Number);
+  const ka = a.width / vb[2];
+  piece.style.transformOrigin = "0 0";
+  // 1. Les battants s'ouvrent sur l'entrée éclairée, les textes s'effacent ; la vue ne bouge pas
+  // (choix de Pauline, 21 octobre 2026 : pas de zoom sur la porte)
+  porte.classList.add("sortie", "ouverte");
+  ouvrirBattants(piece, 450);
+  // 2. La porte ouverte, la façade et le toit s'effacent et dévoilent le studio ; le fond, et avec lui
+  // les barres de Safari, quitte le rose en même temps
+  setTimeout(function () {
+    porte.classList.add("devoile", "fondu");
+    racine.classList.remove("porte-ouverte");
+  }, 450);
+  // 3. La pièce prend sa place : le viewBox de la porte est plus grand que celui de la pièce
+  // (60 26 660 676), on cale le coin de la pièce, et sa largeur, sur la pièce du studio
+  setTimeout(function () {
+    const s = (b.width / 660) / ka;
+    const tx = b.left - a.left - s * (60 - vb[0]) * ka, ty = b.top - a.top - s * (26 - vb[1]) * ka;
+    piece.style.transition = "transform 0.75s cubic-bezier(0.3, 0, 0.2, 1)";
+    piece.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + s + ")";
+    racine.classList.remove("avant-entree");
+  }, 650);
+  // 4. Les meubles arrivent pendant la fin du mouvement
+  setTimeout(function () { porte.classList.add("meubles"); }, 1000);
+  // 5. La pièce de la porte est posée exactement sur celle du studio, meubles compris : on échange
+  setTimeout(fermerPorte, 1450);
+}
+
+// Les battants pivotent sur leurs gonds, vers l'intérieur. Dans la vue isométrique, un battant du pan
+// de gauche (plan y = D) qui tourne d'un angle t garde ses montants verticaux, et sa largeur, qui
+// suivait l'axe x, s'oriente vers l'intérieur : à l'écran, une transformation affine (a, b, 0, 1)
+// autour du gond, calculée angle par angle, que l'animation enchaîne
+function ouvrirBattants(piece, duree) {
+  const C30 = Math.cos(Math.PI / 6), fin = 80;
+  ["battant-g", "battant-d"].forEach(function (classe) {
+    const gauche = classe === "battant-g";
+    const etapes = [];
+    for (let k = 0; k <= 8; k++) {
+      const t = (fin * k / 8) * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
+      const a = gauche ? c + s : c - s;
+      const b = gauche ? 0.5 * (c - s - 1) / C30 : 0.5 * (c + s - 1) / C30;
+      // Il passe à l'ombre en tournant
+      etapes.push({ transform: "matrix(" + a + ", " + b + ", 0, 1, 0, 0)", filter: "brightness(" + (1 - 0.35 * k / 8) + ")" });
+    }
+    const battant = piece.querySelector("." + classe);
+    if (battant) battant.animate(etapes, { duration: duree, easing: "cubic-bezier(0.4, 0, 0.3, 1)", fill: "forwards" });
+  });
+}
+
+document.getElementById("porte-entrer").addEventListener("click", entrer);
+
+// Le nom de l'app ramène à la porte d'entrée, sur téléphone
+const nomApp = document.querySelector(".marque");
+function brancherNomApp() {
+  if (surTelephone.matches) {
+    nomApp.setAttribute("role", "button");
+    nomApp.tabIndex = 0;
+    nomApp.setAttribute("aria-label", "Revoir l'accueil de Tiny Studio");
+  } else {
+    nomApp.removeAttribute("role");
+    nomApp.removeAttribute("tabindex");
+    nomApp.removeAttribute("aria-label");
+  }
+}
+nomApp.addEventListener("click", ouvrirPorte);
+nomApp.addEventListener("keydown", function (evenement) {
+  if (surTelephone.matches && (evenement.key === "Enter" || evenement.key === " ")) {
+    evenement.preventDefault();
+    ouvrirPorte();
+  }
+});
+surTelephone.addEventListener("change", brancherNomApp);
+brancherNomApp();
+
+if (surTelephone.matches && !porteDejaVue()) ouvrirPorte();
