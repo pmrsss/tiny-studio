@@ -694,9 +694,11 @@ body::after {
     background: var(--carte); border-color: var(--brun); box-shadow: 0 4px 0 var(--brun); transform: none;
   }
   .marque { cursor: pointer; }
-  /* La pièce grandit d'environ 9 % ; ses pointes de côté passent juste sous le bord de l'écran */
-  .cadre-piece { overflow-x: clip; }
-  .cadre-piece .studio { flex: none; width: 106%; max-width: none; margin: 0; }
+  /* La pièce prend toute la largeur de l'écran, sans rien couper : rognée au bord de la page, elle
+     perdait l'épaisseur du mur de gauche et le coin du socle, et son ombre finissait en ligne droite
+     (retour de Pauline sur iPhone, 21 octobre 2026) */
+  .cadre-piece { width: 100vw; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); overflow: visible; }
+  .cadre-piece .studio { flex: none; width: 100%; max-width: none; margin: 0; }
   /* Le studio vide : un mot en haut, sous le bandeau, à la place de la bulle (en bas, il passait
      sous le bouton « + ») */
   .studio-vide:not(.vue-boutique) .indice-vide {
