@@ -784,8 +784,8 @@ body::after {
 .porte-entrer:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--brun); }
 .porte-entrer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
 
-/* L'entrée, en 2 secondes environ (21 octobre 2026) : les battants s'ouvrent, on s'avance vers la
-   porte, la façade et le toit s'effacent autour de nous, puis la pièce prend sa place avec ses murs et
+/* L'entrée, en 2 secondes environ (21 octobre 2026) : les battants s'ouvrent, la vue ne bouge pas,
+   puis la façade et le toit s'effacent et dévoilent le studio ; la pièce prend sa place avec ses murs et
    son sol, les meubles arrivent pendant la fin du mouvement, enfin le tiroir monte et le « + » apparaît */
 .porte > :not(.porte-piece) { transition: opacity 0.2s ease, transform 0.2s ease; }
 .porte.sortie { pointer-events: none; }

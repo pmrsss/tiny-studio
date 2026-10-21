@@ -859,19 +859,12 @@ function entrer() {
   const vb = piece.getAttribute("viewBox").split(" ").map(Number);
   const ka = a.width / vb[2];
   piece.style.transformOrigin = "0 0";
-  // 1. Les battants s'ouvrent sur l'entrée éclairée, les textes s'effacent
+  // 1. Les battants s'ouvrent sur l'entrée éclairée, les textes s'effacent ; la vue ne bouge pas, on
+  // laisse à la porte le temps de s'ouvrir (choix de Pauline, 21 octobre 2026 : pas de zoom sur elle)
   porte.classList.add("sortie", "ouverte");
-  // 2. On s'avance vers la porte : la scène grandit autour de son seuil
-  setTimeout(function () {
-    const seuil = piece.querySelector(".ext-battant").getBBox();
-    const ox = (seuil.x + seuil.width / 2 - vb[0]) * ka, oy = (seuil.y + seuil.height * 0.6 - vb[1]) * ka;
-    const z = 2.2;
-    piece.style.transition = "transform 0.8s cubic-bezier(0.55, 0, 0.35, 1)";
-    piece.style.transform = "translate(" + ox * (1 - z) + "px, " + oy * (1 - z) + "px) scale(" + z + ")";
-  }, 350);
-  // 3. La façade et le toit s'effacent autour de nous
+  // 2. Une fois la porte ouverte, la façade et le toit s'effacent et dévoilent le studio
   setTimeout(function () { porte.classList.add("devoile"); }, 800);
-  // 4. La pièce prend sa place : le viewBox de la porte est plus grand que celui de la pièce
+  // 3. La pièce prend sa place : le viewBox de la porte est plus grand que celui de la pièce
   // (60 26 660 676), on cale le coin de la pièce, et sa largeur, sur la pièce du studio
   setTimeout(function () {
     const s = (b.width / 660) / ka;
@@ -881,9 +874,9 @@ function entrer() {
     porte.classList.add("fondu");
     racine.classList.remove("porte-ouverte", "avant-entree");
   }, 1150);
-  // 5. Les meubles arrivent pendant la fin du mouvement
+  // 4. Les meubles arrivent pendant la fin du mouvement
   setTimeout(function () { porte.classList.add("meubles"); }, 1550);
-  // 6. La pièce de la porte est posée exactement sur celle du studio, meubles compris : on échange
+  // 5. La pièce de la porte est posée exactement sur celle du studio, meubles compris : on échange
   setTimeout(fermerPorte, 2000);
 }
 
