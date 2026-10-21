@@ -698,7 +698,7 @@ body::after {
      perdait l'épaisseur du mur de gauche et le coin du socle, et son ombre finissait en ligne droite
      (retour de Pauline sur iPhone, 21 octobre 2026) */
   .cadre-piece { width: 100vw; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); overflow: visible; }
-  .cadre-piece .studio { flex: none; width: 100%; max-width: none; margin: 0; }
+  .cadre-piece .studio { flex: none; width: 93%; max-width: none; margin: 0 auto; }  /* un peu d'air sur les côtés (retour de Pauline, 21 octobre 2026) */
   /* Le studio vide : un mot en haut, sous le bandeau, à la place de la bulle (en bas, il passait
      sous le bouton « + ») */
   .studio-vide:not(.vue-boutique) .indice-vide {
