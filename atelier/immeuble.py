@@ -480,7 +480,11 @@ calques = [("ext-sol", sol()),
            ("ext-battant", battants()),
            ("ext-marche", devant()),
            ("ext-toit", toit())]
-corps = "".join(f'<g class="{c}">{s}</g>' for c, s in calques)
+# Les battants pivotent vers l'intérieur : derrière le mur, ils ne se voient qu'à travers l'embrasure
+# de la porte, d'où ce découpage à sa forme (21 octobre 2026)
+DEFS.append(f'<clipPath id="ext-embrasure">{forme(sur_y(D + 0.02, rect(XC - 1.4, XC + 1.4, 0, 6.0)), "#000")}</clipPath>')
+DECOUPE = ' clip-path="url(#ext-embrasure)"'
+corps = "".join(f'<g class="{c}"{DECOUPE if c == "ext-battant" else ""}>{s}</g>' for c, s in calques)
 svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{VIEWBOX}"><g class="ext" data-viewbox="{VIEWBOX}">'
        f'<defs>{"".join(DEFS)}</defs>{corps}</g></svg>')
 

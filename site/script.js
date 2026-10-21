@@ -859,25 +859,50 @@ function entrer() {
   const vb = piece.getAttribute("viewBox").split(" ").map(Number);
   const ka = a.width / vb[2];
   piece.style.transformOrigin = "0 0";
-  // 1. Les battants s'ouvrent sur l'entrée éclairée, les textes s'effacent ; la vue ne bouge pas, on
-  // laisse à la porte le temps de s'ouvrir (choix de Pauline, 21 octobre 2026 : pas de zoom sur elle)
+  // 1. Les battants s'ouvrent sur l'entrée éclairée, les textes s'effacent ; la vue ne bouge pas
+  // (choix de Pauline, 21 octobre 2026 : pas de zoom sur la porte)
   porte.classList.add("sortie", "ouverte");
-  // 2. Une fois la porte ouverte, la façade et le toit s'effacent et dévoilent le studio
-  setTimeout(function () { porte.classList.add("devoile"); }, 800);
+  ouvrirBattants(piece, 450);
+  // 2. La porte ouverte, la façade et le toit s'effacent et dévoilent le studio ; le fond, et avec lui
+  // les barres de Safari, quitte le rose en même temps
+  setTimeout(function () {
+    porte.classList.add("devoile", "fondu");
+    racine.classList.remove("porte-ouverte");
+  }, 450);
   // 3. La pièce prend sa place : le viewBox de la porte est plus grand que celui de la pièce
   // (60 26 660 676), on cale le coin de la pièce, et sa largeur, sur la pièce du studio
   setTimeout(function () {
     const s = (b.width / 660) / ka;
     const tx = b.left - a.left - s * (60 - vb[0]) * ka, ty = b.top - a.top - s * (26 - vb[1]) * ka;
-    piece.style.transition = "transform 0.8s cubic-bezier(0.3, 0, 0.2, 1)";
+    piece.style.transition = "transform 0.75s cubic-bezier(0.3, 0, 0.2, 1)";
     piece.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + s + ")";
-    porte.classList.add("fondu");
-    racine.classList.remove("porte-ouverte", "avant-entree");
-  }, 1150);
+    racine.classList.remove("avant-entree");
+  }, 650);
   // 4. Les meubles arrivent pendant la fin du mouvement
-  setTimeout(function () { porte.classList.add("meubles"); }, 1550);
+  setTimeout(function () { porte.classList.add("meubles"); }, 1000);
   // 5. La pièce de la porte est posée exactement sur celle du studio, meubles compris : on échange
-  setTimeout(fermerPorte, 2000);
+  setTimeout(fermerPorte, 1450);
+}
+
+// Les battants pivotent sur leurs gonds, vers l'intérieur. Dans la vue isométrique, un battant du pan
+// de gauche (plan y = D) qui tourne d'un angle t garde ses montants verticaux, et sa largeur, qui
+// suivait l'axe x, s'oriente vers l'intérieur : à l'écran, une transformation affine (a, b, 0, 1)
+// autour du gond, calculée angle par angle, que l'animation enchaîne
+function ouvrirBattants(piece, duree) {
+  const C30 = Math.cos(Math.PI / 6), fin = 80;
+  ["battant-g", "battant-d"].forEach(function (classe) {
+    const gauche = classe === "battant-g";
+    const etapes = [];
+    for (let k = 0; k <= 8; k++) {
+      const t = (fin * k / 8) * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
+      const a = gauche ? c + s : c - s;
+      const b = gauche ? 0.5 * (c - s - 1) / C30 : 0.5 * (c + s - 1) / C30;
+      // Il passe à l'ombre en tournant
+      etapes.push({ transform: "matrix(" + a + ", " + b + ", 0, 1, 0, 0)", filter: "brightness(" + (1 - 0.35 * k / 8) + ")" });
+    }
+    const battant = piece.querySelector("." + classe);
+    if (battant) battant.animate(etapes, { duration: duree, easing: "cubic-bezier(0.4, 0, 0.3, 1)", fill: "forwards" });
+  });
 }
 
 document.getElementById("porte-entrer").addEventListener("click", entrer);
