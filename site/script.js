@@ -644,7 +644,11 @@ function ouvrirFenetre(article, cleMeuble) {
     CHAMPS.meuble.value = cleMeuble || "";
   }
   fenetre.showModal();
-  CHAMPS.lien.focus();
+  // Sur un écran tactile, le clavier ne s'ouvre qu'au toucher d'un champ : le focus va au titre de la
+  // fenêtre, pas au champ du lien (retour de Pauline sur iPhone, 21 octobre 2026). À la souris, le
+  // curseur attend dans le champ du lien, prêt pour le collage
+  if (window.matchMedia("(pointer: coarse)").matches) document.getElementById("ajout-titre").focus();
+  else CHAMPS.lien.focus();
 }
 
 boutonAjouter.addEventListener("click", function () { ouvrirFenetre(null, meubleOuvert); });

@@ -157,7 +157,7 @@
        une fiche, et le bouton « + », toujours visible -->
   <dialog class="fenetre" id="fenetre" aria-labelledby="ajout-titre">
     <form class="formulaire-ajout" id="formulaire-ajout" novalidate>
-      <p class="ajout-titre" id="ajout-titre">Nouvel article</p>
+      <p class="ajout-titre" id="ajout-titre" tabindex="-1" autofocus>Nouvel article</p>
       <div class="champ">
         <label for="champ-lien">Lien du produit</label>
         <input id="champ-lien" name="lien" type="url" inputmode="url" autocomplete="off" placeholder="https://" required aria-describedby="erreur-lien">
