@@ -743,11 +743,19 @@ body::after {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
   padding: 24px 22px calc(24px + env(safe-area-inset-bottom)); text-align: center;
 }
+/* Le fond de la porte : un halo clair au milieu, et en haut comme en bas exactement le rose du fond
+   de la page, dont Safari colore ses barres ; sans ce raccord, une bande de couleur dépassait sous
+   l'heure et la batterie (retour de Pauline sur iPhone, 21 octobre 2026) */
 .porte::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
-  background: radial-gradient(120% 70% at 50% 42%, #FCEEEA 0, #F4DAD3 58%, #E9C6BE 100%);
+  background:
+    linear-gradient(#F3D9D2 0, rgba(243, 217, 210, 0) 110px),
+    linear-gradient(to top, #F3D9D2 0, rgba(243, 217, 210, 0) 110px),
+    radial-gradient(120% 70% at 50% 42%, #FCEEEA 0, #F4DAD3 58%, #F3D9D2 100%);
+  background-color: #F3D9D2;
   transition: opacity 0.36s ease 0.26s;
 }
+.porte:focus { outline: none; }
 .porte-titre { display: flex; flex-direction: column; gap: 8px; }
 .porte-marque { margin: 0; font: 700 40px / 1 Fredoka, Nunito, sans-serif; color: var(--brun); }
 .porte-accroche { margin: 0; font: 700 15px / 1.4 Nunito, sans-serif; color: var(--brun-doux); }

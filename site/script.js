@@ -831,7 +831,9 @@ function ouvrirPorte() {
   racine.classList.add("porte-ouverte", "avant-entree", "piece-cachee", "entree");
   porte.hidden = false;
   window.scrollTo(0, 0);
-  document.getElementById("porte-entrer").focus();
+  // Le focus va à la porte elle-même, sans contour : sur le bouton « Entrer », Safari dessinait un
+  // cadre en pointillés (retour de Pauline sur iPhone, 21 octobre 2026)
+  porte.focus({ preventScroll: true });
 }
 
 function fermerPorte() {
@@ -867,10 +869,7 @@ function entrer() {
   // Les meubles arrivent pendant la fin du glissement
   setTimeout(function () { porte.classList.add("meubles"); }, 560);
   // La pièce de la porte est posée exactement sur celle du studio, meubles compris : on échange
-  setTimeout(function () {
-    fermerPorte();
-    document.getElementById("bouton-plus").focus({ preventScroll: true });
-  }, 1100);
+  setTimeout(fermerPorte, 1100);
 }
 
 document.getElementById("porte-entrer").addEventListener("click", entrer);
