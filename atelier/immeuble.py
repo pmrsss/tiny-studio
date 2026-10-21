@@ -355,19 +355,20 @@ def etage():
 
 
 def battants():
-    """La porte du studio, à deux battants, plus sombre que le mur, chacun avec une vitre haute allumée
-    et un panneau bas ; à part, pour pouvoir s'ouvrir."""
+    """La porte du studio, à deux battants, plus sombre que le mur, chacun avec une vitre haute allumée,
+    un panneau bas et sa poignée ; chaque battant dans son groupe (battant-g, battant-d), pour que
+    l'entrée le fasse pivoter sur ses gonds, vers l'intérieur (21 octobre 2026)."""
     y = D + 0.02
     l, zh = 1.4, 6.0
     out = []
-    for (x0, x1) in ((XC - l, XC - 0.04), (XC + 0.04, XC + l)):
-        out.append(forme(sur_y(y, rect(x0, x1, 0, zh)), degrade([(0, SOMBRE[0], 1), (1, SOMBRE[1], 1)]), r=6))
-        out.append(forme(sur_y(y + 0.003, rect(x0 + 0.25, x1 - 0.25, 3.3, zh - 0.35)), degrade([(0, VERRE_CHAUD[0], 1), (1, VERRE_CHAUD[1], 1)]), r=6))
-        out.append(forme(sur_y(y + 0.003, rect(x0 + 0.25, x1 - 0.25, 0.45, 2.8)), SOMBRE[2], r=6))
-        out.append(forme(sur_y(y + 0.004, rect(x0 + 0.4, x1 - 0.25, 0.45, 2.65)), SOMBRE[1], r=5))
-    for xp in (XC - 0.32, XC + 0.32):
+    for (x0, x1, xp, classe) in ((XC - l, XC - 0.04, XC - 0.32, "battant-g"), (XC + 0.04, XC + l, XC + 0.32, "battant-d")):
+        b = [forme(sur_y(y, rect(x0, x1, 0, zh)), degrade([(0, SOMBRE[0], 1), (1, SOMBRE[1], 1)]), r=6),
+             forme(sur_y(y + 0.003, rect(x0 + 0.25, x1 - 0.25, 3.3, zh - 0.35)), degrade([(0, VERRE_CHAUD[0], 1), (1, VERRE_CHAUD[1], 1)]), r=6),
+             forme(sur_y(y + 0.003, rect(x0 + 0.25, x1 - 0.25, 0.45, 2.8)), SOMBRE[2], r=6),
+             forme(sur_y(y + 0.004, rect(x0 + 0.4, x1 - 0.25, 0.45, 2.65)), SOMBRE[1], r=5)]
         sx, sy = q(xp, y + 0.006, 3.0)
-        out.append(f'<circle cx="{sx:.1f}" cy="{sy:.1f}" r="4.4" fill="#F3D7A8" /><circle cx="{sx + 1:.1f}" cy="{sy - 1.2:.1f}" r="1.7" fill="#FFF6E2" />')
+        b.append(f'<circle cx="{sx:.1f}" cy="{sy:.1f}" r="4.4" fill="#F3D7A8" /><circle cx="{sx + 1:.1f}" cy="{sy - 1.2:.1f}" r="1.7" fill="#FFF6E2" />')
+        out.append(f'<g class="{classe}">' + "".join(b) + "</g>")
     return "".join(out)
 
 

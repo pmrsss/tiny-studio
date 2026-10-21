@@ -825,7 +825,7 @@ function preparerPorte() {
     objet.style.transitionDelay = objet.classList.contains("meuble") ? (0.04 + 0.03 * rang++) + "s" : "0s";
   });
   cadre.appendChild(piece);
-  porte.classList.remove("sortie", "ouverte", "devoile", "meubles");
+  porte.classList.remove("sortie", "ouverte", "devoile", "fondu", "meubles");
 }
 
 function ouvrirPorte() {
@@ -856,24 +856,35 @@ function entrer() {
   const piece = porte.querySelector(".porte-piece svg");
   const a = piece.getBoundingClientRect();
   const b = document.querySelector(".cadre-piece svg.studio").getBoundingClientRect();
-  // La porte s'ouvre et les textes s'effacent, puis la façade s'en va
+  const vb = piece.getAttribute("viewBox").split(" ").map(Number);
+  const ka = a.width / vb[2];
+  piece.style.transformOrigin = "0 0";
+  // 1. Les battants s'ouvrent sur l'entrée éclairée, les textes s'effacent
   porte.classList.add("sortie", "ouverte");
-  racine.classList.remove("porte-ouverte");
-  setTimeout(function () { porte.classList.add("devoile"); }, 80);
+  // 2. On s'avance vers la porte : la scène grandit autour de son seuil
   setTimeout(function () {
-    // La pièce glisse jusqu'à sa place : le viewBox de la porte est plus grand que celui de la pièce
-    // (60 26 660 676), on cale le coin de la pièce, et sa largeur, sur la pièce du studio
-    const vb = piece.getAttribute("viewBox").split(" ").map(Number);
-    const ka = a.width / vb[2], s = (b.width / 660) / ka;
+    const seuil = piece.querySelector(".ext-battant").getBBox();
+    const ox = (seuil.x + seuil.width / 2 - vb[0]) * ka, oy = (seuil.y + seuil.height * 0.6 - vb[1]) * ka;
+    const z = 2.2;
+    piece.style.transition = "transform 0.8s cubic-bezier(0.55, 0, 0.35, 1)";
+    piece.style.transform = "translate(" + ox * (1 - z) + "px, " + oy * (1 - z) + "px) scale(" + z + ")";
+  }, 350);
+  // 3. La façade et le toit s'effacent autour de nous
+  setTimeout(function () { porte.classList.add("devoile"); }, 800);
+  // 4. La pièce prend sa place : le viewBox de la porte est plus grand que celui de la pièce
+  // (60 26 660 676), on cale le coin de la pièce, et sa largeur, sur la pièce du studio
+  setTimeout(function () {
+    const s = (b.width / 660) / ka;
     const tx = b.left - a.left - s * (60 - vb[0]) * ka, ty = b.top - a.top - s * (26 - vb[1]) * ka;
-    piece.style.transformOrigin = "0 0";
+    piece.style.transition = "transform 0.8s cubic-bezier(0.3, 0, 0.2, 1)";
     piece.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + s + ")";
-    racine.classList.remove("avant-entree");
-  }, 260);
-  // Les meubles arrivent pendant la fin du glissement
-  setTimeout(function () { porte.classList.add("meubles"); }, 560);
-  // La pièce de la porte est posée exactement sur celle du studio, meubles compris : on échange
-  setTimeout(fermerPorte, 1100);
+    porte.classList.add("fondu");
+    racine.classList.remove("porte-ouverte", "avant-entree");
+  }, 1150);
+  // 5. Les meubles arrivent pendant la fin du mouvement
+  setTimeout(function () { porte.classList.add("meubles"); }, 1550);
+  // 6. La pièce de la porte est posée exactement sur celle du studio, meubles compris : on échange
+  setTimeout(fermerPorte, 2000);
 }
 
 document.getElementById("porte-entrer").addEventListener("click", entrer);

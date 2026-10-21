@@ -741,7 +741,7 @@ body::after {
   /* Le tiroir, fixé au bas de l'écran, donnait son miel à la barre de Safari, même caché sous la
      porte : il n'existe pas tant que la porte est là (retour de Pauline sur iPhone, 21 octobre 2026) */
   .porte-ouverte .barre-meubles { display: none; }
-  .entree, .entree body { transition: background-color 0.36s ease 0.26s; }
+  .entree, .entree body { transition: background-color 0.45s ease; }
 }
 
 /* La porte d'entrée */
@@ -760,14 +760,14 @@ body::after {
     linear-gradient(to top, #F3D9D2 0, rgba(243, 217, 210, 0) 110px),
     radial-gradient(120% 70% at 50% 42%, #FCEEEA 0, #F4DAD3 58%, #F3D9D2 100%);
   background-color: #F3D9D2;
-  transition: opacity 0.36s ease 0.26s;
+  transition: opacity 0.45s ease;
 }
 .porte:focus { outline: none; }
 .porte-titre { display: flex; flex-direction: column; gap: 8px; }
 .porte-marque { margin: 0; font: 700 40px / 1 Fredoka, Nunito, sans-serif; color: var(--brun); }
 .porte-accroche { margin: 0; font: 700 15px / 1.4 Nunito, sans-serif; color: var(--brun-doux); }
 .porte-piece { width: 82%; }
-.porte-piece svg { display: block; width: 100%; height: auto; overflow: visible; transition: transform 0.62s cubic-bezier(0.45, 0.05, 0.25, 1); }
+.porte-piece svg { display: block; width: 100%; height: auto; overflow: visible; }  /* ses transitions, phase par phase, sont posées par le script */
 .porte-piece * { pointer-events: none; }
 .porte-etapes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; text-align: left; }
 .porte-etapes li { display: flex; align-items: center; gap: 12px; font: 700 14.5px / 1.3 Nunito, sans-serif; color: var(--brun); }
@@ -784,20 +784,26 @@ body::after {
 .porte-entrer:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--brun); }
 .porte-entrer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
 
-/* L'entrée, en 1,1 seconde environ : la porte s'ouvre, le toit monte et la façade descend en
-   s'effaçant (une maison de poupée), la pièce glisse jusqu'à sa place avec ses murs et son sol, les
-   meubles arrivent pendant la fin du glissement, puis le tiroir monte et le « + » apparaît */
+/* L'entrée, en 2 secondes environ (21 octobre 2026) : les battants s'ouvrent, on s'avance vers la
+   porte, la façade et le toit s'effacent autour de nous, puis la pièce prend sa place avec ses murs et
+   son sol, les meubles arrivent pendant la fin du mouvement, enfin le tiroir monte et le « + » apparaît */
 .porte > :not(.porte-piece) { transition: opacity 0.2s ease, transform 0.2s ease; }
 .porte.sortie { pointer-events: none; }
 .porte.sortie > :not(.porte-piece) { opacity: 0; transform: translateY(10px); }
-.porte.sortie::before { opacity: 0; }
-.porte-piece .ext-battant { transition: opacity 0.18s ease; }
-.porte-piece .ext-sol, .porte-piece .ext-murs, .porte-piece .ext-marche, .porte-piece .ext-toit {
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+.porte.fondu::before { opacity: 0; }
+/* Les deux battants pivotent sur leurs gonds, vers l'intérieur : chacun se resserre contre son bord
+   et s'assombrit en tournant (21 octobre 2026) */
+.porte-piece .battant-g, .porte-piece .battant-d {
+  transform-box: fill-box; transition: transform 0.65s cubic-bezier(0.45, 0, 0.3, 1), filter 0.65s ease;
 }
-.porte.ouverte .ext-battant { opacity: 0; }
+.porte-piece .battant-g { transform-origin: 0% 50%; }
+.porte-piece .battant-d { transform-origin: 100% 50%; }
+.porte.ouverte .battant-g, .porte.ouverte .battant-d { transform: scaleX(0.14); filter: brightness(0.7); }
+.porte-piece .ext-sol, .porte-piece .ext-murs, .porte-piece .ext-battant, .porte-piece .ext-marche, .porte-piece .ext-toit {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
+}
 .porte.devoile .ext-toit { transform: translateY(-80px); opacity: 0; }
-.porte.devoile .ext-murs, .porte.devoile .ext-marche, .porte.devoile .ext-sol { transform: translateY(60px); opacity: 0; }
+.porte.devoile .ext-murs, .porte.devoile .ext-battant, .porte.devoile .ext-marche, .porte.devoile .ext-sol { transform: translateY(60px); opacity: 0; }
 .porte-piece .objets > *, .porte-piece .ombre-mur, .porte-piece [clip-path="url(#sol-parquet)"] [fill="#6E4426"] {
   transition: opacity 0.26s ease, transform 0.32s cubic-bezier(0.2, 0.8, 0.3, 1);
 }
