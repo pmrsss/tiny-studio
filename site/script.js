@@ -116,9 +116,12 @@ function afficherCompteurs() {
   document.documentElement.classList.toggle("studio-vide", studioVide);
   // Les mêmes mots que la porte d'entrée (repérer, coller son lien, organiser), et le bon geste :
   // « touche » sur un écran tactile, « clique » à la souris (21 octobre 2026)
-  const geste = window.matchMedia("(pointer: coarse)").matches ? "touche" : "clique sur";
+  // Sur ordinateur, le studio vide dit seulement où cliquer (choix de Pauline, 21 octobre 2026)
+  const tactile = window.matchMedia("(pointer: coarse)").matches;
+  const geste = tactile ? "touche" : "clique sur";
   document.getElementById("accueil-texte").textContent = studioVide
-    ? "Ton studio attend tes premiers articles. Repère un article en ligne, puis " + geste + " le bouton + et colle son lien."
+    ? (tactile ? "Ton studio attend tes premiers articles. Repère un article en ligne, puis touche le bouton + et colle son lien."
+               : "Ton studio attend tes premiers articles. Clique sur le bouton + pour en ajouter un.")
     : geste[0].toUpperCase() + geste.slice(1) + " un meuble pour voir les articles que tu y as rangés.";
   // Le nombre d'articles en toutes lettres, dans la liste des meubles de la bulle (ordinateur) ;
   // « Vide » plutôt qu'« Aucun article » (choix de Pauline, 19 octobre 2026)
