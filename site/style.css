@@ -700,9 +700,11 @@ body::after {
   /* Le studio vide : un mot en haut, sous le bandeau, à la place de la bulle (en bas, il passait
      sous le bouton « + ») */
   .studio-vide:not(.vue-boutique) .indice-vide {
-    display: block; order: -1; margin: 18px 28px 0; text-align: center; text-wrap: balance;
+    display: block; order: -1; margin: 30px 28px 0; text-align: center; text-wrap: balance;
     font: 700 14.5px / 1.45 Nunito, sans-serif; color: var(--brun-doux);
   }
+  .indice-vide h2 { margin: 0 0 6px; font: 700 18px / 1.2 Fredoka, Nunito, sans-serif; color: var(--brun); }
+  .indice-vide p { margin: 0; }
 
   /* La boutique, en page à part : ni pièce, ni tiroir, ni « + », une vitrine sous un store */
   .vue-boutique .cadre-piece, .vue-boutique .barre-meubles, .vue-boutique .bouton-plus { display: none !important; }
