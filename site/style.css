@@ -736,6 +736,9 @@ body::after {
   /* Pendant la porte d'entrée, le fond de la page prend le rose de l'immeuble (Safari en colore ses
      barres), et la page ne défile pas */
   .porte-ouverte, .porte-ouverte body { background-color: #F3D9D2; overflow: hidden; }
+  /* Le tiroir, fixé au bas de l'écran, donnait son miel à la barre de Safari, même caché sous la
+     porte : il n'existe pas tant que la porte est là (retour de Pauline sur iPhone, 21 octobre 2026) */
+  .porte-ouverte .barre-meubles { display: none; }
   .entree, .entree body { transition: background-color 0.36s ease 0.26s; }
 }
 
