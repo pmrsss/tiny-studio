@@ -832,7 +832,7 @@ function ouvrirPorte() {
   if (!surTelephone.matches) return;
   choisirOnglet(onglets[0], false);
   preparerPorte();
-  racine.classList.add("porte-ouverte", "avant-entree", "piece-cachee", "entree");
+  racine.classList.add("porte-ouverte", "avant-entree", "piece-cachee", "entree", "tiroir-creme");
   porte.hidden = false;
   window.scrollTo(0, 0);
   // Le focus va à la porte elle-même, sans contour : sur le bouton « Entrer », Safari dessinait un
@@ -843,7 +843,7 @@ function ouvrirPorte() {
 function fermerPorte() {
   porte.hidden = true;
   document.getElementById("porte-piece").textContent = "";
-  racine.classList.remove("porte-ouverte", "avant-entree", "piece-cachee");
+  racine.classList.remove("porte-ouverte", "avant-entree", "piece-cachee", "tiroir-creme");
   setTimeout(function () { racine.classList.remove("entree"); }, 1200);
 }
 
@@ -878,8 +878,10 @@ function entrer() {
     piece.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + s + ")";
     racine.classList.remove("avant-entree");
   }, 650);
-  // 4. Les meubles arrivent pendant la fin du mouvement
+  // 4. Les meubles arrivent pendant la fin du mouvement ; le tiroir monte (0,55 s après la pièce) et
+  // prend son miel à ce moment-là, la barre de Safari avec lui
   setTimeout(function () { porte.classList.add("meubles"); }, 1000);
+  setTimeout(function () { racine.classList.remove("tiroir-creme"); }, 1200);
   // 5. La pièce de la porte est posée exactement sur celle du studio, meubles compris : on échange
   setTimeout(fermerPorte, 1450);
 }

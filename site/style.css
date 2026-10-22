@@ -809,12 +809,13 @@ body::after {
 /* La pièce du studio reste cachée tant que celle de la porte n'est pas posée sur elle ; en opacité,
    pas en visibilité, qui cacherait aussi les motifs (le papier peint) que la pièce de la porte réutilise */
 .piece-cachee .cadre-piece .studio { opacity: 0; }
-.entree .barre-meubles { transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.2, 1) 0.55s, background-color 0.35s ease 0.55s; }
-.entree .barre-meubles::after { transition: background-color 0.35s ease 0.55s; }
+.entree .barre-meubles { transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.2, 1) 0.55s, background-color 0.35s ease; }
+.entree .barre-meubles::after { transition: background-color 0.35s ease; }
 /* Le tiroir attend sous l'écran en crème, et prend son miel en montant : fixé au bas de l'écran, c'est
    lui qui colore la barre de Safari, qui restait miel pendant toute l'entrée (retour de Pauline sur
-   iPhone, 22 octobre 2026) */
-.avant-entree .barre-meubles, .avant-entree .barre-meubles::after { background-color: #F3EADF; }
+   iPhone, 22 octobre 2026). Safari prend la couleur d'arrivée d'une transition sans l'attendre : le
+   miel est donc rendu par le script au moment où le tiroir monte, pas par un délai de transition */
+.tiroir-creme .barre-meubles, .tiroir-creme .barre-meubles::after { background-color: #F3EADF; }
 .entree .bouton-plus { transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1) 0.75s; }
 .entree .onglets { transition: opacity 0.25s ease 0.6s; }
 .avant-entree .barre-meubles { transform: translateY(115%); }
