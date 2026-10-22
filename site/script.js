@@ -860,13 +860,13 @@ function entrer() {
   const ka = a.width / vb[2];
   piece.style.transformOrigin = "0 0";
   // 1. Les battants s'ouvrent sur l'entrée éclairée, les textes s'effacent ; la vue ne bouge pas
-  // (choix de Pauline, 21 octobre 2026 : pas de zoom sur la porte)
-  porte.classList.add("sortie", "ouverte");
+  // (choix de Pauline, 21 octobre 2026 : pas de zoom sur la porte). Le fond de la porte s'efface tout
+  // de suite et laisse place au dégradé du studio (retour de Pauline sur iPhone, 22 octobre 2026)
+  porte.classList.add("sortie", "ouverte", "fondu");
   ouvrirBattants(piece, 450);
-  // 2. La porte ouverte, la façade et le toit s'effacent et dévoilent le studio ; le fond, et avec lui
-  // les barres de Safari, quitte le rose en même temps
+  // 2. La porte ouverte, la façade et le toit s'effacent et dévoilent le studio
   setTimeout(function () {
-    porte.classList.add("devoile", "fondu");
+    porte.classList.add("devoile");
     racine.classList.remove("porte-ouverte");
   }, 450);
   // 3. La pièce prend sa place : le viewBox de la porte est plus grand que celui de la pièce

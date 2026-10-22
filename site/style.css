@@ -738,9 +738,10 @@ body::after {
   /* Pendant la porte d'entrée, le fond de la page garde le crème du reste de l'app (Safari en colore
      ses barres ; c'était le rose de l'immeuble jusqu'au 22 octobre 2026), et la page ne défile pas */
   .porte-ouverte, .porte-ouverte body { background-color: #F3EADF; overflow: hidden; }
-  /* Le tiroir, fixé au bas de l'écran, donnait son miel à la barre de Safari, même caché sous la
-     porte : il n'existe pas tant que la porte est là (retour de Pauline sur iPhone, 21 octobre 2026) */
-  .porte-ouverte .barre-meubles { display: none; }
+  /* Le tiroir, fixé au bas de l'écran, donne sa couleur à la barre de Safari, même caché sous la
+     porte : il y reste, en crème (classe tiroir-creme, plus bas). Le 21 octobre il était retiré de la
+     page, mais en revenant à la porte depuis le studio, Safari gardait alors le miel (retour de
+     Pauline sur iPhone, 22 octobre 2026) */
   .entree, .entree body { transition: background-color 0.35s ease; }
 }
 
@@ -816,6 +817,7 @@ body::after {
    iPhone, 22 octobre 2026). Safari prend la couleur d'arrivée d'une transition sans l'attendre : le
    miel est donc rendu par le script au moment où le tiroir monte, pas par un délai de transition */
 .tiroir-creme .barre-meubles, .tiroir-creme .barre-meubles::after { background-color: #F3EADF; }
+.tiroir-creme .barre-meubles { box-shadow: none; }  /* son ombre dépassait au bas de l'écran pendant qu'il attend */
 .entree .bouton-plus { transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1) 0.75s; }
 .entree .onglets { transition: opacity 0.25s ease 0.6s; }
 .avant-entree .barre-meubles { transform: translateY(115%); }
