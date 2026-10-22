@@ -28,6 +28,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>
+    // La porte d'entrée est en place dès le premier affichage, avant que la page ne se dessine :
+    // Safari colore ses barres d'après ce premier affichage, et y prenait le miel du tiroir (retour de
+    // Pauline sur iPhone, 22 octobre 2026). Mêmes conditions que dans script.js
+    try {
+      if (window.matchMedia("(max-width: 600px)").matches && localStorage.getItem("tiny-studio-porte-vue") !== "1") {
+        document.documentElement.classList.add("porte-ouverte", "avant-entree", "piece-cachee", "entree");
+      }
+    } catch (erreur) { /* script.js ouvrira la porte lui-même */ }
+  </script>
 </head>
 <body>
 
