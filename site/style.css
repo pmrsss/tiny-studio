@@ -701,7 +701,7 @@ body::after {
   .cadre-piece .studio { flex: none; width: 93%; max-width: none; margin: 0 auto; }  /* un peu d'air sur les côtés (retour de Pauline, 21 octobre 2026) */
   /* Le studio vide : un mot en haut, sous le bandeau, à la place de la bulle (en bas, il passait
      sous le bouton « + ») */
-  .studio-vide:not(.vue-boutique) .indice-vide {
+  html:not(.vue-boutique) .indice-vide {  /* pour tout studio, vide ou non, depuis le 22 octobre 2026 */
     display: block; order: -1; margin: 30px 28px 0; text-align: center; text-wrap: balance;
     font: 700 14.5px / 1.45 Nunito, sans-serif; color: var(--brun-doux);
   }

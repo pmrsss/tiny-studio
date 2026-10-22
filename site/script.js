@@ -114,20 +114,21 @@ function afficherCompteurs() {
   // l'action ; les pastilles des meubles restent à « 0 » (20 octobre 2026)
   const studioVide = Object.keys(meubles).every(function (cle) { return meubles[cle].articles.length === 0; });
   document.documentElement.classList.toggle("studio-vide", studioVide);
-  // Le studio vide dit seulement où toucher ou cliquer, le même texte partout, au bon geste près :
-  // « touche » sur un écran tactile, « clique sur » à la souris (choix de Pauline, 21 octobre 2026)
+  // L'accueil dit où toucher ou cliquer, le même texte partout, au bon geste près : « touche » sur un
+  // écran tactile, « clique sur » à la souris (choix de Pauline, 21 octobre 2026). Un texte pour le
+  // studio vide, un autre dès qu'un article est rangé (choix de Pauline, 22 octobre 2026)
   const tactile = window.matchMedia("(pointer: coarse)").matches;
   const geste = tactile ? "touche" : "clique sur";
   const Geste = geste[0].toUpperCase() + geste.slice(1);
   document.getElementById("accueil-texte").textContent = studioVide
-    ? "Ton studio attend tes premiers articles. " + Geste + " le bouton + pour en ajouter un."
-    : Geste + " un meuble pour voir les articles que tu y as rangés.";
-  // Sur téléphone, sans la bulle, le même accueil s'affiche sous le bandeau quand le studio est vide,
-  // avec son titre (issue n° 7)
+    ? "Ton studio attend tes premiers articles. " + Geste + " le bouton\u00A0+ pour en ajouter un."
+    : "Ton studio prend vie. " + Geste + " le bouton\u00A0+ pour ajouter un nouvel article.";
+  // Sur téléphone, sans la bulle, le même accueil s'affiche sous le bandeau, avec son titre (issue
+  // n° 7 ; le studio vide seulement jusqu'au 22 octobre 2026)
   const indice = document.getElementById("indice-vide");
   if (indice) {
     indice.hidden = false;
-    document.getElementById("indice-texte").textContent = studioVide ? document.getElementById("accueil-texte").textContent : "";
+    document.getElementById("indice-texte").textContent = document.getElementById("accueil-texte").textContent;
   }
   // Le nombre d'articles en toutes lettres, dans la liste des meubles de la bulle (ordinateur) ;
   // « Vide » plutôt qu'« Aucun article » (choix de Pauline, 19 octobre 2026)
