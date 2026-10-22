@@ -114,20 +114,21 @@ function afficherCompteurs() {
   // l'action ; les pastilles des meubles restent à « 0 » (20 octobre 2026)
   const studioVide = Object.keys(meubles).every(function (cle) { return meubles[cle].articles.length === 0; });
   document.documentElement.classList.toggle("studio-vide", studioVide);
-  // Le studio vide dit seulement où toucher ou cliquer, le même texte partout, au bon geste près :
-  // « touche » sur un écran tactile, « clique sur » à la souris (choix de Pauline, 21 octobre 2026)
+  // L'accueil dit où toucher ou cliquer, le même texte partout, au bon geste près : « touche » sur un
+  // écran tactile, « clique sur » à la souris (choix de Pauline, 21 octobre 2026). Un texte pour le
+  // studio vide, un autre dès qu'un article est rangé (choix de Pauline, 22 octobre 2026)
   const tactile = window.matchMedia("(pointer: coarse)").matches;
   const geste = tactile ? "touche" : "clique sur";
   const Geste = geste[0].toUpperCase() + geste.slice(1);
   document.getElementById("accueil-texte").textContent = studioVide
-    ? "Ton studio attend tes premiers articles. " + Geste + " le bouton + pour en ajouter un."
-    : Geste + " un meuble pour voir les articles que tu y as rangés.";
-  // Sur téléphone, sans la bulle, le même accueil s'affiche sous le bandeau quand le studio est vide,
-  // avec son titre (issue n° 7)
+    ? "Ton studio attend tes premiers articles. " + Geste + " le bouton\u00A0+ pour en ajouter un."
+    : "Ton studio prend vie. " + Geste + " le bouton\u00A0+ pour ajouter un nouvel article.";
+  // Sur téléphone, sans la bulle, le même accueil s'affiche sous le bandeau, avec son titre (issue
+  // n° 7 ; le studio vide seulement jusqu'au 22 octobre 2026)
   const indice = document.getElementById("indice-vide");
   if (indice) {
     indice.hidden = false;
-    document.getElementById("indice-texte").textContent = studioVide ? document.getElementById("accueil-texte").textContent : "";
+    document.getElementById("indice-texte").textContent = document.getElementById("accueil-texte").textContent;
   }
   // Le nombre d'articles en toutes lettres, dans la liste des meubles de la bulle (ordinateur) ;
   // « Vide » plutôt qu'« Aucun article » (choix de Pauline, 19 octobre 2026)
@@ -832,7 +833,7 @@ function ouvrirPorte() {
   if (!surTelephone.matches) return;
   choisirOnglet(onglets[0], false);
   preparerPorte();
-  racine.classList.add("porte-ouverte", "avant-entree", "piece-cachee", "entree");
+  racine.classList.add("porte-ouverte", "avant-entree", "piece-cachee", "entree", "tiroir-creme");
   porte.hidden = false;
   window.scrollTo(0, 0);
   // Le focus va à la porte elle-même, sans contour : sur le bouton « Entrer », Safari dessinait un
@@ -843,7 +844,7 @@ function ouvrirPorte() {
 function fermerPorte() {
   porte.hidden = true;
   document.getElementById("porte-piece").textContent = "";
-  racine.classList.remove("porte-ouverte", "avant-entree", "piece-cachee");
+  racine.classList.remove("porte-ouverte", "avant-entree", "piece-cachee", "tiroir-creme");
   setTimeout(function () { racine.classList.remove("entree"); }, 1200);
 }
 
@@ -860,13 +861,13 @@ function entrer() {
   const ka = a.width / vb[2];
   piece.style.transformOrigin = "0 0";
   // 1. Les battants s'ouvrent sur l'entrée éclairée, les textes s'effacent ; la vue ne bouge pas
-  // (choix de Pauline, 21 octobre 2026 : pas de zoom sur la porte)
-  porte.classList.add("sortie", "ouverte");
+  // (choix de Pauline, 21 octobre 2026 : pas de zoom sur la porte). Le fond de la porte s'efface tout
+  // de suite et laisse place au dégradé du studio (retour de Pauline sur iPhone, 22 octobre 2026)
+  porte.classList.add("sortie", "ouverte", "fondu");
   ouvrirBattants(piece, 450);
-  // 2. La porte ouverte, la façade et le toit s'effacent et dévoilent le studio ; le fond, et avec lui
-  // les barres de Safari, quitte le rose en même temps
+  // 2. La porte ouverte, la façade et le toit s'effacent et dévoilent le studio
   setTimeout(function () {
-    porte.classList.add("devoile", "fondu");
+    porte.classList.add("devoile");
     racine.classList.remove("porte-ouverte");
   }, 450);
   // 3. La pièce prend sa place : le viewBox de la porte est plus grand que celui de la pièce
@@ -878,8 +879,10 @@ function entrer() {
     piece.style.transform = "translate(" + tx + "px, " + ty + "px) scale(" + s + ")";
     racine.classList.remove("avant-entree");
   }, 650);
-  // 4. Les meubles arrivent pendant la fin du mouvement
+  // 4. Les meubles arrivent pendant la fin du mouvement ; le tiroir monte (0,55 s après la pièce) et
+  // prend son miel à ce moment-là, la barre de Safari avec lui
   setTimeout(function () { porte.classList.add("meubles"); }, 1000);
+  setTimeout(function () { racine.classList.remove("tiroir-creme"); }, 1200);
   // 5. La pièce de la porte est posée exactement sur celle du studio, meubles compris : on échange
   setTimeout(fermerPorte, 1450);
 }

@@ -1,7 +1,9 @@
 """L'immeuble de la porte d'entrée : le studio fermé, vu de dehors (21 octobre 2026), d'après les
 deux références de Pauline : un petit immeuble d'habitation, pas un café. Un rendu « argile » :
 une seule famille de couleur (le rose terracotta, proche du rose de l'app), des volumes simples et
-ronds comme le mobilier, des traits épais, des fenêtres allumées au crépuscule.
+ronds comme le mobilier, des traits épais, des fenêtres allumées au crépuscule. Depuis le
+22 octobre 2026, la façade est miel clair, les corniches crème, la porte et les volets rose (voir
+PALETTES) : le rose sur le fond rose manquait de contraste.
 
 Deux étages : le studio est au rez-de-chaussée, sa porte au milieu du pan de gauche ; au-dessus,
 l'étage d'un voisin, avec son balcon et sa guirlande. Un plancher droit fait le tour des deux
@@ -56,6 +58,36 @@ VERRE_ROSE = ("#FFE0EA", "#F59AB6")
 VERRE_ETEINT = ("#9A6156", "#7F4B42")
 OMBRE = "#6E3B33"
 VERTS = ("#6F9160", "#89AC74", "#A6C58D")
+PORTE = SOMBRE      # les battants de la porte
+VOLETS = VOLUME     # la fenêtre aux volets fermés de l'étage : (dessus, lames, joints)
+ARETE = "#FDE3DA"   # l'arête de l'angle, prise par la lumière
+TOIT_DESSUS = "#EEBDAF"
+TOIT_FILETS = ("#FFF0EA", "#FFF6F2")
+
+# Les variantes de couleur, à comparer dans planches/couleurs-immeuble.html (22 octobre 2026, à la
+# demande de Pauline : le rose sur rose de la porte d'entrée manque de contraste et tranche avec le
+# crème du reste de l'app). « rose » est l'immeuble du 21 octobre, la palette écrite ci-dessus ;
+# « creme » : une façade crème, les corniches et le trottoir miel, la porte et les volets en rose ;
+# « miel » : une façade miel clair, les corniches crème, la porte et les volets en rose. Choisie par
+# la variable IMMEUBLE_PALETTE. Pauline retient « miel » le 22 octobre 2026 : c'est le dessin par défaut.
+NOYER = ("#B48A66", "#9A6E4C", "#76503A")
+ROSE_PORTE = ("#E58FA8", "#C9557C", "#A83E63")
+ROSE_VOLETS = ("#FBE3EA", "#F2B3C6", "#D98AA3")
+PALETTES = {
+    "creme": dict(MUR_SOLEIL=("#FCF5E8", "#F5E8D2"), MUR_OMBRE=("#E0CBA8", "#D3BB94"),
+                  VOLUME=("#F8E3BC", "#EECB94", "#C9A066"), SOMBRE=NOYER,
+                  SOCLE=("#F3DFBF", "#E5C79C", "#B99567"), TROTTOIR=("#FCF3E5", "#F2E3C9", "#CDB28A"),
+                  CADRE_SOLEIL="#B98E62", CADRE_OMBRE="#946A45", VERRE_ETEINT=("#9A7656", "#7F5E42"),
+                  OMBRE="#6E4426", PORTE=ROSE_PORTE, VOLETS=ROSE_VOLETS, ARETE="#FFFBF2",
+                  TOIT_DESSUS="#EFD4A6", TOIT_FILETS=("#FFF7E8", "#FFFBF2")),
+    "miel": dict(MUR_SOLEIL=("#F9E4C0", "#F0D3A4"), MUR_OMBRE=("#D2AA78", "#C49A64"),
+                 VOLUME=("#FFFAF1", "#F4E8D4", "#CDB693"), SOMBRE=NOYER,
+                 SOCLE=("#F5E5C9", "#E7CDA5", "#BB976A"), TROTTOIR=("#FDF6EA", "#F3E6CF", "#CEB58F"),
+                 CADRE_SOLEIL="#B4875C", CADRE_OMBRE="#8D6240", VERRE_ETEINT=("#9A7656", "#7F5E42"),
+                 OMBRE="#6E4426", PORTE=ROSE_PORTE, VOLETS=ROSE_VOLETS, ARETE="#FFF6E4",
+                 TOIT_DESSUS="#ECDDC2", TOIT_FILETS=("#FFFBF4", "#FFFDF8")),
+}
+globals().update(PALETTES.get(os.environ.get("IMMEUBLE_PALETTE", "miel"), {}))
 
 
 def q(x, y, z):
@@ -213,7 +245,7 @@ def murs():
     out.append(forme(sur_x(W + 0.004, rect(-0.5, D, H2 - 0.8, H2)), degrade([(0, OMBRE, 0.16), (1, OMBRE, 0)]), r=22))
     out.append(forme(sur_y(D + 0.004, rect(-0.5, W, H1 - EP - 1.8, H1 - EP)), degrade([(0, OMBRE, 0.34), (1, OMBRE, 0)]), r=22))
     out.append(forme(sur_x(W + 0.004, rect(-0.5, D, H1 - EP - 1.4, H1 - EP)), degrade([(0, OMBRE, 0.2), (1, OMBRE, 0)]), r=22))
-    out.append(trait((W, D, ZP + 0.3), (W, D, H2 - 0.3), "#FDE3DA", 3.2, 0.9))
+    out.append(trait((W, D, ZP + 0.3), (W, D, H2 - 0.3), ARETE, 3.2, 0.9))
     return "".join(out)
 
 
@@ -329,10 +361,10 @@ def etage():
     # La fenêtre aux volets fermés, sur le pan de droite : un cadre épais, quatre lames larges
     y0, y1 = 2.4, 4.8
     out.append(forme(sur_x(W + 0.01, rect(y0 - 0.34, y1 + 0.34, 10.4, 13.6)), CADRE_SOLEIL, r=10))
-    out.append(forme(sur_x(W + 0.012, rect(y0, y1, 10.65, 13.35)), VOLUME[1], r=7))
+    out.append(forme(sur_x(W + 0.012, rect(y0, y1, 10.65, 13.35)), VOLETS[1], r=7))
     for j in range(1, 4):
         z = 10.65 + j * (13.35 - 10.65) / 4
-        out.append(forme(sur_x(W + 0.014, rect(y0, y1, z - 0.08, z + 0.08)), VOLUME[2], r=2))
+        out.append(forme(sur_x(W + 0.014, rect(y0, y1, z - 0.08, z + 0.08)), VOLETS[2], r=2))
     out.append(boite(W, W + 0.5, y0 - 0.6, y1 + 0.6, 10.05, 10.4, VOLUME, r=2))
     # La baie de l'angle (la guirlande est retirée le 21 octobre 2026)
     # La baie commence plus loin de l'angle qu'avant (7,0), le balcon un peu avant elle (retour de
@@ -362,10 +394,10 @@ def battants():
     l, zh = 1.4, 6.0
     out = []
     for (x0, x1, xp, classe) in ((XC - l, XC - 0.04, XC - 0.32, "battant-g"), (XC + 0.04, XC + l, XC + 0.32, "battant-d")):
-        b = [forme(sur_y(y, rect(x0, x1, 0, zh)), degrade([(0, SOMBRE[0], 1), (1, SOMBRE[1], 1)]), r=6),
+        b = [forme(sur_y(y, rect(x0, x1, 0, zh)), degrade([(0, PORTE[0], 1), (1, PORTE[1], 1)]), r=6),
              forme(sur_y(y + 0.003, rect(x0 + 0.25, x1 - 0.25, 3.3, zh - 0.35)), degrade([(0, VERRE_CHAUD[0], 1), (1, VERRE_CHAUD[1], 1)]), r=6),
-             forme(sur_y(y + 0.003, rect(x0 + 0.25, x1 - 0.25, 0.45, 2.8)), SOMBRE[2], r=6),
-             forme(sur_y(y + 0.004, rect(x0 + 0.4, x1 - 0.25, 0.45, 2.65)), SOMBRE[1], r=5)]
+             forme(sur_y(y + 0.003, rect(x0 + 0.25, x1 - 0.25, 0.45, 2.8)), PORTE[2], r=6),
+             forme(sur_y(y + 0.004, rect(x0 + 0.4, x1 - 0.25, 0.45, 2.65)), PORTE[1], r=5)]
         sx, sy = q(xp, y + 0.006, 3.0)
         b.append(f'<circle cx="{sx:.1f}" cy="{sy:.1f}" r="4.4" fill="#F3D7A8" /><circle cx="{sx + 1:.1f}" cy="{sy - 1.2:.1f}" r="1.7" fill="#FFF6E2" />')
         out.append(f'<g class="{classe}">' + "".join(b) + "</g>")
@@ -448,7 +480,7 @@ def toit():
     out = [boite(-0.7, W + 0.3, -0.7, D + 0.3, zd, zt, VOLUME, r=6, bombe=0.012)]
     out.append(boite(-0.7, W + 0.3, -0.7, -0.1, zt, zr, VOLUME, r=5))
     out.append(boite(-0.7, -0.1, -0.7, D + 0.3, zt, zr, VOLUME, r=5))
-    out.append(forme([(-0.1, -0.1, zt), (W - 0.3, -0.1, zt), (W - 0.3, D - 0.3, zt), (-0.1, D - 0.3, zt)], "#EEBDAF", r=30))
+    out.append(forme([(-0.1, -0.1, zt), (W - 0.3, -0.1, zt), (W - 0.3, D - 0.3, zt), (-0.1, D - 0.3, zt)], TOIT_DESSUS, r=30))
     out.append(forme([(-0.1, -0.1, zt), (W - 0.3, -0.1, zt), (W - 0.3, 0.6, zt), (0.6, 0.6, zt), (0.6, D - 0.3, zt), (-0.1, D - 0.3, zt)],
                      OMBRE, r=14, extra=' opacity="0.16"'))
     # La cheminée, au fond à droite
@@ -469,8 +501,8 @@ def toit():
     # Le rebord de devant, qui prend la lumière sur le dessus
     out.append(boite(-0.7, W + 0.3, D - 0.3, D + 0.3, zt, zr, VOLUME, r=5))
     out.append(boite(W - 0.3, W + 0.3, -0.7, D + 0.3, zt, zr, VOLUME, r=5))
-    out.append(trait((-0.55, D + 0.3, zr), (W + 0.15, D + 0.3, zr), "#FFF0EA", 3.0, 0.9))
-    out.append(trait((W + 0.3, -0.55, zr), (W + 0.3, D + 0.15, zr), "#FFF6F2", 3.0, 0.9))
+    out.append(trait((-0.55, D + 0.3, zr), (W + 0.15, D + 0.3, zr), TOIT_FILETS[0], 3.0, 0.9))
+    out.append(trait((W + 0.3, -0.55, zr), (W + 0.3, D + 0.15, zr), TOIT_FILETS[1], 3.0, 0.9))
     return "".join(out)
 
 
@@ -488,7 +520,11 @@ corps = "".join(f'<g class="{c}"{DECOUPE if c == "ext-battant" else ""}>{s}</g>'
 svg = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{VIEWBOX}"><g class="ext" data-viewbox="{VIEWBOX}">'
        f'<defs>{"".join(DEFS)}</defs>{corps}</g></svg>')
 
-if __name__ == "__main__":
+if __name__ == "__main__" and sys.argv[1].endswith(".svg"):
+    # Le dessin seul, pour une planche : IMMEUBLE_PALETTE=creme python3 atelier/immeuble.py chemin.svg
+    open(sys.argv[1], "w", encoding="utf-8").write(svg)
+    print("immeuble écrit,", len(svg), "caractères")
+elif __name__ == "__main__":
     page = open(sys.argv[1], encoding="utf-8").read()
     debut, fin = "<!-- IMMEUBLE -->", "<!-- /IMMEUBLE -->"
     i, j = page.index(debut) + len(debut), page.index(fin)
