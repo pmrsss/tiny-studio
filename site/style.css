@@ -735,9 +735,9 @@ body::after {
   .rayons b { margin-top: 8px; font: 700 15px / 1.2 Fredoka, Nunito, sans-serif; color: var(--brun); }
   .rayons .bientot-tag { margin-top: 8px; font-size: 10px; padding: 3px 8px; }
 
-  /* Pendant la porte d'entrée, le fond de la page prend le rose de l'immeuble (Safari en colore ses
-     barres), et la page ne défile pas */
-  .porte-ouverte, .porte-ouverte body { background-color: #F3D9D2; overflow: hidden; }
+  /* Pendant la porte d'entrée, le fond de la page garde le crème du reste de l'app (Safari en colore
+     ses barres ; c'était le rose de l'immeuble jusqu'au 22 octobre 2026), et la page ne défile pas */
+  .porte-ouverte, .porte-ouverte body { background-color: #F3EADF; overflow: hidden; }
   /* Le tiroir, fixé au bas de l'écran, donnait son miel à la barre de Safari, même caché sous la
      porte : il n'existe pas tant que la porte est là (retour de Pauline sur iPhone, 21 octobre 2026) */
   .porte-ouverte .barre-meubles { display: none; }
@@ -750,16 +750,16 @@ body::after {
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
   padding: 24px 22px calc(24px + env(safe-area-inset-bottom)); text-align: center;
 }
-/* Le fond de la porte : un halo clair au milieu, et en haut comme en bas exactement le rose du fond
+/* Le fond de la porte : un halo clair au milieu, et en haut comme en bas exactement le crème du fond
    de la page, dont Safari colore ses barres ; sans ce raccord, une bande de couleur dépassait sous
    l'heure et la batterie (retour de Pauline sur iPhone, 21 octobre 2026) */
 .porte::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
   background:
-    linear-gradient(#F3D9D2 0, rgba(243, 217, 210, 0) 110px),
-    linear-gradient(to top, #F3D9D2 0, rgba(243, 217, 210, 0) 110px),
-    radial-gradient(120% 70% at 50% 42%, #FCEEEA 0, #F4DAD3 58%, #F3D9D2 100%);
-  background-color: #F3D9D2;
+    linear-gradient(#F3EADF 0, rgba(243, 234, 223, 0) 110px),
+    linear-gradient(to top, #F3EADF 0, rgba(243, 234, 223, 0) 110px),
+    radial-gradient(120% 70% at 50% 42%, #FCF8F1 0, #F5EDE2 58%, #F3EADF 100%);
+  background-color: #F3EADF;
   transition: opacity 0.45s ease;
 }
 .porte:focus { outline: none; }
