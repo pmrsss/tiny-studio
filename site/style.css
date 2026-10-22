@@ -820,6 +820,11 @@ body::after {
 .tiroir-creme .barre-meubles { box-shadow: none; }  /* son ombre dépassait au bas de l'écran pendant qu'il attend */
 .entree .bouton-plus { transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1) 0.75s; }
 .entree .onglets { transition: opacity 0.25s ease 0.6s; }
+/* Le mot de bienvenue du studio vide arrive en dernier, une fois la pièce posée : depuis que le fond de
+   la porte s'efface dès le tap, il apparaissait dès le début de l'entrée (retour de Pauline sur iPhone,
+   22 octobre 2026) */
+.piece-cachee .indice-vide { opacity: 0; transform: translateY(8px); }
+.entree .indice-vide { transition: opacity 0.4s ease 0.1s, transform 0.4s ease 0.1s; }
 .avant-entree .barre-meubles { transform: translateY(115%); }
 .avant-entree .bouton-plus { transform: scale(0); }
 .avant-entree .onglets { opacity: 0; }
