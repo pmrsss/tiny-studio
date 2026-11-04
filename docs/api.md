@@ -87,22 +87,22 @@ Sur certaines plateformes, la marque n'apparaît qu'au début du nom (« Nike - 
 
 La fonction range d'abord le produit dans une catégorie, puis la catégorie donne le meuble. Elle cherche la catégorie dans cet ordre : la catégorie déclarée par la boutique (`category` du JSON-LD, ou le fil d'Ariane de la page), puis les mots du nom du produit. Les mots se comparent sans accents ni majuscules.
 
-Proposition à valider :
+Validées par Pauline le 4 novembre 2026 :
 
 | Catégorie | Meuble | Exemples de mots |
 |---|---|---|
 | `vetements` | `dressing` | robe, jupe, pull, gilet, chemise, t-shirt, jean, pantalon, manteau, veste |
 | `chaussures` | `dressing` | chaussures, bottes, bottines, baskets, sandales, escarpins, mocassins |
 | `sacs` | `dressing` | sac, cabas, pochette, besace, sac à dos |
-| `accessoires` | `dressing` | bijoux, collier, boucles d'oreilles, bague, montre, ceinture, écharpe, bonnet, lunettes |
+| `accessoires` | `dressing` | bijoux, collier, boucles d'oreilles, bague, montre, ceinture, écharpe, bonnet, lunettes de soleil, lunettes de vue |
 | `livres` | `bibliotheque` | livre, roman, BD, manga, album, beau livre |
 | `papeterie` | `bibliotheque` | carnet, agenda, cahier, stylo, papeterie |
 | `deco` | `deco` | bougie, vase, cadre, affiche, coussin, plaid, miroir, lampe |
 | `maquillage` | `coiffeuse` | rouge à lèvres, mascara, fond de teint, fard, palette, vernis |
 | `soins-parfums` | `coiffeuse` | crème, sérum, soin, parfum, eau de toilette, shampooing |
-| `autre` | `coffre` | tout le reste |
+| `autre` | `coffre` | l'ameublement (chaise, table, étagère, canapé, lit), le matériel de sport (tapis de yoga, haltères, raquette, vélo), et tout le reste |
 
-Les listes de mots vivent dans le code et s'affinent avec la base de liens. L'application propose le meuble dans « Ranger dans » ; on peut toujours le changer.
+La lampe et le miroir sont de la déco, mais un meuble va dans le coffre. Les tenues de sport (legging, brassière, baskets de running) restent au dressing, seul le matériel va dans le coffre. Les listes de mots vivent dans le code et s'affinent avec la base de liens. L'application propose le meuble dans « Ranger dans » ; on peut toujours le changer.
 
 ## La base de liens
 
