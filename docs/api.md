@@ -74,7 +74,7 @@ Dans l'ordre, la première source qui répond gagne, champ par champ :
 
 Le prix est rendu au format de l'application (« 29,90 € ») ; une autre devise est indiquée telle quelle.
 
-**La marque, pas le site.** Sur une marketplace ou un grand magasin en ligne (Vinted, ASOS, Zalando, La Redoute, Veepee, Place des Tendances, Galeries Lafayette, Amazon…), le nom du site n'est pas la marque du produit : une paire de Nike achetée sur ASOS doit être rangée sous « Nike ». D'où trois règles :
+**La marque, pas le site.** Sur une marketplace ou un grand magasin en ligne (Vinted, ASOS, Zalando, La Redoute, Veepee, Place des Tendances, Galeries Lafayette, Amazon, Joybuy…), le nom du site n'est pas la marque du produit : une paire de Nike achetée sur ASOS doit être rangée sous « Nike ». D'où trois règles :
 - **La marque vient du produit lui-même** : `brand.name` du JSON-LD, puis `product:brand`, puis le champ « Marque » de l'annonce quand la plateforme en affiche un (Vinted).
 - **Le nom du site (`og:site_name`) ne sert de marque que sur le site d'une marque** (Ganni, Sézane…). La fonction tient une liste des plateformes multimarques, où il n'est jamais utilisé.
 - **Une marque égale au nom de la plateforme est écartée** : la marque reste vide, `complet` passe à `false` et l'utilisateur la complète. Exception : les produits de la marque propre d'une plateforme (« ASOS DESIGN ») gardent leur marque.
@@ -85,7 +85,7 @@ Sur certaines plateformes, la marque n'apparaît qu'au début du nom (« Nike - 
 
 ### Les catégories d'objets et le meuble proposé
 
-La fonction range d'abord le produit dans une catégorie, puis la catégorie donne le meuble. Elle cherche la catégorie dans cet ordre : la catégorie déclarée par la boutique (`category` du JSON-LD, ou le fil d'Ariane de la page), puis les mots du nom du produit. Les mots se comparent sans accents ni majuscules.
+La fonction range d'abord le produit dans une catégorie, puis la catégorie donne le meuble. Elle cherche la catégorie dans cet ordre : la catégorie déclarée par la boutique (`category` du JSON-LD, ou le fil d'Ariane de la page), puis les mots du nom du produit. Les mots se comparent sans accents ni majuscules, en français et en anglais : beaucoup de boutiques déclarent leurs catégories en anglais (« Ring », « Tote Bags »). Un mot plus précis passe avant un mot plus large : « agenda » ou « weeks » l'emporte sur « book ».
 
 Validées par Pauline le 4 novembre 2026 :
 
@@ -143,6 +143,16 @@ La base passe par la fonction elle-même, et pas par le navigateur de Claude : u
 
 Seuils proposés, à discuter : sur les sites qui se laissent lire, le nom et la photo justes pour 8 liens sur 10, le meuble juste pour 9 liens sur 10, et aucun nom de plateforme rendu comme marque.
 
+## Deux portes, un seul moteur
+
+**La mesure du 4 novembre 2026.** Les 24 premiers liens de la base ont été lus depuis Cloudflare, par une sonde jetable sur une branche de test. **10 se laissent lire :** Courir, Aest Studios, Caintè, Meller, Justine Clenquet, Merci, Joybuy et Cultura, avec leurs données de produit, Hobonichi avec ses seules balises de partage, et Amazon avec son seul titre. **14 refusent :** Zara et Oysho renvoient un écran anti-robot vide, et Zalando, ASOS, Printemps, Place des Tendances, Vivienne Westwood, la Fnac et Miista répondent 403 ou 429. Les grands sites de mode, là où l'on achète le plus, ne se laissent pas lire par un serveur.
+
+**Décision de Pauline :** la fonction et le favori « Ranger dans Tiny Studio » se construisent ensemble, autour d'un seul moteur.
+- **Le moteur** est un module commun, `moteur.js`. Il prend le HTML d'une page de produit et rend la fiche du produit, selon les règles de ce contrat (ordre des sources, bon produit, marque, catégorie, meuble).
+- **Première porte, le lien collé :** la fonction `/api/produit` télécharge la page puis la passe au moteur. Elle couvre les sites qui se laissent lire.
+- **Seconde porte, le favori :** sur la page de produit déjà ouverte dans le navigateur, un clic passe la page au même moteur. Le favori ouvre ensuite Tiny Studio avec le formulaire rempli. Aucun site ne peut le refuser, puisque c'est le navigateur de l'utilisateur qui a chargé la page. Les informations passent dans l'adresse après un `#`, une partie que le serveur ne reçoit pas.
+- **La base de liens sert aux deux.** Les liens lisibles se testent par la fonction. Les autres se testent comme le ferait le favori : Claude ouvre la page dans son navigateur et y lance le moteur.
+
 ## Endpoint 2 (facultatif, à discuter) : rapatrier une photo
 
 `GET /api/photo?adresse=<adresse de l'image, encodée>`
@@ -190,7 +200,7 @@ Une fonction qui va lire l'adresse qu'on lui donne peut être détournée (on pa
 
 ## Ce que l'API ne fait pas
 
-- Contourner les sites qui bloquent la lecture : ils passent par la saisie à la main (le favori « Ranger dans Tiny Studio » et l'application iPhone pourront les lire depuis la page ouverte).
+- Contourner les sites qui bloquent la lecture : ils passent par le favori « Ranger dans Tiny Studio », qui lit la page ouverte, ou par la saisie à la main.
 - Utiliser une IA pour lire les pages : l'IA sert seulement à la mise au point.
 - Stocker quoi que ce soit.
 - Suivre l'évolution des prix.
