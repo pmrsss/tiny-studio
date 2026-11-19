@@ -97,12 +97,12 @@ Validées par Pauline le 4 novembre 2026 :
 | `accessoires` | `dressing` | bijoux, collier, boucles d'oreilles, bague, montre, ceinture, écharpe, bonnet, lunettes de soleil, lunettes de vue |
 | `livres` | `bibliotheque` | livre, roman, BD, manga, album, beau livre |
 | `papeterie` | `bibliotheque` | carnet, agenda, cahier, stylo, papeterie |
-| `deco` | `deco` | bougie, vase, cadre, affiche, coussin, plaid, miroir, lampe |
-| `maquillage` | `coiffeuse` | rouge à lèvres, mascara, fond de teint, fard, palette, vernis |
+| `deco` | `deco` | bougie, vase, cadre, affiche, coussin, plaid, miroir, lampe, vaisselle (bol, plat, assiette) |
+| `maquillage` | `coiffeuse` | rouge à lèvres, baume teinté, blush, mascara, fond de teint, fard, palette, vernis |
 | `soins-parfums` | `coiffeuse` | crème, sérum, soin, parfum, eau de toilette, shampooing |
-| `autre` | `coffre` | l'ameublement (chaise, table, étagère, canapé, lit), le matériel de sport (tapis de yoga, haltères, raquette, vélo), et tout le reste |
+| `autre` | `coffre` | l'ameublement (chaise, table, étagère, canapé, lit), le linge de maison (parure de lit, serviettes), le matériel de sport (tapis de yoga, haltères, raquette, vélo), et tout le reste |
 
-La lampe et le miroir sont de la déco, mais un meuble va dans le coffre. Les tenues de sport (legging, brassière, baskets de running) restent au dressing, seul le matériel va dans le coffre. Les listes de mots vivent dans le code et s'affinent avec la base de liens. L'application propose le meuble dans « Ranger dans » ; on peut toujours le changer.
+La lampe, le miroir et la vaisselle sont de la déco, mais un meuble et le linge de maison vont dans le coffre. Pour un livre, la marque affichée est l'auteur (décision de Pauline, 19 novembre 2026). Les tenues de sport (legging, brassière, baskets de running) restent au dressing, seul le matériel va dans le coffre. Les listes de mots vivent dans le code et s'affinent avec la base de liens. L'application propose le meuble dans « Ranger dans » ; on peut toujours le changer.
 
 ## La base de liens
 

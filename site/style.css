@@ -258,6 +258,13 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .champs-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; }
 .aide { margin: 0; font-size: 12px; color: var(--brun-doux); line-height: 1.4; }
 .erreur { margin: 0; font: 700 12.5px Nunito, sans-serif; color: var(--rose-texte); }
+.aide.lecture { font-weight: 700; }
+.aide.lecture.en-cours::before {
+  content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px;
+  border: 2px solid var(--rose-pale); border-top-color: var(--rose); border-radius: 50%; animation: tourner 0.8s linear infinite;
+}
+@keyframes tourner { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .aide.lecture.en-cours::before { animation: none; } }
 .ajout-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
 .bouton-ranger {
   font: 700 15px Fredoka, Nunito, sans-serif; color: #FFFFFF; cursor: pointer;

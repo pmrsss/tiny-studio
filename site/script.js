@@ -652,6 +652,69 @@ function ouvrirFenetre(article, cleMeuble) {
   else CHAMPS.lien.focus();
 }
 
+// Le remplissage automatique (issues n° 9 et 10, contrat docs/api.md) : un lien collé est lu par la
+// fonction /api/produit, qui rend la fiche du produit ; seuls les champs encore vides se remplissent,
+// et tout reste modifiable. Si le site refuse la lecture, un message invite à remplir à la main
+const etatLecture = document.getElementById("etat-lecture");
+let lectureEnCours = null;
+let dernierLu = "";
+let minuterieLien = null;
+
+function montrerLecture(texte, enCours) {
+  etatLecture.textContent = texte || "";
+  etatLecture.hidden = !texte;
+  etatLecture.classList.toggle("en-cours", Boolean(enCours));
+}
+
+function remplirAvec(fiche) {
+  [["nom", "nom"], ["marque", "marque"], ["prix", "prix"], ["photo", "image"]].forEach(function (paire) {
+    const valeur = fiche[paire[1]];
+    if (typeof valeur === "string" && valeur && !CHAMPS[paire[0]].value.trim()) CHAMPS[paire[0]].value = valeur;
+  });
+  if (fiche.meuble && meubles[fiche.meuble] && !CHAMPS.meuble.value) CHAMPS.meuble.value = fiche.meuble;
+}
+
+async function lireLien() {
+  const lien = CHAMPS.lien.value.trim();
+  if (articleModifie || !adresseWeb(lien) || lien === dernierLu || location.protocol === "file:") return;
+  dernierLu = lien;
+  if (lectureEnCours) lectureEnCours.abort();
+  const controle = new AbortController();
+  lectureEnCours = controle;
+  montrerLecture("Recherche des informations du produit…", true);
+  try {
+    const r = await fetch("/api/produit?lien=" + encodeURIComponent(lien), { signal: controle.signal });
+    const corps = await r.json();
+    if (controle !== lectureEnCours) return;
+    if (r.ok) {
+      remplirAvec(corps);
+      montrerLecture(corps.complet ? "Informations trouvées : vérifie-les avant de ranger l'article." : "Une partie des informations est trouvée : complète le reste.", false);
+    } else {
+      montrerLecture(corps.message || "Ce site ne se laisse pas lire. Remplis l'article à la main.", false);
+    }
+  } catch (e) {
+    if (e.name !== "AbortError" && controle === lectureEnCours) montrerLecture("La recherche n'a pas abouti. Remplis l'article à la main.", false);
+  } finally {
+    if (controle === lectureEnCours) lectureEnCours = null;
+  }
+}
+
+CHAMPS.lien.addEventListener("input", function () {
+  clearTimeout(minuterieLien);
+  minuterieLien = setTimeout(lireLien, 500);
+});
+CHAMPS.lien.addEventListener("change", function () {
+  clearTimeout(minuterieLien);
+  lireLien();
+});
+fenetre.addEventListener("close", function () {
+  clearTimeout(minuterieLien);
+  if (lectureEnCours) lectureEnCours.abort();
+  lectureEnCours = null;
+  dernierLu = "";
+  montrerLecture("");
+});
+
 boutonAjouter.addEventListener("click", function () { ouvrirFenetre(null, meubleOuvert); });
 boutonPlus.addEventListener("click", function () { ouvrirFenetre(null, ""); });
 document.getElementById("annuler").addEventListener("click", function () { fenetre.close(); });
@@ -933,4 +996,41 @@ nomApp.addEventListener("keydown", function (evenement) {
 surTelephone.addEventListener("change", brancherNomApp);
 brancherNomApp();
 
-if (surTelephone.matches && !porteDejaVue()) ouvrirPorte();
+// Un article qui arrive du favori (#ajout=… : la fiche lue sur la page ouverte, après le « # » que le
+// serveur ne reçoit pas) ou d'un lien (?lien=… : le lien est collé et sa lecture lancée). La fiche
+// venue de l'adresse est traitée comme une saisie : du texte dans les champs, rien d'autre
+function arriverAvecUnArticle() {
+  if (location.hash.indexOf("#ajout=") === 0) {
+    let recue = null;
+    try { recue = JSON.parse(decodeURIComponent(location.hash.slice(7))); } catch (e) { recue = null; }
+    history.replaceState(null, "", location.pathname + location.search);
+    if (!recue || typeof recue !== "object") return false;
+    const fiche = {};
+    ["lien", "nom", "marque", "prix", "image", "meuble"].forEach(function (cle) {
+      if (typeof recue[cle] === "string") fiche[cle] = recue[cle].trim().slice(0, 2048);
+    });
+    if (!fiche.lien || !adresseWeb(fiche.lien)) return false;
+    if (fiche.image && !adresseWeb(fiche.image)) delete fiche.image;
+    if (fenetre.open) fenetre.close();
+    ouvrirFenetre(null, meubles[fiche.meuble] ? fiche.meuble : "");
+    CHAMPS.lien.value = fiche.lien;
+    remplirAvec(fiche);
+    dernierLu = fiche.lien;
+    montrerLecture("Informations lues sur la page : vérifie-les avant de ranger l'article.", false);
+    return true;
+  }
+  const lienRecu = new URLSearchParams(location.search).get("lien");
+  if (lienRecu && adresseWeb(lienRecu)) {
+    history.replaceState(null, "", location.pathname + location.hash);
+    if (fenetre.open) fenetre.close();
+    ouvrirFenetre(null, "");
+    CHAMPS.lien.value = lienRecu;
+    lireLien();
+    return true;
+  }
+  return false;
+}
+const arriveeAvecArticle = arriverAvecUnArticle();
+window.addEventListener("hashchange", arriverAvecUnArticle);
+
+if (surTelephone.matches && !porteDejaVue() && !arriveeAvecArticle) ouvrirPorte();
