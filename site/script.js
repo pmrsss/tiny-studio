@@ -668,6 +668,14 @@ function ouvrirFenetre(article, cleMeuble) {
   else CHAMPS.lien.focus();
 }
 
+// Après un enregistrement, le focus va à la fiche concernée, pour le clavier et les lecteurs d'écran.
+// Au doigt, il va au titre du panneau, qui n'a pas de cadre : le cadre en pointillés rose apparaissait
+// sur la fiche à peine rangée (essai de Pauline sur iPhone, 19 novembre 2026)
+function rendreFocus(element) {
+  if (window.matchMedia("(pointer: coarse)").matches) document.getElementById("panneau-titre").focus({ preventScroll: true });
+  else if (element) element.focus();
+}
+
 // Le remplissage automatique (issues n° 9 et 10, contrat docs/api.md) : un lien collé est lu par la
 // fonction /api/produit, qui rend la fiche du produit ; seuls les champs encore vides se remplissent,
 // et tout reste modifiable. Si le site refuse la lecture, un message invite à remplir à la main
@@ -784,11 +792,11 @@ formulaire.addEventListener("submit", function (evenement) {
     afficherCompteurs();
     if (cle !== depart) {
       annonce.textContent = "« " + nom + " » est modifié et déplacé dans " + meubles[cle].nom.toLowerCase() + ".";
-      (liste.querySelector(".article-texte") || boutonAjouter).focus();
+      rendreFocus(liste.querySelector(".article-texte") || boutonAjouter);
     } else {
       annonce.textContent = "« " + nom + " » est modifié.";
       const rang = meubles[cle].articles.indexOf(article);
-      liste.querySelectorAll(".bouton-modifier")[rang].focus();
+      rendreFocus(liste.querySelectorAll(".bouton-modifier")[rang]);
     }
     return;
   }
@@ -803,7 +811,7 @@ formulaire.addEventListener("submit", function (evenement) {
   afficherCompteurs();
   if (!panneau.open) panneau.showModal();
   annonce.textContent = "« " + nom + " » est rangé dans " + meubles[cle].nom.toLowerCase() + ".";
-  liste.querySelector(".article-texte").focus();
+  rendreFocus(liste.querySelector(".article-texte"));
 });
 
 // Sortir un article de son meuble : le panneau se redessine, et le focus va à l'article qui prend

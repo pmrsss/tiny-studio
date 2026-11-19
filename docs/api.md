@@ -157,6 +157,7 @@ Seuils proposés, à discuter : sur les sites qui se laissent lire, le nom et la
 - **Le moteur** est un module commun, `moteur.js`. Il prend le HTML d'une page de produit et rend la fiche du produit, selon les règles de ce contrat (ordre des sources, bon produit, marque, catégorie, meuble).
 - **Première porte, le lien collé :** la fonction `/api/produit` télécharge la page puis la passe au moteur. Elle couvre les sites qui se laissent lire.
 - **Seconde porte, le favori :** sur la page de produit déjà ouverte dans le navigateur, un clic passe la page au même moteur. Le favori ouvre ensuite Tiny Studio avec le formulaire rempli. Aucun site ne peut le refuser, puisque c'est le navigateur de l'utilisateur qui a chargé la page. Les informations passent dans l'adresse après un `#`, une partie que le serveur ne reçoit pas.
+- **Un favori garde le moteur du jour de son installation** (essai de Pauline, 19 novembre 2026) : il contient le moteur lui-même, pour qu'aucun site ne puisse l'empêcher de tourner. Il envoie donc sa version (`v`) avec la fiche. Quand elle diffère de celle du studio, le studio demande de le réinstaller, et remet déjà en forme ce qu'il peut (le nom ; une photo portée est recadrée). La version, en tête de `moteur.js`, change à chaque modification du moteur.
 - **La base de liens sert aux deux.** Les liens lisibles se testent par la fonction. Les autres se testent comme le ferait le favori : Claude ouvre la page dans son navigateur et y lance le moteur.
 
 ## Endpoint 2 (facultatif, à discuter) : rapatrier une photo
