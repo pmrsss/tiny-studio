@@ -252,17 +252,19 @@
   }
 
   // Le titre de la page, sans le nom du site qui le suit ou le précède
-  function nettoyerTitre(titre, site) {
+  // Les morceaux retirés : le nom du site (« | ZARA France », « ≡ SEPHORA ») et la marque, déjà dans son champ
+  function nettoyerTitre(titre, noms) {
     let t = titre.replace(/\s+/g, " ").trim();
     t = t.replace(/^Amazon\.[a-z.]+\s*[-:|]\s*/i, "").replace(/\s*:\s*Amazon\.[a-z.]+\s*:.*$/i, "");
-    const morceaux = t.split(/\s+[|–—-]\s+/);
-    if (morceaux.length > 1 && site) {
-      const s = normaliser(site);
-      if (normaliser(morceaux[morceaux.length - 1]) === s) morceaux.pop();
-      else if (normaliser(morceaux[0]) === s) morceaux.shift();
-      t = morceaux.join(" - ");
-    }
-    return t.trim();
+    const aRetirer = noms.filter(Boolean).map(function (n) { return normaliser(n).replace(/ /g, ""); });
+    const retirable = function (morceau) {
+      const m = normaliser(morceau).replace(/ /g, "");
+      return aRetirer.some(function (n) { return m === n || (n.length > 3 && m.indexOf(n) === 0 && m.length - n.length <= 8); });
+    };
+    let morceaux = t.split(/\s+[|–—≡-]\s+/);
+    while (morceaux.length > 1 && retirable(morceaux[morceaux.length - 1])) morceaux.pop();
+    while (morceaux.length > 1 && retirable(morceaux[0])) morceaux.shift();
+    return morceaux.join(" - ").trim();
   }
 
   // La catégorie : on cherche dans chaque texte, du plus sûr au moins sûr (la catégorie déclarée, le fil
@@ -331,11 +333,16 @@
     const fiche = { lien: lien, nom: "", marque: "", prix: "", image: "", categorie: "", meuble: "", complet: false };
 
     // Le nom : celui du produit, sinon le titre de partage, sinon le titre de la page
-    fiche.nom = chaine(produit && produit.name) || chaine(groupe && groupe.name) ||
-      nettoyerTitre(balises["og:title"] || "", titreSite) || nettoyerTitre(titrePage, titreSite);
+    fiche.nom = chaine(produit && produit.name) || chaine(groupe && groupe.name);
+    const nomDuTitre = !fiche.nom;
 
     // La marque : celle du produit ; l'auteur pour un livre ; le nom du site seulement sur le site d'une marque
     fiche.marque = premier(function (s) { return lireMarque(s.brand); }) || chaine(balises["product:brand"]);
+    // Les données de produit écrites dans la page elle-même (microdonnées, itemprop) : Sephora (19 novembre)
+    if (!fiche.marque) {
+      const bloc = html.match(/itemprop=["']brand["'][\s\S]{0,800}?itemprop=["']name["'](?:[^>]*content=["']([^"']+)["']|[^>]*>([^<]+)<)/i);
+      if (bloc) fiche.marque = decoder(bloc[1] || bloc[2] || "").trim();
+    }
     const estLivre = produits.some(function (p) { return typesDe(p).indexOf("Book") !== -1; });
     const auteur = premier(function (s) { return lireMarque(s.author); });
     if (!fiche.marque && !plateforme && titreSite) fiche.marque = titreSite;
@@ -349,6 +356,13 @@
     const prix = lirePrix(offre);
     if (prix) fiche.prix = formaterPrix(prix.montant, prix.devise);
     if (!fiche.prix && balises["product:price:amount"]) fiche.prix = formaterPrix(balises["product:price:amount"], balises["product:price:currency"] || balises["og:price:currency"]);
+    if (!fiche.prix && balises["price"]) fiche.prix = formaterPrix(balises["price"], balises["pricecurrency"]);
+
+    // Sans données de produit, le nom vient du titre de partage ou de la page, sans le site ni la marque
+    if (nomDuTitre) {
+      const noms = [titreSite, site, fiche.marque];
+      fiche.nom = nettoyerTitre(balises["og:title"] || "", noms) || nettoyerTitre(titrePage, noms);
+    }
 
     // La photo
     fiche.image = premier(function (s) { return lireImage(s.image, base); }) || absolue(balises["og:image"] || balises["og:image:secure_url"] || balises["twitter:image"], base);
