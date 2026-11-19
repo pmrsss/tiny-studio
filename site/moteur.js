@@ -379,11 +379,16 @@
 
     // Les corrections propres au site
     const regle = REGLES_SITES[hote] || REGLES_SITES[hote.split(".").slice(-2).join(".")];
-    // Toutes les photos de la fiche qui a donné la première, pour les règles qui choisissent parmi elles
-    const sourcePhoto = sources.find(function (s) { return lireImage(s.image, base); });
-    const images = sourcePhoto ? liste(sourcePhoto.image).map(function (v) {
-      return absolue(typeof v === "string" ? v : v && (v.url || v.contentUrl || v["@id"]), base);
-    }).filter(Boolean) : [];
+    // Les photos d'une liste où figure la photo retenue (la variante, ou la fiche générale de la même
+    // couleur), pour les règles qui choisissent parmi elles
+    const sansParametres = function (u) { return String(u || "").split("?")[0]; };
+    let images = [];
+    sources.forEach(function (s) {
+      const toutes = liste(s.image).map(function (v) {
+        return absolue(typeof v === "string" ? v : v && (v.url || v.contentUrl || v["@id"]), base);
+      }).filter(Boolean);
+      if (toutes.length > images.length && toutes.some(function (u) { return sansParametres(u) === sansParametres(fiche.image); })) images = toutes;
+    });
     if (regle) regle(html, fiche, { images: images });
 
     // La catégorie, puis le meuble
