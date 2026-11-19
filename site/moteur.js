@@ -6,6 +6,10 @@
 (function (racine) {
   "use strict";
 
+  // La version du moteur, À CHANGER À CHAQUE MODIFICATION : un favori installé garde le moteur du jour
+  // de son installation. Il envoie sa version au studio, qui demande de le réinstaller quand elle a changé
+  const VERSION = "2026-11-19.5";
+
   // Les catégories d'objets et leur meuble (contrat, validées par Pauline le 4 novembre 2026, complétées
   // le 19). Les mots se comparent sans accents ni majuscules, au singulier comme au pluriel, en français
   // et en anglais. Quand plusieurs mots d'un même texte répondent, le plus long l'emporte : « lampe de
@@ -296,6 +300,14 @@
     return null;
   }
 
+  // Le nom avec une seule majuscule, au début : un nom écrit tout en capitales passe en minuscules
+  // (« BLOUSON BOMBER EFFET DAIM », Zara) ; un nom en casse mixte garde ses noms propres (choix de Pauline, 19 novembre 2026)
+  function nomPropre(nom) {
+    nom = String(nom || "");
+    if (/[A-ZÀ-Þ]{2}/.test(nom) && !/[a-zß-ÿ]/.test(nom)) nom = nom.toLocaleLowerCase("fr-FR");
+    return nom.charAt(0).toLocaleUpperCase("fr-FR") + nom.slice(1);
+  }
+
   // ---------------------------------------------------------------------------------------------
   // La fiche
 
@@ -401,13 +413,7 @@
     else { fiche.categorie = "autre"; fiche.meuble = "coffre"; }
     if (fiche.categorie === "livres" && auteur) fiche.marque = auteur;
 
-    // Le nom avec une seule majuscule, au début : un nom écrit tout en capitales passe en minuscules
-    // (« BLOUSON BOMBER EFFET DAIM », Zara) ; un nom en casse mixte garde ses noms propres (choix de Pauline, 19 novembre 2026)
-    if (fiche.nom) {
-      let nom = fiche.nom;
-      if (/[A-ZÀ-Þ]{2}/.test(nom) && !/[a-zß-ÿ]/.test(nom)) nom = nom.toLocaleLowerCase("fr-FR");
-      fiche.nom = nom.charAt(0).toLocaleUpperCase("fr-FR") + nom.slice(1);
-    }
+    fiche.nom = nomPropre(fiche.nom);
 
     fiche.complet = Boolean(fiche.nom && fiche.marque && fiche.prix && fiche.image);
     // Une page sans produit (une liste, un article retiré qui renvoie ailleurs) ne donne pas de fiche
@@ -418,7 +424,7 @@
     return fiche;
   }
 
-  const api = { lireProduit: lireProduit, formaterPrix: formaterPrix, trouverCategorie: trouverCategorie, CATEGORIES: CATEGORIES, PLATEFORMES: PLATEFORMES };
+  const api = { VERSION: VERSION, nomPropre: nomPropre, lireProduit: lireProduit, formaterPrix: formaterPrix, trouverCategorie: trouverCategorie, CATEGORIES: CATEGORIES, PLATEFORMES: PLATEFORMES };
   racine.TinyMoteur = api;
   if (typeof module === "object" && module.exports) module.exports = api;
 })(typeof globalThis !== "undefined" ? globalThis : this);

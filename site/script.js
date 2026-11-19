@@ -1027,12 +1027,25 @@ function arriverAvecUnArticle() {
     });
     if (!fiche.lien || !adresseWeb(fiche.lien)) return false;
     if (fiche.image && !adresseWeb(fiche.image)) delete fiche.image;
+    // Un favori installé garde le moteur du jour de son installation : le nom est remis en forme ici, et
+    // un favori plus ancien que le moteur du studio est signalé, avec le lien pour le réinstaller
+    const moteur = window.TinyMoteur;
+    if (moteur && fiche.nom) fiche.nom = moteur.nomPropre(fiche.nom);
+    const ancien = moteur && recue.v !== moteur.VERSION;
     if (fenetre.open) fenetre.close();
     ouvrirFenetre(null, meubles[fiche.meuble] ? fiche.meuble : "");
     CHAMPS.lien.value = fiche.lien;
     remplirAvec(fiche);
     dernierLu = fiche.lien;
     montrerLecture("Informations lues sur la page : vérifie-les avant de ranger l'article.", false);
+    if (ancien) {
+      etatLecture.appendChild(document.createTextNode(" Ton favori date d'une version précédente : "));
+      const lienFavori = document.createElement("a");
+      lienFavori.href = "favori";
+      lienFavori.textContent = "réinstalle-le";
+      etatLecture.appendChild(lienFavori);
+      etatLecture.appendChild(document.createTextNode(" pour avoir les dernières lectures."));
+    }
     return true;
   }
   const lienRecu = new URLSearchParams(location.search).get("lien");

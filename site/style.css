@@ -259,6 +259,7 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .aide { margin: 0; font-size: 12px; color: var(--brun-doux); line-height: 1.4; }
 .erreur { margin: 0; font: 700 12.5px Nunito, sans-serif; color: var(--rose-texte); }
 .aide.lecture { font-weight: 700; }
+.aide.lecture a { color: var(--rose-texte); font-weight: 800; }
 .aide.lecture.en-cours::before {
   content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px;
   border: 2px solid var(--rose-pale); border-top-color: var(--rose); border-radius: 50%; animation: tourner 0.8s linear infinite;

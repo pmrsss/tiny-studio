@@ -57,6 +57,7 @@
       </ol>
       <a class="favori" id="favori" href="#" aria-disabled="true" title="Glisse ce bouton dans ta barre des favoris">+ Ranger dans Tiny Studio</a>
       <p class="note" id="note-favori">Préparation du favori…</p>
+      <p class="note">Tu l’avais déjà ? Supprime l’ancien de ta barre, puis fais glisser celui-ci : un favori garde la version du jour où il a été installé.</p>
     </section>
 
     <section aria-labelledby="titre-iphone">
@@ -100,7 +101,7 @@
         const cible = location.origin + location.pathname.replace(/[^/]*$/, "");
         code = "(function(){var R={};\n" + moteur + "\n" +
           "var f=R.TinyMoteur.lireProduit(document.documentElement.outerHTML,location.href);" +
-          "if(!f){alert('Tiny Studio ne trouve pas d\\'article sur cette page. Ouvre la page d\\'un seul article, puis réessaie.');return;}" +
+          "if(!f){alert('Tiny Studio ne trouve pas d\\'article sur cette page. Ouvre la page d\\'un seul article, puis réessaie.');return;}f.v=R.TinyMoteur.VERSION;" +
           "var u=" + JSON.stringify(cible) + "+'#ajout='+encodeURIComponent(JSON.stringify(f));" +
           "var w=window.open(u,'_blank');if(!w)location.href=u;})();";
         lien.href = "javascript:" + encodeURIComponent(code);
