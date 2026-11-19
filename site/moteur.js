@@ -31,6 +31,9 @@
   // Les règles propres à un site, seulement quand la base de liens montre que les règles générales s'y
   // trompent. Chacune reçoit le HTML et la fiche déjà lue, et la corrige
   const REGLES_SITES = {
+    // Aesop déclare « AES » comme marque (essai du favori, 19 novembre 2026)
+    "aesop.fr": function (html, fiche) { fiche.marque = "Aesop"; },
+    "aesop.com": function (html, fiche) { fiche.marque = "Aesop"; },
     // The Masie déclare « Thm FR » comme marque (relevé du 19 novembre 2026)
     "themasie.com": function (html, fiche) { fiche.marque = "The Masie"; },
     // Amazon ne déclare ni données de produit ni balises de partage (relevés du 4 et du 19 novembre)
@@ -382,7 +385,8 @@
     if (fiche.categorie === "livres" && auteur) fiche.marque = auteur;
 
     fiche.complet = Boolean(fiche.nom && fiche.marque && fiche.prix && fiche.image);
-    if (!fiche.nom && !fiche.image) return null;
+    // Une page sans produit (une liste, un article retiré qui renvoie ailleurs) ne donne pas de fiche
+    if (!fiche.nom || (!produit && !fiche.prix && !fiche.image)) return null;
     return fiche;
   }
 
