@@ -1030,8 +1030,8 @@ function arriverAvecUnArticle() {
     // Un favori installé garde le moteur du jour de son installation : le nom est remis en forme ici, et
     // un favori plus ancien que le moteur du studio est signalé, avec le lien pour le réinstaller
     const moteur = window.TinyMoteur;
-    if (moteur && fiche.nom) fiche.nom = moteur.nomPropre(fiche.nom);
-    const ancien = moteur && recue.v !== moteur.VERSION;
+    if (moteur && typeof moteur.nomPropre === "function" && fiche.nom) fiche.nom = moteur.nomPropre(fiche.nom);
+    const ancien = Boolean(moteur && moteur.VERSION && recue.v !== moteur.VERSION);
     if (fenetre.open) fenetre.close();
     ouvrirFenetre(null, meubles[fiche.meuble] ? fiche.meuble : "");
     CHAMPS.lien.value = fiche.lien;
