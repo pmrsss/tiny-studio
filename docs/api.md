@@ -76,6 +76,8 @@ Le prix est rendu au format de l'application (« 29,90 € ») ; une autre devis
 
 **La casse (Pauline, 19 novembre 2026).** La marque s'affiche en majuscules, par le style de la fiche. Le nom de l'article prend une seule majuscule, au début : un nom écrit tout en capitales (« BLOUSON BOMBER EFFET DAIM », Zara) passe en « Blouson bomber effet daim » ; un nom en casse mixte garde ses noms propres (« ASOS DESIGN jean barrel »).
 
+**La photo (Pauline, 19 novembre 2026) : l'article seul d'abord, sinon la photo portée recadrée.** Quand le site donne une photo de l'article seul (packshot) parmi celles du produit, le moteur la prend : chez Zara, ce sont les photos dont le nom finit par « -e1 », « -e2 »… À défaut, la photo portée par un mannequin remplit la case de la fiche, cadrée sur le haut, au lieu d'y être réduite en pied. L'application la reconnaît à son adresse (Zara : « -p », « -a1 »…). Un autre site s'ajoute quand la base de liens le montre.
+
 **Une page sans article ne donne pas de fiche.** Ni produit déclaré, ni prix, et une page qui ne se dit pas produit (`og:type`) : c'est une liste, dont l'image de partage est souvent le logo du site (Zara, « Vestes pour femme », 19 novembre 2026). Le favori le dit et demande d'ouvrir la page d'un seul article.
 
 **La marque, pas le site.** Sur une marketplace ou un grand magasin en ligne (Vinted, ASOS, Zalando, La Redoute, Veepee, Place des Tendances, Galeries Lafayette, Amazon, Joybuy…), le nom du site n'est pas la marque du produit : une paire de Nike achetée sur ASOS doit être rangée sous « Nike ». D'où trois règles :

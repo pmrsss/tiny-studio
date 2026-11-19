@@ -234,6 +234,13 @@ function analyserPhoto(adresse, rappel) {
   sonde.src = adresse;
 }
 
+// Une photo portée, reconnue à son adresse : le mannequin en pied, tout petit une fois réduit à la case.
+// Choix de Pauline (19 novembre 2026) : la photo de l'article seul d'abord (le moteur la prend quand le site
+// en a une), sinon la photo portée recadrée. Zara nomme ses photos portées « -p » et « -a1 », « -a2 »…
+function photoPortee(adresse) {
+  return /^https:\/\/static\.zara\.net\/.*-(p|a\d+)\/[^/?]*$/.test(String(adresse).split("?")[0]);
+}
+
 // Place la photo pour que le contour du produit occupe 80 % de la case, centré
 function cadrer(img, cadre) {
   function placer() {
@@ -278,6 +285,15 @@ function fiche(article) {
     img.alt = "";
     img.loading = "lazy";
     img.addEventListener("error", function () { visuel.style.background = ""; visuel.classList.remove("visuel-livre"); visuel.innerHTML = neutre; });
+    visuel.appendChild(img);
+  } else if (article.image && photoPortee(article.image)) {
+    // Une photo portée par un mannequin : elle remplit la case, cadrée sur le haut, où est l'article
+    visuel.classList.add("visuel-plein", "visuel-portee");
+    const img = document.createElement("img");
+    img.src = article.image;
+    img.alt = "";
+    img.loading = "lazy";
+    img.addEventListener("error", function () { visuel.classList.remove("visuel-plein", "visuel-portee"); visuel.innerHTML = neutre; });
     visuel.appendChild(img);
   } else if (article.image) {
     // La case prend la couleur du fond de la photo : le produit y flotte, centré, sans toucher les bords

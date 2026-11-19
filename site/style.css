@@ -345,6 +345,8 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .visuel img { position: absolute; inset: 8px; width: calc(100% - 16px); height: calc(100% - 16px); object-fit: contain; }
 /* Une photo ajoutée dont le fond n'est pas uni, ou illisible : elle remplit la case, sans vide */
 .visuel.visuel-plein img { inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Une photo portée par un mannequin, sans photo de l'article seul : cadrée sur le haut (19 novembre 2026) */
+.visuel.visuel-portee img { object-position: center 22%; }
 /* Un livre, un carnet (bibliothèque) : la couverture entière, centrée sur fond blanc, sans ombre (elle
    ne marchait pas sur toutes les photos, celle de Hobonichi par exemple ; règle du 20 octobre 2026) */
 .visuel.visuel-livre img { inset: 12%; width: 76%; height: 76%; object-fit: contain; }

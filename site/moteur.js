@@ -66,6 +66,13 @@
     "asos.com": function (html, fiche) {
       const prix = html.match(/"price":\{"current":\{"value":([\d.]+)/);
       if (prix && !fiche.prix) fiche.prix = formaterPrix(prix[1], "EUR");
+    },
+    // Zara : la première photo est portée par un mannequin ; celles dont le nom finit par « -e1 », « -e2 »…
+    // montrent l'article seul, sur fond clair. On prend la première de la fiche choisie (choix de Pauline,
+    // 19 novembre 2026). Sans elle, la photo portée reste, et l'application la recadre (photoPortee)
+    "zara.com": function (html, fiche, contexte) {
+      const packshot = contexte.images.find(function (u) { return /-e\d+\/[^/?]*$/.test(u.split("?")[0]); });
+      if (packshot) fiche.image = packshot;
     }
   };
 
@@ -372,7 +379,12 @@
 
     // Les corrections propres au site
     const regle = REGLES_SITES[hote] || REGLES_SITES[hote.split(".").slice(-2).join(".")];
-    if (regle) regle(html, fiche);
+    // Toutes les photos de la fiche qui a donné la première, pour les règles qui choisissent parmi elles
+    const sourcePhoto = sources.find(function (s) { return lireImage(s.image, base); });
+    const images = sourcePhoto ? liste(sourcePhoto.image).map(function (v) {
+      return absolue(typeof v === "string" ? v : v && (v.url || v.contentUrl || v["@id"]), base);
+    }).filter(Boolean) : [];
+    if (regle) regle(html, fiche, { images: images });
 
     // La catégorie, puis le meuble
     const filAriane = ariane.map(function (a) {
