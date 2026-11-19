@@ -110,7 +110,27 @@ export async function onRequestGet({ request }) {
     const type = r.headers.get("content-type") || "";
     if (!/text\/html|application\/xhtml/i.test(type)) return erreur(422, "rien-trouve");
     const html = await lireCorps(r);
-    const fiche = globalThis.TinyMoteur.lireProduit(html, lien.trim());
+    let fiche = globalThis.TinyMoteur.lireProduit(html, lien.trim());
+    // Une boutique Shopify qui répond quand même en dollars : une seconde lecture, en demandant l'euro
+    // dans l'adresse (relevé du 19 novembre 2026 : Aest Studios, Caintè, Justine Clenquet)
+    if (fiche && fiche.prix && !/€$/.test(fiche.prix) && /\/cdn\/shop\/|cdn\.shopify\.com/.test(html)) {
+      try {
+        const enEuros = new URL(cible.toString());
+        enEuros.searchParams.set("currency", "EUR");
+        enEuros.searchParams.set("country", "FR");
+        const r2 = await fetch(enEuros.toString(), {
+          redirect: "follow",
+          signal: controle.signal,
+          headers: { "user-agent": UA, accept: "text/html", "accept-language": "fr-FR,fr;q=0.9", cookie: "cart_currency=EUR; localization=FR" }
+        });
+        if (r2.ok && adresseAutorisee(r2.url || enEuros.toString())) {
+          const seconde = globalThis.TinyMoteur.lireProduit(await lireCorps(r2), lien.trim());
+          if (seconde && /€$/.test(seconde.prix)) fiche = seconde;
+        }
+      } catch (e) {
+        if (e && e.name === "AbortError") throw e;
+      }
+    }
     if (!fiche) {
       // Une page minuscule sans produit est presque toujours un écran anti-robot
       return html.length < 6000 ? erreur(502, "site-refuse") : erreur(422, "rien-trouve");
