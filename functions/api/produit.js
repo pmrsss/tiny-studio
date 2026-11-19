@@ -96,7 +96,8 @@ export async function onRequestGet({ request }) {
       r = await fetch(cible.toString(), {
         redirect: "manual",
         signal: controle.signal,
-        headers: { "user-agent": UA, accept: "text/html,application/xhtml+xml", "accept-language": "fr-FR,fr;q=0.9,en;q=0.5" }
+        // Les boutiques Shopify choisissent la devise d'après le pays du serveur : on demande l'euro et la France
+        headers: { "user-agent": UA, accept: "text/html,application/xhtml+xml", "accept-language": "fr-FR,fr;q=0.9,en;q=0.5", cookie: "cart_currency=EUR; localization=FR" }
       });
       if (r.status < 300 || r.status >= 400) break;
       const suite = r.headers.get("location");
