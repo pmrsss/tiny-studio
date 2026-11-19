@@ -74,6 +74,10 @@ Dans l'ordre, la première source qui répond gagne, champ par champ :
 
 Le prix est rendu au format de l'application (« 29,90 € ») ; une autre devise est indiquée telle quelle.
 
+**La casse (Pauline, 19 novembre 2026).** La marque s'affiche en majuscules, par le style de la fiche. Le nom de l'article prend une seule majuscule, au début : un nom écrit tout en capitales (« BLOUSON BOMBER EFFET DAIM », Zara) passe en « Blouson bomber effet daim » ; un nom en casse mixte garde ses noms propres (« ASOS DESIGN jean barrel »).
+
+**Une page sans article ne donne pas de fiche.** Ni produit déclaré, ni prix, et une page qui ne se dit pas produit (`og:type`) : c'est une liste, dont l'image de partage est souvent le logo du site (Zara, « Vestes pour femme », 19 novembre 2026). Le favori le dit et demande d'ouvrir la page d'un seul article.
+
 **La marque, pas le site.** Sur une marketplace ou un grand magasin en ligne (Vinted, ASOS, Zalando, La Redoute, Veepee, Place des Tendances, Galeries Lafayette, Amazon, Joybuy…), le nom du site n'est pas la marque du produit : une paire de Nike achetée sur ASOS doit être rangée sous « Nike ». D'où trois règles :
 - **La marque vient du produit lui-même** : `brand.name` du JSON-LD, puis `product:brand`, puis le champ « Marque » de l'annonce quand la plateforme en affiche un (Vinted).
 - **Le nom du site (`og:site_name`) ne sert de marque que sur le site d'une marque** (Ganni, Sézane…). La fonction tient une liste des plateformes multimarques, où il n'est jamais utilisé.

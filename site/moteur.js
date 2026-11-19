@@ -384,6 +384,14 @@
     else { fiche.categorie = "autre"; fiche.meuble = "coffre"; }
     if (fiche.categorie === "livres" && auteur) fiche.marque = auteur;
 
+    // Le nom avec une seule majuscule, au début : un nom écrit tout en capitales passe en minuscules
+    // (« BLOUSON BOMBER EFFET DAIM », Zara) ; un nom en casse mixte garde ses noms propres (choix de Pauline, 19 novembre 2026)
+    if (fiche.nom) {
+      let nom = fiche.nom;
+      if (/[A-ZÀ-Þ]{2}/.test(nom) && !/[a-zß-ÿ]/.test(nom)) nom = nom.toLocaleLowerCase("fr-FR");
+      fiche.nom = nom.charAt(0).toLocaleUpperCase("fr-FR") + nom.slice(1);
+    }
+
     fiche.complet = Boolean(fiche.nom && fiche.marque && fiche.prix && fiche.image);
     // Une page sans produit (une liste, un article retiré qui renvoie ailleurs) ne donne pas de fiche
     if (!fiche.nom || (!produit && !fiche.prix && !fiche.image)) return null;
