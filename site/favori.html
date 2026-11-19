@@ -100,7 +100,7 @@
         const cible = location.origin + location.pathname.replace(/[^/]*$/, "");
         code = "(function(){var R={};\n" + moteur + "\n" +
           "var f=R.TinyMoteur.lireProduit(document.documentElement.outerHTML,location.href);" +
-          "if(!f){alert('Tiny Studio ne trouve pas de produit sur cette page.');return;}" +
+          "if(!f){alert('Tiny Studio ne trouve pas d\\'article sur cette page. Ouvre la page d\\'un seul article, puis réessaie.');return;}" +
           "var u=" + JSON.stringify(cible) + "+'#ajout='+encodeURIComponent(JSON.stringify(f));" +
           "var w=window.open(u,'_blank');if(!w)location.href=u;})();";
         lien.href = "javascript:" + encodeURIComponent(code);

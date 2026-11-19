@@ -387,6 +387,9 @@
     fiche.complet = Boolean(fiche.nom && fiche.marque && fiche.prix && fiche.image);
     // Une page sans produit (une liste, un article retiré qui renvoie ailleurs) ne donne pas de fiche
     if (!fiche.nom || (!produit && !fiche.prix && !fiche.image)) return null;
+    // Ni produit déclaré ni prix, sur une page qui ne se dit pas produit : une liste dont l'image de
+    // partage est le logo du site (Zara, « Vestes pour femme », 19 novembre 2026)
+    if (!produit && !fiche.prix && !/product|book/i.test(balises["og:type"] || "")) return null;
     return fiche;
   }
 
