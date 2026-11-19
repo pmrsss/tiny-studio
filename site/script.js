@@ -234,6 +234,13 @@ function analyserPhoto(adresse, rappel) {
   sonde.src = adresse;
 }
 
+// Une photo portée, reconnue à son adresse : le mannequin en pied, tout petit une fois réduit à la case.
+// Choix de Pauline (19 novembre 2026) : la photo de l'article seul d'abord (le moteur la prend quand le site
+// en a une), sinon la photo portée recadrée. Zara nomme ses photos portées « -p » et « -a1 », « -a2 »…
+function photoPortee(adresse) {
+  return /^https:\/\/static\.zara\.net\/.*-(p|a\d+)\/[^/?]*$/.test(String(adresse).split("?")[0]);
+}
+
 // Place la photo pour que le contour du produit occupe 80 % de la case, centré
 function cadrer(img, cadre) {
   function placer() {
@@ -278,6 +285,15 @@ function fiche(article) {
     img.alt = "";
     img.loading = "lazy";
     img.addEventListener("error", function () { visuel.style.background = ""; visuel.classList.remove("visuel-livre"); visuel.innerHTML = neutre; });
+    visuel.appendChild(img);
+  } else if (article.image && photoPortee(article.image)) {
+    // Une photo portée par un mannequin : elle remplit la case, cadrée sur le haut, où est l'article
+    visuel.classList.add("visuel-plein", "visuel-portee");
+    const img = document.createElement("img");
+    img.src = article.image;
+    img.alt = "";
+    img.loading = "lazy";
+    img.addEventListener("error", function () { visuel.classList.remove("visuel-plein", "visuel-portee"); visuel.innerHTML = neutre; });
     visuel.appendChild(img);
   } else if (article.image) {
     // La case prend la couleur du fond de la photo : le produit y flotte, centré, sans toucher les bords
@@ -652,6 +668,77 @@ function ouvrirFenetre(article, cleMeuble) {
   else CHAMPS.lien.focus();
 }
 
+// Après un enregistrement, le focus va à la fiche concernée, pour le clavier et les lecteurs d'écran.
+// Au doigt, il va au titre du panneau, qui n'a pas de cadre : le cadre en pointillés rose apparaissait
+// sur la fiche à peine rangée (essai de Pauline sur iPhone, 19 novembre 2026)
+function rendreFocus(element) {
+  if (window.matchMedia("(pointer: coarse)").matches) document.getElementById("panneau-titre").focus({ preventScroll: true });
+  else if (element) element.focus();
+}
+
+// Le remplissage automatique (issues n° 9 et 10, contrat docs/api.md) : un lien collé est lu par la
+// fonction /api/produit, qui rend la fiche du produit ; seuls les champs encore vides se remplissent,
+// et tout reste modifiable. Si le site refuse la lecture, un message invite à remplir à la main
+const etatLecture = document.getElementById("etat-lecture");
+let lectureEnCours = null;
+let dernierLu = "";
+let minuterieLien = null;
+
+function montrerLecture(texte, enCours) {
+  etatLecture.textContent = texte || "";
+  etatLecture.hidden = !texte;
+  etatLecture.classList.toggle("en-cours", Boolean(enCours));
+}
+
+function remplirAvec(fiche) {
+  [["nom", "nom"], ["marque", "marque"], ["prix", "prix"], ["photo", "image"]].forEach(function (paire) {
+    const valeur = fiche[paire[1]];
+    if (typeof valeur === "string" && valeur && !CHAMPS[paire[0]].value.trim()) CHAMPS[paire[0]].value = valeur;
+  });
+  if (fiche.meuble && meubles[fiche.meuble] && !CHAMPS.meuble.value) CHAMPS.meuble.value = fiche.meuble;
+}
+
+async function lireLien() {
+  const lien = CHAMPS.lien.value.trim();
+  if (articleModifie || !adresseWeb(lien) || lien === dernierLu || location.protocol === "file:") return;
+  dernierLu = lien;
+  if (lectureEnCours) lectureEnCours.abort();
+  const controle = new AbortController();
+  lectureEnCours = controle;
+  montrerLecture("Recherche des informations du produit…", true);
+  try {
+    const r = await fetch("/api/produit?lien=" + encodeURIComponent(lien), { signal: controle.signal });
+    const corps = await r.json();
+    if (controle !== lectureEnCours) return;
+    if (r.ok) {
+      remplirAvec(corps);
+      montrerLecture(corps.complet ? "Informations trouvées : vérifie-les avant de ranger l'article." : "Une partie des informations est trouvée : complète le reste.", false);
+    } else {
+      montrerLecture(corps.message || "Ce site ne se laisse pas lire. Remplis l'article à la main.", false);
+    }
+  } catch (e) {
+    if (e.name !== "AbortError" && controle === lectureEnCours) montrerLecture("La recherche n'a pas abouti. Remplis l'article à la main.", false);
+  } finally {
+    if (controle === lectureEnCours) lectureEnCours = null;
+  }
+}
+
+CHAMPS.lien.addEventListener("input", function () {
+  clearTimeout(minuterieLien);
+  minuterieLien = setTimeout(lireLien, 500);
+});
+CHAMPS.lien.addEventListener("change", function () {
+  clearTimeout(minuterieLien);
+  lireLien();
+});
+fenetre.addEventListener("close", function () {
+  clearTimeout(minuterieLien);
+  if (lectureEnCours) lectureEnCours.abort();
+  lectureEnCours = null;
+  dernierLu = "";
+  montrerLecture("");
+});
+
 boutonAjouter.addEventListener("click", function () { ouvrirFenetre(null, meubleOuvert); });
 boutonPlus.addEventListener("click", function () { ouvrirFenetre(null, ""); });
 document.getElementById("annuler").addEventListener("click", function () { fenetre.close(); });
@@ -705,11 +792,11 @@ formulaire.addEventListener("submit", function (evenement) {
     afficherCompteurs();
     if (cle !== depart) {
       annonce.textContent = "« " + nom + " » est modifié et déplacé dans " + meubles[cle].nom.toLowerCase() + ".";
-      (liste.querySelector(".article-texte") || boutonAjouter).focus();
+      rendreFocus(liste.querySelector(".article-texte") || boutonAjouter);
     } else {
       annonce.textContent = "« " + nom + " » est modifié.";
       const rang = meubles[cle].articles.indexOf(article);
-      liste.querySelectorAll(".bouton-modifier")[rang].focus();
+      rendreFocus(liste.querySelectorAll(".bouton-modifier")[rang]);
     }
     return;
   }
@@ -724,7 +811,7 @@ formulaire.addEventListener("submit", function (evenement) {
   afficherCompteurs();
   if (!panneau.open) panneau.showModal();
   annonce.textContent = "« " + nom + " » est rangé dans " + meubles[cle].nom.toLowerCase() + ".";
-  liste.querySelector(".article-texte").focus();
+  rendreFocus(liste.querySelector(".article-texte"));
 });
 
 // Sortir un article de son meuble : le panneau se redessine, et le focus va à l'article qui prend
@@ -933,4 +1020,54 @@ nomApp.addEventListener("keydown", function (evenement) {
 surTelephone.addEventListener("change", brancherNomApp);
 brancherNomApp();
 
-if (surTelephone.matches && !porteDejaVue()) ouvrirPorte();
+// Un article qui arrive du favori (#ajout=… : la fiche lue sur la page ouverte, après le « # » que le
+// serveur ne reçoit pas) ou d'un lien (?lien=… : le lien est collé et sa lecture lancée). La fiche
+// venue de l'adresse est traitée comme une saisie : du texte dans les champs, rien d'autre
+function arriverAvecUnArticle() {
+  if (location.hash.indexOf("#ajout=") === 0) {
+    let recue = null;
+    try { recue = JSON.parse(decodeURIComponent(location.hash.slice(7))); } catch (e) { recue = null; }
+    history.replaceState(null, "", location.pathname + location.search);
+    if (!recue || typeof recue !== "object") return false;
+    const fiche = {};
+    ["lien", "nom", "marque", "prix", "image", "meuble"].forEach(function (cle) {
+      if (typeof recue[cle] === "string") fiche[cle] = recue[cle].trim().slice(0, 2048);
+    });
+    if (!fiche.lien || !adresseWeb(fiche.lien)) return false;
+    if (fiche.image && !adresseWeb(fiche.image)) delete fiche.image;
+    // Un favori installé garde le moteur du jour de son installation : le nom est remis en forme ici, et
+    // un favori plus ancien que le moteur du studio est signalé, avec le lien pour le réinstaller
+    const moteur = window.TinyMoteur;
+    if (moteur && typeof moteur.nomPropre === "function" && fiche.nom) fiche.nom = moteur.nomPropre(fiche.nom);
+    const ancien = Boolean(moteur && moteur.VERSION && recue.v !== moteur.VERSION);
+    if (fenetre.open) fenetre.close();
+    ouvrirFenetre(null, meubles[fiche.meuble] ? fiche.meuble : "");
+    CHAMPS.lien.value = fiche.lien;
+    remplirAvec(fiche);
+    dernierLu = fiche.lien;
+    montrerLecture("Informations lues sur la page : vérifie-les avant de ranger l'article.", false);
+    if (ancien) {
+      etatLecture.appendChild(document.createTextNode(" Ton favori date d'une version précédente : "));
+      const lienFavori = document.createElement("a");
+      lienFavori.href = "favori";
+      lienFavori.textContent = "réinstalle-le";
+      etatLecture.appendChild(lienFavori);
+      etatLecture.appendChild(document.createTextNode(" pour avoir les dernières lectures."));
+    }
+    return true;
+  }
+  const lienRecu = new URLSearchParams(location.search).get("lien");
+  if (lienRecu && adresseWeb(lienRecu)) {
+    history.replaceState(null, "", location.pathname + location.hash);
+    if (fenetre.open) fenetre.close();
+    ouvrirFenetre(null, "");
+    CHAMPS.lien.value = lienRecu;
+    lireLien();
+    return true;
+  }
+  return false;
+}
+const arriveeAvecArticle = arriverAvecUnArticle();
+window.addEventListener("hashchange", arriverAvecUnArticle);
+
+if (surTelephone.matches && !porteDejaVue() && !arriveeAvecArticle) ouvrirPorte();

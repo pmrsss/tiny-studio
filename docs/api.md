@@ -74,6 +74,12 @@ Dans l'ordre, la première source qui répond gagne, champ par champ :
 
 Le prix est rendu au format de l'application (« 29,90 € ») ; une autre devise est indiquée telle quelle.
 
+**La casse (Pauline, 19 novembre 2026).** La marque s'affiche en majuscules, par le style de la fiche. Le nom de l'article prend une seule majuscule, au début : un nom écrit tout en capitales (« BLOUSON BOMBER EFFET DAIM », Zara) passe en « Blouson bomber effet daim » ; un nom en casse mixte garde ses noms propres (« ASOS DESIGN jean barrel »).
+
+**La photo (Pauline, 19 novembre 2026) : l'article seul d'abord, sinon la photo portée recadrée.** Quand le site donne une photo de l'article seul (packshot) parmi celles du produit, le moteur la prend : chez Zara, ce sont les photos dont le nom finit par « -e1 », « -e2 »… À défaut, la photo portée par un mannequin remplit la case de la fiche, cadrée sur le haut, au lieu d'y être réduite en pied. L'application la reconnaît à son adresse (Zara : « -p », « -a1 »…). Un autre site s'ajoute quand la base de liens le montre.
+
+**Une page sans article ne donne pas de fiche.** Ni produit déclaré, ni prix, et une page qui ne se dit pas produit (`og:type`) : c'est une liste, dont l'image de partage est souvent le logo du site (Zara, « Vestes pour femme », 19 novembre 2026). Le favori le dit et demande d'ouvrir la page d'un seul article.
+
 **La marque, pas le site.** Sur une marketplace ou un grand magasin en ligne (Vinted, ASOS, Zalando, La Redoute, Veepee, Place des Tendances, Galeries Lafayette, Amazon, Joybuy…), le nom du site n'est pas la marque du produit : une paire de Nike achetée sur ASOS doit être rangée sous « Nike ». D'où trois règles :
 - **La marque vient du produit lui-même** : `brand.name` du JSON-LD, puis `product:brand`, puis le champ « Marque » de l'annonce quand la plateforme en affiche un (Vinted).
 - **Le nom du site (`og:site_name`) ne sert de marque que sur le site d'une marque** (Ganni, Sézane…). La fonction tient une liste des plateformes multimarques, où il n'est jamais utilisé.
@@ -97,12 +103,12 @@ Validées par Pauline le 4 novembre 2026 :
 | `accessoires` | `dressing` | bijoux, collier, boucles d'oreilles, bague, montre, ceinture, écharpe, bonnet, lunettes de soleil, lunettes de vue |
 | `livres` | `bibliotheque` | livre, roman, BD, manga, album, beau livre |
 | `papeterie` | `bibliotheque` | carnet, agenda, cahier, stylo, papeterie |
-| `deco` | `deco` | bougie, vase, cadre, affiche, coussin, plaid, miroir, lampe |
-| `maquillage` | `coiffeuse` | rouge à lèvres, mascara, fond de teint, fard, palette, vernis |
+| `deco` | `deco` | bougie, vase, cadre, affiche, coussin, plaid, miroir, lampe, vaisselle (bol, plat, assiette) |
+| `maquillage` | `coiffeuse` | rouge à lèvres, baume teinté, blush, mascara, fond de teint, fard, palette, vernis |
 | `soins-parfums` | `coiffeuse` | crème, sérum, soin, parfum, eau de toilette, shampooing |
-| `autre` | `coffre` | l'ameublement (chaise, table, étagère, canapé, lit), le matériel de sport (tapis de yoga, haltères, raquette, vélo), et tout le reste |
+| `autre` | `coffre` | l'ameublement (chaise, table, étagère, canapé, lit), le linge de maison (parure de lit, serviettes), le matériel de sport (tapis de yoga, haltères, raquette, vélo), et tout le reste |
 
-La lampe et le miroir sont de la déco, mais un meuble va dans le coffre. Les tenues de sport (legging, brassière, baskets de running) restent au dressing, seul le matériel va dans le coffre. Les listes de mots vivent dans le code et s'affinent avec la base de liens. L'application propose le meuble dans « Ranger dans » ; on peut toujours le changer.
+La lampe, le miroir et la vaisselle sont de la déco, mais un meuble et le linge de maison vont dans le coffre. Pour un livre, la marque affichée est l'auteur (décision de Pauline, 19 novembre 2026). Les tenues de sport (legging, brassière, baskets de running) restent au dressing, seul le matériel va dans le coffre. Les listes de mots vivent dans le code et s'affinent avec la base de liens. L'application propose le meuble dans « Ranger dans » ; on peut toujours le changer.
 
 ## La base de liens
 
@@ -151,6 +157,7 @@ Seuils proposés, à discuter : sur les sites qui se laissent lire, le nom et la
 - **Le moteur** est un module commun, `moteur.js`. Il prend le HTML d'une page de produit et rend la fiche du produit, selon les règles de ce contrat (ordre des sources, bon produit, marque, catégorie, meuble).
 - **Première porte, le lien collé :** la fonction `/api/produit` télécharge la page puis la passe au moteur. Elle couvre les sites qui se laissent lire.
 - **Seconde porte, le favori :** sur la page de produit déjà ouverte dans le navigateur, un clic passe la page au même moteur. Le favori ouvre ensuite Tiny Studio avec le formulaire rempli. Aucun site ne peut le refuser, puisque c'est le navigateur de l'utilisateur qui a chargé la page. Les informations passent dans l'adresse après un `#`, une partie que le serveur ne reçoit pas.
+- **Un favori garde le moteur du jour de son installation** (essai de Pauline, 19 novembre 2026) : il contient le moteur lui-même, pour qu'aucun site ne puisse l'empêcher de tourner. Il envoie donc sa version (`v`) avec la fiche. Quand elle diffère de celle du studio, le studio demande de le réinstaller, et remet déjà en forme ce qu'il peut (le nom ; une photo portée est recadrée). La version, en tête de `moteur.js`, change à chaque modification du moteur.
 - **La base de liens sert aux deux.** Les liens lisibles se testent par la fonction. Les autres se testent comme le ferait le favori : Claude ouvre la page dans son navigateur et y lance le moteur.
 
 ## Endpoint 2 (facultatif, à discuter) : rapatrier une photo

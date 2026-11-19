@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Le favori Tiny Studio</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="partage/favicon-32.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --fond: #FAF3E8; --carte: #FFFBF5; --ombre: #EAD8C6; --encre: #4A3328; --encre-douce: #7A5C46;
+      --rose: #C9557C; --rose-texte: #A83E63; --rose-pale: #F7E1E8; --vert-texte: #28694F;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--fond); color: var(--encre); font-family: Nunito, "Helvetica Neue", Arial, sans-serif; font-size: 16px; line-height: 1.5; }
+    main { max-width: 560px; margin: 0 auto; padding: 40px 16px 56px; }
+    .retour { color: var(--rose-texte); font-weight: 700; text-decoration: none; }
+    .retour:hover { text-decoration: underline; }
+    h1, h2 { font-family: Fredoka, Nunito, sans-serif; font-weight: 600; line-height: 1.2; margin: 0; }
+    h1 { font-size: 30px; margin-top: 20px; }
+    h2 { font-size: 20px; margin-bottom: 12px; }
+    .intro { color: var(--encre-douce); margin: 12px 0 0; }
+    section { margin-top: 28px; padding: 20px; background: var(--carte); border-radius: 20px; box-shadow: 0 2px 0 var(--ombre); }
+    ol { margin: 0; padding-left: 20px; }
+    li + li { margin-top: 8px; }
+    .favori {
+      display: inline-flex; align-items: center; gap: 8px; margin: 20px 0 8px;
+      padding: 12px 20px; min-height: 48px; border-radius: 999px;
+      background: var(--rose); color: #FFFFFF; font-weight: 700; text-decoration: none; cursor: grab;
+      box-shadow: 0 3px 0 #A83E63;
+    }
+    .favori[aria-disabled="true"] { opacity: 0.6; cursor: default; }
+    .bouton {
+      font: inherit; font-weight: 700; color: var(--rose-texte); background: var(--rose-pale);
+      border: 0; border-radius: 12px; padding: 12px 20px; min-height: 48px; cursor: pointer;
+    }
+    .bouton:focus-visible, .favori:focus-visible, .retour:focus-visible { outline: 3px solid var(--rose-texte); outline-offset: 2px; }
+    .note { font-size: 15px; color: var(--encre-douce); margin: 12px 0 0; }
+    .etat { font-size: 15px; font-weight: 700; color: var(--vert-texte); margin: 8px 0 0; min-height: 22px; }
+    kbd { font-family: inherit; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="retour" href="./">← Tiny Studio</a>
+    <h1>Le favori « Ranger dans Tiny Studio »</h1>
+    <p class="intro">Sur la page d’un produit, un clic sur ce favori lit la page ouverte et ouvre Tiny Studio avec l’article déjà rempli. Il marche aussi sur les sites qui refusent la lecture par lien, comme Zara ou Zalando.</p>
+
+    <section aria-labelledby="titre-ordinateur">
+      <h2 id="titre-ordinateur">Sur ordinateur</h2>
+      <ol>
+        <li>Affiche la barre des favoris : dans Safari, menu Présentation, « Afficher la barre des favoris » ; dans Chrome, <kbd>⌘ Maj B</kbd>.</li>
+        <li>Fais glisser ce bouton jusqu’à la barre des favoris :</li>
+      </ol>
+      <a class="favori" id="favori" href="#" aria-disabled="true" title="Glisse ce bouton dans ta barre des favoris">+ Ranger dans Tiny Studio</a>
+      <p class="note" id="note-favori">Préparation du favori…</p>
+      <p class="note">Tu l’avais déjà ? Supprime l’ancien de ta barre, puis fais glisser celui-ci : un favori garde la version du jour où il a été installé.</p>
+    </section>
+
+    <section aria-labelledby="titre-iphone">
+      <h2 id="titre-iphone">Sur iPhone, dans Safari</h2>
+      <ol>
+        <li>Copie le code du favori :</li>
+      </ol>
+      <p><button class="bouton" id="copier" type="button" disabled>Copier le code</button></p>
+      <p class="etat" id="etat-copie" aria-live="polite"></p>
+      <ol start="2">
+        <li>Ajoute cette page à tes favoris : bouton de partage, puis « Ajouter un signet ».</li>
+        <li>Ouvre tes signets, touche « Modifier », puis le signet que tu viens d’ajouter.</li>
+        <li>Renomme-le « Ranger dans Tiny Studio », efface son adresse et colle le code à la place.</li>
+        <li>Sur la page d’un produit, ouvre tes signets et touche « Ranger dans Tiny Studio ».</li>
+      </ol>
+      <p class="note">Cette installation est encore à l’essai sur iPhone.</p>
+    </section>
+  </main>
+
+  <script>
+    // Un favori installé avant le 19 novembre 2026 visait cette page au lieu du studio : il y est renvoyé
+    if (location.hash.indexOf("#ajout=") === 0) location.replace(location.pathname.replace(/[^/]*$/, "") + location.hash);
+  </script>
+  <script>
+    // Le favori est le moteur lui-même (moteur.js), suivi de quelques lignes : il lit la page ouverte,
+    // puis ouvre Tiny Studio avec la fiche après le « # » de l'adresse, une partie que le serveur ne
+    // reçoit jamais. Il est fabriqué ici, à partir du moteur servi avec cette page, pour viser toujours
+    // la bonne adresse de Tiny Studio (le site en ligne ou une version de test)
+    (async function () {
+      const lien = document.getElementById("favori");
+      const note = document.getElementById("note-favori");
+      const copier = document.getElementById("copier");
+      let code = "";
+      try {
+        const source = await (await fetch("moteur.js", { cache: "no-cache" })).text();
+        // Les commentaires et les retraits partent, pour un favori plus court
+        const moteur = source.split("\n").filter(function (l) { return !/^\s*\/\//.test(l); })
+          .map(function (l) { return l.trim(); }).join("\n")
+          .replace(/\}\)\(typeof globalThis[^;]*;\s*$/, "})(R);");
+        // Le dossier de la page, quelle que soit la forme de son adresse (« /favori » chez Cloudflare, « /favori.html » ailleurs)
+        const cible = location.origin + location.pathname.replace(/[^/]*$/, "");
+        code = "(function(){var R={};\n" + moteur + "\n" +
+          "var f=R.TinyMoteur.lireProduit(document.documentElement.outerHTML,location.href);" +
+          "if(!f){alert('Tiny Studio ne trouve pas d\\'article sur cette page. Ouvre la page d\\'un seul article, puis réessaie.');return;}f.v=R.TinyMoteur.VERSION;" +
+          "var u=" + JSON.stringify(cible) + "+'#ajout='+encodeURIComponent(JSON.stringify(f));" +
+          "var w=window.open(u,'_blank');if(!w)location.href=u;})();";
+        lien.href = "javascript:" + encodeURIComponent(code);
+        lien.removeAttribute("aria-disabled");
+        note.textContent = "Ne clique pas dessus ici : il ne marche que sur la page d’un produit.";
+        copier.disabled = false;
+      } catch (e) {
+        note.textContent = "Le favori n’a pas pu se préparer. Recharge la page.";
+      }
+      lien.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        note.textContent = "Fais-le glisser dans ta barre des favoris, puis utilise-le sur la page d’un produit.";
+      });
+      copier.addEventListener("click", async function () {
+        const etat = document.getElementById("etat-copie");
+        try {
+          await navigator.clipboard.writeText("javascript:" + encodeURIComponent(code));
+          etat.textContent = "Code copié.";
+        } catch (e) {
+          etat.textContent = "La copie a échoué. Réessaie.";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
