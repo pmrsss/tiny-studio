@@ -77,6 +77,10 @@
   </main>
 
   <script>
+    // Un favori installé avant le 19 novembre 2026 visait cette page au lieu du studio : il y est renvoyé
+    if (location.hash.indexOf("#ajout=") === 0) location.replace(location.pathname.replace(/[^/]*$/, "") + location.hash);
+  </script>
+  <script>
     // Le favori est le moteur lui-même (moteur.js), suivi de quelques lignes : il lit la page ouverte,
     // puis ouvre Tiny Studio avec la fiche après le « # » de l'adresse, une partie que le serveur ne
     // reçoit jamais. Il est fabriqué ici, à partir du moteur servi avec cette page, pour viser toujours
@@ -92,7 +96,8 @@
         const moteur = source.split("\n").filter(function (l) { return !/^\s*\/\//.test(l); })
           .map(function (l) { return l.trim(); }).join("\n")
           .replace(/\}\)\(typeof globalThis[^;]*;\s*$/, "})(R);");
-        const cible = location.origin + location.pathname.replace(/favori\.html$/, "");
+        // Le dossier de la page, quelle que soit la forme de son adresse (« /favori » chez Cloudflare, « /favori.html » ailleurs)
+        const cible = location.origin + location.pathname.replace(/[^/]*$/, "");
         code = "(function(){var R={};\n" + moteur + "\n" +
           "var f=R.TinyMoteur.lireProduit(document.documentElement.outerHTML,location.href);" +
           "if(!f){alert('Tiny Studio ne trouve pas de produit sur cette page.');return;}" +
