@@ -159,6 +159,10 @@ const panneau = document.getElementById("panneau");
 const liste = document.getElementById("articles");
 const vide = document.getElementById("vide");
 let meubleOuvert = null;  // le meuble dont le panneau est ouvert, proposé pour ranger un nouvel article
+// Le mode « Sélectionner » du panneau, et les articles cochés (20 novembre 2026)
+let enSelection = false;
+const selection = new Set();
+const boutonSelectionner = document.getElementById("selectionner");
 
 // Les règles de mise en forme des photos (décision de Pauline, 19 octobre 2026) :
 // 1. la case prend la couleur du fond de la photo ;
@@ -234,6 +238,24 @@ function analyserPhoto(adresse, rappel) {
   sonde.src = adresse;
 }
 
+// La boutique, sur un site qui vend plusieurs marques : la fiche dit « chez Zalando » à côté du prix (choix de
+// Pauline, 20 novembre 2026), sauf quand la marque est celle du site (ASOS DESIGN chez ASOS, Merci chez Merci).
+// Seuls les sites connus pour vendre plusieurs marques sont nommés ; un autre s'ajoute quand la base de liens le montre
+const BOUTIQUES = {
+  "zalando.fr": "Zalando", "asos.com": "ASOS", "printemps.com": "Printemps", "amazon.fr": "Amazon",
+  "vinted.fr": "Vinted", "sephora.fr": "Sephora", "placedestendances.com": "Place des Tendances",
+  "joybuy.fr": "Joybuy", "fnac.com": "Fnac", "cultura.com": "Cultura", "courir.com": "Courir",
+  "thecoolrepublic.com": "The Cool Republic", "merci-merci.com": "Merci"
+};
+function boutique(article) {
+  let hote = "";
+  try { hote = new URL(article.lien).hostname.replace(/^www\./, ""); } catch (e) { return ""; }
+  const nom = BOUTIQUES[hote];
+  if (!nom) return "";
+  const simple = function (s) { return String(s || "").toLowerCase().normalize("NFD").replace(/[^a-z0-9]/g, ""); };
+  return simple(article.marque).includes(simple(nom)) ? "" : nom;
+}
+
 // Une photo portée, reconnue à son adresse : le mannequin en pied, tout petit une fois réduit à la case.
 // Choix de Pauline (19 novembre 2026) : la photo de l'article seul d'abord (le moteur la prend quand le site
 // en a une), sinon la photo portée recadrée. Zara nomme ses photos portées « -p » et « -a1 », « -a2 »…
@@ -265,9 +287,10 @@ function fiche(article) {
 
   // Le visuel : la photo du produit si on l'a, sinon le dessin d'exemple. Avec un lien, il ouvre
   // lui aussi le site du produit dans un nouvel onglet (19 octobre 2026)
-  const visuel = document.createElement(article.lien ? "a" : "span");
+  const avecLien = article.lien && !enSelection;  // en sélection, toucher la fiche la coche
+  const visuel = document.createElement(avecLien ? "a" : "span");
   visuel.className = "visuel";
-  if (article.lien) {
+  if (avecLien) {
     visuel.href = article.lien;
     visuel.target = "_blank";
     visuel.rel = "noopener";
@@ -332,9 +355,9 @@ function fiche(article) {
   ligne.appendChild(visuel);
 
   // Le texte : un lien vers le site du produit quand il existe
-  const texte = document.createElement(article.lien ? "a" : "div");
+  const texte = document.createElement(avecLien ? "a" : "div");
   texte.className = "article-texte";
-  if (article.lien) {
+  if (avecLien) {
     texte.href = article.lien;
     texte.target = "_blank";
     texte.rel = "noopener";
@@ -352,6 +375,11 @@ function fiche(article) {
     texte.querySelector(".prix-barre").setAttribute("aria-label", "au lieu de " + article.prixBarre);
     texte.querySelector(".remise").textContent = article.remise || "";
   }
+  const chez = boutique(article);
+  if (chez) {
+    texte.querySelector(".article-ligne").insertAdjacentHTML("beforeend", '<span class="article-boutique"></span>');
+    texte.querySelector(".article-boutique").textContent = "chez " + chez;
+  }
   if (article.precision) {
     texte.querySelector(".article-ligne").insertAdjacentHTML("beforeend", '<span class="precision"></span>');
     texte.querySelector(".precision").textContent = article.precision;
@@ -365,6 +393,27 @@ function fiche(article) {
     texte.querySelector(".article-lien").className = "article-exemple";
   }
   ligne.appendChild(texte);
+
+  // En sélection (20 novembre 2026) : une case ronde à gauche, toute la fiche la coche, pas d'actions
+  if (enSelection) {
+    const caseACocher = document.createElement("input");
+    caseACocher.type = "checkbox";
+    caseACocher.className = "case-selection";
+    caseACocher.checked = selection.has(article);
+    caseACocher.setAttribute("aria-label", "Sélectionner « " + article.nom + " »");
+    ligne.prepend(caseACocher);
+    ligne.classList.add("selectionnable");
+    ligne.classList.toggle("selectionnee", caseACocher.checked);
+    caseACocher.addEventListener("change", function () {
+      if (caseACocher.checked) selection.add(article); else selection.delete(article);
+      ligne.classList.toggle("selectionnee", caseACocher.checked);
+      majSelection();
+    });
+    ligne.addEventListener("click", function (evenement) {
+      if (evenement.target !== caseACocher) caseACocher.click();
+    });
+    return ligne;
+  }
 
   // Le bouton « Acheté »
   const bouton = document.createElement("button");
@@ -468,6 +517,10 @@ function remplirPanneau(cle) {
   document.getElementById("panneau-icone").setAttribute("href", "#ic-" + cle);
   document.getElementById("panneau-titre").textContent = meuble.nom;
   document.getElementById("panneau-compte").textContent = libelleNombre(meuble.articles.length);
+  // « Sélectionner » n'a de sens qu'à partir de deux articles ; la poubelle d'une fiche suffit pour un seul
+  if (enSelection && meuble.articles.length === 0) quitterSelection(false);
+  boutonSelectionner.hidden = !enSelection && meuble.articles.length < 2;
+  document.querySelector(".ajout").hidden = enSelection;
 
   liste.innerHTML = "";
   meuble.articles.forEach(function (article) { liste.appendChild(fiche(article)); });
@@ -481,6 +534,7 @@ function remplirPanneau(cle) {
 
 function ouvrir(cle) {
   meubleOuvert = cle;
+  quitterSelection(false);
   remplirPanneau(cle);
   panneau.showModal();
   // Le focus va au titre du meuble, pas à la croix : sur téléphone, la croix s'affichait entourée
@@ -834,6 +888,94 @@ function retirer(article) {
   enregistrerArticles();
   annonce.textContent = "« " + article.nom + " » est retiré.";
 }
+
+// ---------- Retirer plusieurs articles d'un coup (choix de Pauline, 20 novembre 2026) ----------
+// « Sélectionner », dans l'en-tête du meuble : chaque fiche prend une case, une barre en bas dit
+// « Retirer 2 articles », puis demande confirmation, comme pour un seul article (le focus va à « Garder »)
+const barreSelection = document.getElementById("barre-selection");
+const actionsSelection = document.getElementById("selection-actions");
+const confirmationSelection = document.getElementById("selection-confirmation");
+const boutonTout = document.getElementById("tout-selectionner");
+const boutonRetirerSelection = document.getElementById("retirer-selection");
+
+function nombreArticles(n) { return n + (n > 1 ? " articles" : " article"); }
+
+function majSelection() {
+  const meuble = meubles[meubleOuvert];
+  const n = selection.size;
+  if (enSelection) {
+    document.getElementById("panneau-compte").textContent = n ? nombreArticles(n) + (n > 1 ? " sélectionnés" : " sélectionné") : "Touche les articles à retirer";
+  }
+  boutonRetirerSelection.disabled = n === 0;
+  boutonRetirerSelection.textContent = n ? "Retirer " + nombreArticles(n) : "Retirer";
+  boutonTout.textContent = meuble && n === meuble.articles.length ? "Tout désélectionner" : "Tout sélectionner";
+}
+
+function entrerSelection() {
+  enSelection = true;
+  selection.clear();
+  panneau.classList.add("en-selection");
+  boutonSelectionner.textContent = "Annuler";
+  barreSelection.hidden = false;
+  montrerConfirmationSelection(false, false);
+  remplirPanneau(meubleOuvert);
+  majSelection();
+  const premiere = liste.querySelector(".case-selection");
+  if (premiere) premiere.focus({ preventScroll: true });
+}
+
+function quitterSelection(redessiner) {
+  if (!enSelection) return;
+  enSelection = false;
+  selection.clear();
+  panneau.classList.remove("en-selection");
+  boutonSelectionner.textContent = "Sélectionner";
+  barreSelection.hidden = true;
+  if (redessiner) remplirPanneau(meubleOuvert);
+}
+
+function montrerConfirmationSelection(ouvert, donnerFocus) {
+  confirmationSelection.hidden = !ouvert;
+  actionsSelection.hidden = ouvert;
+  if (ouvert) document.getElementById("selection-question").textContent = "Retirer " + nombreArticles(selection.size) + "\u00A0?";
+  if (donnerFocus !== false) (ouvert ? document.getElementById("garder-selection") : boutonRetirerSelection).focus();
+}
+
+boutonSelectionner.addEventListener("click", function () {
+  if (enSelection) {
+    quitterSelection(true);
+    boutonSelectionner.focus();
+  } else {
+    entrerSelection();
+  }
+});
+boutonTout.addEventListener("click", function () {
+  const meuble = meubles[meubleOuvert];
+  const tout = selection.size === meuble.articles.length;
+  selection.clear();
+  if (!tout) meuble.articles.forEach(function (a) { selection.add(a); });
+  liste.querySelectorAll(".case-selection").forEach(function (c) {
+    c.checked = !tout;
+    c.closest(".article").classList.toggle("selectionnee", !tout);
+  });
+  majSelection();
+});
+boutonRetirerSelection.addEventListener("click", function () { if (selection.size) montrerConfirmationSelection(true); });
+document.getElementById("garder-selection").addEventListener("click", function () { montrerConfirmationSelection(false); });
+document.getElementById("confirmer-selection").addEventListener("click", function () {
+  const meuble = meubles[meubleOuvert];
+  const n = selection.size;
+  for (let i = meuble.articles.length - 1; i >= 0; i--) if (selection.has(meuble.articles[i])) meuble.articles.splice(i, 1);
+  selection.forEach(function (a) { delete achats[a.id]; });
+  enregistrerAchats(achats);
+  quitterSelection(false);
+  remplirPanneau(meubleOuvert);
+  afficherCompteurs();
+  enregistrerArticles();
+  annonce.textContent = nombreArticles(n) + (n > 1 ? " retirés." : " retiré.");
+  rendreFocus(liste.querySelector(".article-texte") || boutonAjouter);
+});
+panneau.addEventListener("close", function () { quitterSelection(false); });
 
 // Déplacer un article : il quitte le meuble ouvert et se range en tête du meuble choisi
 function deplacer(article, cle) {

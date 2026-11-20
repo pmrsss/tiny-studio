@@ -164,6 +164,7 @@
         <h2 id="panneau-titre" tabindex="-1"></h2>
         <p class="panneau-compte" id="panneau-compte"></p>
       </div>
+      <button class="bouton-selectionner" id="selectionner" type="button" hidden>Sélectionner</button>
       <button class="fermer" id="fermer" type="button" aria-label="Fermer le panneau">×</button>
     </div>
     <div class="panneau-corps">
@@ -178,6 +179,17 @@
       <p id="vide-texte"></p>
     </div>
     <p class="panneau-note" id="panneau-note">Exemples fictifs, en attendant tes vrais articles.</p>
+    </div>
+    <!-- Retirer plusieurs articles (20 novembre 2026) : la barre du mode « Sélectionner » -->
+    <div class="barre-selection" id="barre-selection" hidden>
+      <div class="selection-actions" id="selection-actions">
+        <button class="bouton-garder" id="tout-selectionner" type="button">Tout sélectionner</button>
+        <button class="bouton-confirmer" id="retirer-selection" type="button" disabled>Retirer</button>
+      </div>
+      <div class="confirmation-retrait selection-confirmation" id="selection-confirmation" role="group" aria-labelledby="selection-question" hidden>
+        <span class="confirmation-texte" id="selection-question"></span>
+        <span class="confirmation-boutons"><button class="bouton-confirmer" id="confirmer-selection" type="button">Retirer</button><button class="bouton-garder" id="garder-selection" type="button">Garder</button></span>
+      </div>
     </div>
   </dialog>
 
