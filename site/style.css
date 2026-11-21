@@ -365,11 +365,16 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 /* Une photo recadrée à son produit : sa taille et sa place sont calculées par cadrer() */
 .visuel img.cadree { inset: auto; max-width: none; object-fit: fill; }
 .article-texte { min-width: 0; color: inherit; text-decoration: none; }
-/* En sélection : une case ronde devant le visuel, toute la fiche se touche, la fiche choisie se teinte */
-.panneau.en-selection .article { grid-template-columns: 28px 84px minmax(0, 1fr); cursor: pointer; }
+/* En sélection : une case ronde posée sur le coin de la photo, toute la fiche se touche, la fiche choisie
+   se teinte. Rien ne se décale : les boutons de la fiche restent à leur place, pâlis (21 novembre 2026) */
+.article { position: relative; }
+.panneau.en-selection .article { cursor: pointer; }
+.panneau.en-selection .article-actions { opacity: 0.35; pointer-events: none; }
 .case-selection {
-  grid-row: span 2; appearance: none; -webkit-appearance: none; margin: 0; cursor: pointer;
-  width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--brun-doux); background: var(--creme);
+  position: absolute; top: 19px; left: 19px; z-index: 1;
+  appearance: none; -webkit-appearance: none; margin: 0; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--brun-doux); background: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(74, 51, 40, 0.25);
   transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 .case-selection:checked {
@@ -378,14 +383,19 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 }
 .case-selection:focus-visible { outline: 3px dashed var(--focus); outline-offset: 2px; }
 .article.selectionnee { background: #FBEEF2; border-color: var(--rose); }  /* plus clair que --rose-pale : le texte brun doux y garde 4,6:1 */
-/* La barre du bas : « Tout sélectionner » et « Retirer 2 articles », puis la confirmation à la même place */
-.barre-selection { flex: 0 0 auto; margin: 12px -22px -20px; padding: 12px 22px 20px; background: var(--creme); border-top: 1px solid var(--carte-ombre); }
+/* La barre de la sélection, à la place du bouton rose et à sa hauteur : « Tout sélectionner » et
+   « Retirer 2 articles », puis la confirmation au même endroit. Elle reste en haut quand la liste défile */
+.barre-selection { position: sticky; top: -4px; z-index: 2; margin: -4px 0 0; padding: 4px 0 0; background: var(--creme); }
 .barre-selection[hidden] { display: none; }
-.selection-actions { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.selection-actions, .selection-confirmation { min-height: 46px; box-sizing: border-box; }  /* la hauteur du bouton rose */
+.selection-actions { display: flex; align-items: stretch; gap: 10px; }
 .selection-actions[hidden] { display: none; }
-.selection-actions .bouton-confirmer, .selection-actions .bouton-garder { min-height: 44px; }
+.selection-actions .bouton-garder, .selection-actions .bouton-confirmer { flex: 1 1 0; border-radius: 18px; }
+.selection-actions .bouton-garder { font-size: 14px; }
+.selection-actions .bouton-confirmer { font-size: 15px; }
 .bouton-confirmer:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
-.selection-confirmation { margin-top: 0; }
+.selection-confirmation { margin-top: 0; padding: 2px 2px 2px 14px; border-radius: 18px; }
+.selection-confirmation .bouton-confirmer, .selection-confirmation .bouton-garder { min-height: 42px; }
 a.article-texte:hover .article-nom { color: var(--rose-texte); }
 a.article-texte:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; border-radius: 8px; }
 .article-marque { margin: 0; font: 800 11.5px Nunito, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brun-doux); }

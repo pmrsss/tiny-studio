@@ -394,7 +394,8 @@ function fiche(article) {
   }
   ligne.appendChild(texte);
 
-  // En sélection (20 novembre 2026) : une case ronde à gauche, toute la fiche la coche, pas d'actions
+  // En sélection (20 novembre 2026) : une case ronde posée sur le coin de la photo, toute la fiche la
+  // coche ; ses boutons restent à leur place, pâlis et inactifs, pour que la fiche ne bouge pas (21 novembre)
   if (enSelection) {
     const caseACocher = document.createElement("input");
     caseACocher.type = "checkbox";
@@ -412,7 +413,6 @@ function fiche(article) {
     ligne.addEventListener("click", function (evenement) {
       if (evenement.target !== caseACocher) caseACocher.click();
     });
-    return ligne;
   }
 
   // Le bouton « Acheté »
@@ -509,6 +509,7 @@ function fiche(article) {
     }
     (ouvert ? confirmation.querySelector(".bouton-garder") : retrait).focus();
   }
+  if (enSelection) actions.inert = true;
   return ligne;
 }
 
@@ -890,8 +891,9 @@ function retirer(article) {
 }
 
 // ---------- Retirer plusieurs articles d'un coup (choix de Pauline, 20 novembre 2026) ----------
-// « Sélectionner », dans l'en-tête du meuble : chaque fiche prend une case, une barre en bas dit
-// « Retirer 2 articles », puis demande confirmation, comme pour un seul article (le focus va à « Garder »)
+// « Sélectionner », dans l'en-tête du meuble : chaque fiche prend une case, la barre qui remplace le
+// bouton rose dit « Retirer 2 articles », puis demande confirmation, comme pour un seul article (le focus
+// va à « Garder »). Rien ne change de taille ni de place en entrant dans la sélection (21 novembre 2026)
 const barreSelection = document.getElementById("barre-selection");
 const actionsSelection = document.getElementById("selection-actions");
 const confirmationSelection = document.getElementById("selection-confirmation");
@@ -903,9 +905,6 @@ function nombreArticles(n) { return n + (n > 1 ? " articles" : " article"); }
 function majSelection() {
   const meuble = meubles[meubleOuvert];
   const n = selection.size;
-  if (enSelection) {
-    document.getElementById("panneau-compte").textContent = n ? nombreArticles(n) + (n > 1 ? " sélectionnés" : " sélectionné") : "Touche les articles à retirer";
-  }
   boutonRetirerSelection.disabled = n === 0;
   boutonRetirerSelection.textContent = n ? "Retirer " + nombreArticles(n) : "Retirer";
   boutonTout.textContent = meuble && n === meuble.articles.length ? "Tout désélectionner" : "Tout sélectionner";
@@ -915,11 +914,14 @@ function entrerSelection() {
   enSelection = true;
   selection.clear();
   panneau.classList.add("en-selection");
+  // Le bouton garde la largeur de « Sélectionner » : le titre ne se replie pas autrement
+  boutonSelectionner.style.minWidth = boutonSelectionner.offsetWidth + "px";
   boutonSelectionner.textContent = "Annuler";
   barreSelection.hidden = false;
   montrerConfirmationSelection(false, false);
   remplirPanneau(meubleOuvert);
   majSelection();
+  annonce.textContent = "Touche les articles à retirer.";
   const premiere = liste.querySelector(".case-selection");
   if (premiere) premiere.focus({ preventScroll: true });
 }
@@ -930,6 +932,7 @@ function quitterSelection(redessiner) {
   selection.clear();
   panneau.classList.remove("en-selection");
   boutonSelectionner.textContent = "Sélectionner";
+  boutonSelectionner.style.minWidth = "";
   barreSelection.hidden = true;
   if (redessiner) remplirPanneau(meubleOuvert);
 }
