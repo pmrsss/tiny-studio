@@ -394,8 +394,8 @@ function fiche(article) {
   }
   ligne.appendChild(texte);
 
-  // En sélection (20 novembre 2026) : une case ronde en bas à droite de la carte, toute la fiche la
-  // coche ; ses boutons s'effacent sans libérer leur ligne, pour que la fiche ne bouge pas (21 novembre)
+  // En sélection (20 novembre 2026) : une case ronde à droite de la carte, toute la fiche la coche ; la
+  // fiche se resserre, sans ses boutons (21 novembre)
   if (enSelection) {
     const caseACocher = document.createElement("input");
     caseACocher.type = "checkbox";
@@ -893,7 +893,7 @@ function retirer(article) {
 // ---------- Retirer plusieurs articles d'un coup (choix de Pauline, 20 novembre 2026) ----------
 // « Sélectionner », dans l'en-tête du meuble : chaque fiche prend une case, la barre qui remplace le
 // bouton rose dit « Retirer 2 articles », puis demande confirmation, comme pour un seul article (le focus
-// va à « Garder »). Rien ne change de taille ni de place en entrant dans la sélection (21 novembre 2026)
+// va à « Garder »). Le meuble garde sa place, seules les fiches se resserrent (21 novembre 2026)
 const barreSelection = document.getElementById("barre-selection");
 const actionsSelection = document.getElementById("selection-actions");
 const confirmationSelection = document.getElementById("selection-confirmation");
@@ -913,9 +913,11 @@ function majSelection() {
 function entrerSelection() {
   enSelection = true;
   selection.clear();
-  panneau.classList.add("en-selection");
-  // Le bouton garde la largeur de « Sélectionner » : le titre ne se replie pas autrement
+  // Le bouton garde la largeur de « Sélectionner » : le titre ne se replie pas autrement. Le meuble garde
+  // sa hauteur, mesurée avant que les fiches se resserrent : le panneau ne descend pas
   boutonSelectionner.style.minWidth = boutonSelectionner.offsetWidth + "px";
+  panneau.style.minHeight = panneau.offsetHeight + "px";
+  panneau.classList.add("en-selection");
   boutonSelectionner.textContent = "Annuler";
   barreSelection.hidden = false;
   montrerConfirmationSelection(false, false);
@@ -933,6 +935,7 @@ function quitterSelection(redessiner) {
   panneau.classList.remove("en-selection");
   boutonSelectionner.textContent = "Sélectionner";
   boutonSelectionner.style.minWidth = "";
+  panneau.style.minHeight = "";
   barreSelection.hidden = true;
   if (redessiner) remplirPanneau(meubleOuvert);
 }

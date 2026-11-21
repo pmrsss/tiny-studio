@@ -365,13 +365,12 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 /* Une photo recadrée à son produit : sa taille et sa place sont calculées par cadrer() */
 .visuel img.cadree { inset: auto; max-width: none; object-fit: fill; }
 .article-texte { min-width: 0; color: inherit; text-decoration: none; }
-/* En sélection : une case ronde en bas à droite, à la place de la poubelle, toute la fiche se touche, la
-   fiche choisie se teinte. Les boutons s'effacent sans libérer leur ligne : rien ne se décale (21 novembre 2026) */
-.article { position: relative; }
-.panneau.en-selection .article { cursor: pointer; }
-.panneau.en-selection .article-actions { visibility: hidden; }
+/* En sélection : la fiche se resserre sur sa photo et son texte, ses boutons disparaissent, une case ronde
+   se pose à droite, au milieu ; toute la fiche se touche, la fiche choisie se teinte (21 novembre 2026) */
+.panneau.en-selection .article { grid-template-columns: 84px minmax(0, 1fr) 28px; cursor: pointer; }
+.panneau.en-selection .article-actions { display: none; }
 .case-selection {
-  position: absolute; right: 20px; bottom: 20px; z-index: 1;  /* centrée sur la poubelle, 42 px à 13 px du bord */
+  grid-column: 3; grid-row: 1 / span 2; align-self: center;
   appearance: none; -webkit-appearance: none; margin: 0; cursor: pointer;
   width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--brun-doux); background: #FFFFFF;
   transition: background-color 0.12s ease, border-color 0.12s ease;
