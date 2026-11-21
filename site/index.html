@@ -164,12 +164,25 @@
         <h2 id="panneau-titre" tabindex="-1"></h2>
         <p class="panneau-compte" id="panneau-compte"></p>
       </div>
+      <button class="bouton-selectionner" id="selectionner" type="button" hidden>Sélectionner</button>
       <button class="fermer" id="fermer" type="button" aria-label="Fermer le panneau">×</button>
     </div>
     <div class="panneau-corps">
       <!-- Ranger un article dans ce meuble : il ouvre la fenêtre d'un article, le meuble déjà choisi -->
       <div class="ajout">
         <button class="bouton-ajouter" id="ajouter" type="button" aria-haspopup="dialog"><span aria-hidden="true">+</span> Ajouter un article</button>
+      </div>
+      <!-- Retirer plusieurs articles (20 novembre 2026) : la barre du mode « Sélectionner » prend la place
+           du bouton rose, à la même hauteur (choix de Pauline, 21 novembre 2026) -->
+      <div class="barre-selection" id="barre-selection" hidden>
+        <div class="selection-actions" id="selection-actions">
+          <button class="bouton-garder" id="tout-selectionner" type="button">Tout sélectionner</button>
+          <button class="bouton-confirmer" id="retirer-selection" type="button" disabled>Retirer</button>
+        </div>
+        <div class="confirmation-retrait selection-confirmation" id="selection-confirmation" role="group" aria-labelledby="selection-question" hidden>
+          <span class="confirmation-texte" id="selection-question"></span>
+          <span class="confirmation-boutons"><button class="bouton-confirmer" id="confirmer-selection" type="button">Retirer</button><button class="bouton-garder" id="garder-selection" type="button">Garder</button></span>
+        </div>
       </div>
       <p class="annonce" id="annonce" aria-live="polite"></p>
       <ul class="articles" id="articles"></ul>

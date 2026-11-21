@@ -8,7 +8,7 @@
 
   // La version du moteur, À CHANGER À CHAQUE MODIFICATION : un favori installé garde le moteur du jour
   // de son installation. Il envoie sa version au studio, qui demande de le réinstaller quand elle a changé
-  const VERSION = "2026-11-19.5";
+  const VERSION = "2026-11-20.1";
 
   // Les catégories d'objets et leur meuble (contrat, validées par Pauline le 4 novembre 2026, complétées
   // le 19). Les mots se comparent sans accents ni majuscules, au singulier comme au pluriel, en français
@@ -77,6 +77,16 @@
     "zara.com": function (html, fiche, contexte) {
       const packshot = contexte.images.find(function (u) { return /-e\d+\/[^/?]*$/.test(u.split("?")[0]); });
       if (packshot) fiche.image = packshot;
+    },
+    // Zalando écrit le nom « MODÈLE - type - couleur » : on garde le modèle, choix de Pauline du 20 novembre
+    // 2026. La photo de l'article seul porte « filter=packshot » ; les photos déclarées font 200 px de large,
+    // on les demande en 800, comme l'image de partage du site
+    "zalando.fr": function (html, fiche, contexte) {
+      const modele = String(fiche.nom || "").split(" - ")[0].trim();
+      if (modele) fiche.nom = modele;
+      const packshot = contexte.images.find(function (u) { return /[?&]filter=packshot\b/.test(u); });
+      if (packshot) fiche.image = packshot;
+      if (fiche.image) fiche.image = fiche.image.replace(/([?&]imwidth=)\d+/, "$1800");
     }
   };
 

@@ -223,6 +223,17 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 }
 .fermer:hover { color: var(--rose); border-color: var(--brun); }
 .fermer:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
+/* « Sélectionner », dans l'en-tête du meuble (20 novembre 2026) : une pastille de texte, devant la croix */
+.bouton-selectionner {
+  margin-left: auto; flex: 0 0 auto; min-height: 44px;
+  font: 800 13.5px Nunito, sans-serif; color: var(--brun); cursor: pointer;
+  background: var(--carte); border: 1.5px solid var(--carte-ombre); border-radius: 99px; padding: 8px 14px;
+}
+.bouton-selectionner:hover { border-color: var(--rose); }
+.bouton-selectionner:focus-visible { outline: 3px dashed var(--focus); outline-offset: 2px; }
+.bouton-selectionner[hidden] { display: none; }
+.bouton-selectionner:not([hidden]) + .fermer { margin-left: 0; }
+.ajout[hidden] { display: none; }
 #panneau-titre:focus, #ajout-titre:focus { outline: none; }  /* ils reçoivent le focus à l'ouverture, sans cadre */
 
 /* Le corps du panneau défile d'un bloc : le formulaire d'ajout, puis les fiches */
@@ -354,6 +365,35 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 /* Une photo recadrée à son produit : sa taille et sa place sont calculées par cadrer() */
 .visuel img.cadree { inset: auto; max-width: none; object-fit: fill; }
 .article-texte { min-width: 0; color: inherit; text-decoration: none; }
+/* En sélection : la fiche se resserre sur sa photo et son texte, ses boutons disparaissent, une case ronde
+   se pose à droite, au milieu ; toute la fiche se touche, la fiche choisie se teinte (21 novembre 2026) */
+.panneau.en-selection .article { grid-template-columns: 84px minmax(0, 1fr) 28px; cursor: pointer; }
+.panneau.en-selection .article-actions { display: none; }
+.case-selection {
+  grid-column: 3; grid-row: 1 / span 2; align-self: center;
+  appearance: none; -webkit-appearance: none; margin: 0; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--brun-doux); background: #FFFFFF;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+.case-selection:checked {
+  border-color: var(--rose); background: var(--rose) center / 16px no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.5l3 3 6-7' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.case-selection:focus-visible { outline: 3px dashed var(--focus); outline-offset: 2px; }
+.article.selectionnee { background: #FBEEF2; border-color: var(--rose); }  /* plus clair que --rose-pale : le texte brun doux y garde 4,6:1 */
+/* La barre de la sélection, à la place du bouton rose et à sa hauteur : « Tout sélectionner » et
+   « Retirer 2 articles », puis la confirmation au même endroit. Elle reste en haut quand la liste défile */
+.barre-selection { position: sticky; top: -4px; z-index: 2; margin: -4px 0 0; padding: 4px 0 0; background: var(--creme); }
+.barre-selection[hidden] { display: none; }
+.selection-actions, .selection-confirmation { min-height: 46px; box-sizing: border-box; }  /* la hauteur du bouton rose */
+.selection-actions { display: flex; align-items: stretch; gap: 10px; }
+.selection-actions[hidden] { display: none; }
+.selection-actions .bouton-garder, .selection-actions .bouton-confirmer { flex: 1 1 0; border-radius: 18px; }
+.selection-actions .bouton-garder { font-size: 14px; }
+.selection-actions .bouton-confirmer { font-size: 15px; }
+.bouton-confirmer:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
+.selection-confirmation { margin-top: 0; padding: 2px 2px 2px 14px; border-radius: 18px; }
+.selection-confirmation .bouton-confirmer, .selection-confirmation .bouton-garder { min-height: 42px; }
 a.article-texte:hover .article-nom { color: var(--rose-texte); }
 a.article-texte:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; border-radius: 8px; }
 .article-marque { margin: 0; font: 800 11.5px Nunito, sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brun-doux); }
@@ -361,6 +401,7 @@ a.article-texte:focus-visible { outline: 3px dashed var(--focus); outline-offset
 .article-ligne { margin: 4px 0 0; font-size: 13.5px; color: var(--brun-doux); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
 .article-prix { font-weight: 800; color: var(--brun); font-size: 15px; }
 .article-lien { color: var(--rose-texte); font-weight: 800; }
+.article-boutique { color: var(--brun-doux); }
 .article-exemple { font-style: italic; color: var(--brun-doux); }
 /* Les remises, retenues par Pauline le 19 octobre 2026 : le prix du moment en rose, l'ancien barré,
    une pastille « -10 % » (l'étiquette en biais sur la vignette, essayée le même jour, est retirée) */
