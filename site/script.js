@@ -394,8 +394,8 @@ function fiche(article) {
   }
   ligne.appendChild(texte);
 
-  // En sélection (20 novembre 2026) : une case ronde posée sur le coin de la photo, toute la fiche la
-  // coche ; ses boutons restent à leur place, pâlis et inactifs, pour que la fiche ne bouge pas (21 novembre)
+  // En sélection (20 novembre 2026) : une case ronde en bas à droite de la carte, toute la fiche la
+  // coche ; ses boutons s'effacent sans libérer leur ligne, pour que la fiche ne bouge pas (21 novembre)
   if (enSelection) {
     const caseACocher = document.createElement("input");
     caseACocher.type = "checkbox";
