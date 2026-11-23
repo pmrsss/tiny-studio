@@ -8,7 +8,7 @@
 
   // La version du moteur, À CHANGER À CHAQUE MODIFICATION : un favori installé garde le moteur du jour
   // de son installation. Il envoie sa version au studio, qui demande de le réinstaller quand elle a changé
-  const VERSION = "2026-11-23.1";
+  const VERSION = "2026-11-23.2";
 
   // Les catégories d'objets et leur meuble (contrat, validées par Pauline le 4 novembre 2026, complétées
   // le 19). Les mots se comparent sans accents ni majuscules, au singulier comme au pluriel, en français
@@ -67,9 +67,19 @@
       if (prix && !fiche.prix) fiche.prix = formaterPrix(prix[1], prix[2]);
     },
     // ASOS : le prix n'est pas dans ses données de produit (relevé du 19 novembre)
-    "asos.com": function (html, fiche) {
+    // ASOS : ses données de produit ne déclarent qu'une photo, portée ; la galerie de la page en a
+    // d'autres, nommées « <numéro du produit>-2 », « -3 »…, que Pauline peut choisir (23 novembre 2026)
+    "asos.com": function (html, fiche, contexte) {
       const prix = html.match(/"price":\{"current":\{"value":([\d.]+)/);
       if (prix && !fiche.prix) fiche.prix = formaterPrix(prix[1], "EUR");
+      const numero = capturer(fiche.lien, /\/prd\/(\d+)/);
+      if (!numero) return;
+      const motif = new RegExp("https:\\/\\/images\\.asos-media\\.com\\/products\\/[a-z0-9-]+\\/" + numero + "-(\\d+)(?:-[a-z0-9]+)?(?=[\"'?$&\\\\\\s])", "gi");
+      const rangs = {};
+      let m;
+      while ((m = motif.exec(html))) { if (!rangs[m[1]]) rangs[m[1]] = m[0]; }
+      const galerie = Object.keys(rangs).sort(function (a, b) { return a - b; }).map(function (r) { return rangs[r]; });
+      if (galerie.length > 1) contexte.photos = galerie;
     },
     // Zara : la première photo est portée par un mannequin ; celles dont le nom finit par « -e1 », « -e2 »…
     // montrent l'article seul, sur fond clair. On prend la première de la fiche choisie (choix de Pauline,
