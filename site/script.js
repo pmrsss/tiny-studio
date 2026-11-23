@@ -701,7 +701,10 @@ function prixAffiche(texte) {
 // avec les informations de l'article à modifier
 function ouvrirFenetre(article, cleMeuble) {
   articleModifie = article || null;
+  promoLue = null;
   formulaire.reset();
+  cacherPrix(false);
+  montrerPhotos([]);
   ["lien", "nom", "photo", "meuble"].forEach(function (cle) { montrerErreur(cle, ""); });
   document.getElementById("ajout-titre").textContent = article ? "Modifier l'article" : "Nouvel article";
   boutonValider.textContent = article ? "Enregistrer" : "Ranger l'article";
@@ -738,6 +741,51 @@ const etatLecture = document.getElementById("etat-lecture");
 let lectureEnCours = null;
 let dernierLu = "";
 let minuterieLien = null;
+// Le prix barré lu sur la page (23 novembre 2026) : il n'a pas de champ, il suit le prix lu, et part si
+// le prix est changé à la main, la remise n'étant alors plus sûre
+let promoLue = null;
+
+// Le prix et les photos lus sur la page (Pauline, 23 novembre 2026) : le prix lu se garde sans champ, le
+// champ revient quand la page n'en donne pas ; les photos se choisissent dans une rangée sous le lien, et
+// le champ de l'adresse de la photo se cache tant qu'elle est là
+const champPhotos = document.getElementById("champ-photos");
+const vignettes = document.getElementById("vignettes");
+const blocAdressePhoto = document.getElementById("bloc-adresse-photo");
+const blocPrix = document.getElementById("bloc-prix");
+const champsDuo = document.getElementById("champs-duo");
+
+function cacherPrix(cache) {
+  blocPrix.hidden = cache;
+  champsDuo.classList.toggle("seul", cache);
+}
+
+function montrerPhotos(photos) {
+  vignettes.textContent = "";
+  const avecRangee = photos.length >= 2;
+  champPhotos.hidden = !avecRangee;
+  blocAdressePhoto.hidden = avecRangee;
+  if (!avecRangee) return;
+  if (photos.indexOf(CHAMPS.photo.value) === -1) CHAMPS.photo.value = photos[0];
+  photos.forEach(function (adresse, rang) {
+    const bouton = document.createElement("button");
+    bouton.type = "button";
+    bouton.className = "vignette-photo";
+    bouton.setAttribute("role", "radio");
+    bouton.setAttribute("aria-label", "Photo " + (rang + 1) + " sur " + photos.length);
+    bouton.setAttribute("aria-checked", String(adresse === CHAMPS.photo.value));
+    const img = document.createElement("img");
+    img.alt = "";
+    img.src = adresse;
+    // Une photo qui ne s'affiche pas quitte la rangée, sauf la choisie
+    img.addEventListener("error", function () { if (bouton.getAttribute("aria-checked") !== "true") bouton.remove(); });
+    bouton.appendChild(img);
+    bouton.addEventListener("click", function () {
+      CHAMPS.photo.value = adresse;
+      vignettes.querySelectorAll(".vignette-photo").forEach(function (b) { b.setAttribute("aria-checked", String(b === bouton)); });
+    });
+    vignettes.appendChild(bouton);
+  });
+}
 
 function montrerLecture(texte, enCours) {
   etatLecture.textContent = texte || "";
@@ -751,6 +799,20 @@ function remplirAvec(fiche) {
     if (typeof valeur === "string" && valeur && !CHAMPS[paire[0]].value.trim()) CHAMPS[paire[0]].value = valeur;
   });
   if (fiche.meuble && meubles[fiche.meuble] && !CHAMPS.meuble.value) CHAMPS.meuble.value = fiche.meuble;
+  if (typeof fiche.prix === "string" && fiche.prix) {
+    if (blocPrix.hidden || CHAMPS.prix.value.trim() === fiche.prix) { CHAMPS.prix.value = fiche.prix; cacherPrix(true); }
+  } else if (blocPrix.hidden) {
+    CHAMPS.prix.value = "";
+    cacherPrix(false);
+  }
+  const photos = Array.isArray(fiche.photos)
+    ? fiche.photos.filter(function (u) { return typeof u === "string" && u.length <= 2048 && adresseWeb(u); }).slice(0, 8)
+    : [];
+  if (blocAdressePhoto.hidden && typeof fiche.image === "string" && fiche.image) CHAMPS.photo.value = fiche.image;
+  montrerPhotos(photos);
+  promoLue = typeof fiche.prixBarre === "string" && fiche.prixBarre && typeof fiche.prix === "string" && fiche.prix
+    ? { prix: fiche.prix, prixBarre: fiche.prixBarre, remise: typeof fiche.remise === "string" ? fiche.remise : "" }
+    : null;
 }
 
 async function lireLien() {
@@ -826,11 +888,17 @@ formulaire.addEventListener("submit", function (evenement) {
     return;
   }
   const infos = { lien: lien, nom: nom, marque: CHAMPS.marque.value.trim(), prix: prixAffiche(CHAMPS.prix.value), image: photo };
+  if (promoLue && infos.prix === promoLue.prix) {
+    infos.prixBarre = promoLue.prixBarre;
+    if (promoLue.remise) infos.remise = promoLue.remise;
+  }
 
   if (articleModifie) {
     // Modifier : la fiche est mise à jour à sa place ; si le meuble change, l'article s'y déplace
     const article = articleModifie;
     const depart = meubleDe(article);
+    // Un prix changé à la main fait partir le prix barré et la remise
+    if (infos.prix !== article.prix) { delete article.prixBarre; delete article.remise; }
     if (article.image !== photo) {
       // Une nouvelle photo est relue selon les règles de mise en forme
       delete article.fond; delete article.cadre; delete article.plein; delete article.analyse;
@@ -1178,9 +1246,10 @@ function arriverAvecUnArticle() {
     history.replaceState(null, "", location.pathname + location.search);
     if (!recue || typeof recue !== "object") return false;
     const fiche = {};
-    ["lien", "nom", "marque", "prix", "image", "meuble"].forEach(function (cle) {
+    ["lien", "nom", "marque", "prix", "prixBarre", "remise", "image", "meuble"].forEach(function (cle) {
       if (typeof recue[cle] === "string") fiche[cle] = recue[cle].trim().slice(0, 2048);
     });
+    if (Array.isArray(recue.photos)) fiche.photos = recue.photos;
     if (!fiche.lien || !adresseWeb(fiche.lien)) return false;
     if (fiche.image && !adresseWeb(fiche.image)) delete fiche.image;
     // Un favori installé garde le moteur du jour de son installation : le nom est remis en forme ici, et

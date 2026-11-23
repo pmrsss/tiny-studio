@@ -206,6 +206,13 @@
         <p class="aide lecture" id="etat-lecture" aria-live="polite" hidden></p>
         <p class="erreur" id="erreur-lien" hidden></p>
       </div>
+      <!-- Les photos lues sur la page, sous le lien (variante 1, choisie par Pauline le 23 novembre 2026) :
+           la première est prise d'office, on touche une autre pour la garder à la place. Le champ de
+           l'adresse de la photo se cache tant que la rangée est là -->
+      <div class="champ" id="champ-photos" hidden>
+        <p class="etiquette" id="etiquette-photos">Photo</p>
+        <div class="vignettes" id="vignettes" role="radiogroup" aria-labelledby="etiquette-photos"></div>
+      </div>
       <div class="champ">
         <label for="champ-nom">Nom</label>
         <input id="champ-nom" name="nom" type="text" autocomplete="off" required aria-describedby="erreur-nom">
@@ -216,17 +223,19 @@
         <select id="champ-meuble" name="meuble" aria-describedby="erreur-meuble"></select>
         <p class="erreur" id="erreur-meuble" hidden></p>
       </div>
-      <div class="champs-duo">
+      <!-- Le prix se cache quand la page le donne (Pauline, 23 novembre 2026) : il est gardé tel quel, avec
+           son prix barré ; il reste à taper quand la page n'en donne pas, et dans « Modifier l'article » -->
+      <div class="champs-duo" id="champs-duo">
         <div class="champ">
           <label for="champ-marque">Marque <span class="facultatif">facultatif</span></label>
           <input id="champ-marque" name="marque" type="text" autocomplete="off">
         </div>
-        <div class="champ">
+        <div class="champ" id="bloc-prix">
           <label for="champ-prix">Prix <span class="facultatif">facultatif</span></label>
           <input id="champ-prix" name="prix" type="text" inputmode="decimal" autocomplete="off" placeholder="29,90">
         </div>
       </div>
-      <div class="champ">
+      <div class="champ" id="bloc-adresse-photo">
         <label for="champ-photo">Adresse de la photo <span class="facultatif">facultatif</span></label>
         <input id="champ-photo" name="photo" type="url" inputmode="url" autocomplete="off" placeholder="https://" aria-describedby="aide-photo erreur-photo">
         <p class="aide" id="aide-photo">Sur la page du produit, clic droit sur la photo, puis « Copier l'adresse de l'image ».</p>

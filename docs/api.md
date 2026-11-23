@@ -55,7 +55,10 @@ Réponse `200` :
   "nom": "Grand sac Kat en fausse fourrure",
   "marque": "Ganni",
   "prix": "1 095 €",
+  "prixBarre": "",
+  "remise": "",
   "image": "https://www.ganni.com/…/A6997.jpg",
+  "photos": ["https://www.ganni.com/…/A6997.jpg", "https://www.ganni.com/…/A6997_2.jpg"],
   "categorie": "sacs",
   "meuble": "dressing",
   "complet": true
@@ -63,6 +66,10 @@ Réponse `200` :
 ```
 
 `complet` vaut `false` si le nom, la marque, le prix ou la photo manque. L'application remplit ce qu'elle a et laisse les autres champs à compléter.
+
+**Le prix barré (23 novembre 2026).** Quand la boutique déclare le prix d'avant la remise (`priceSpecification` de type `StrikethroughPrice` ou `ListPrice`, Printemps), `prixBarre` le donne et `remise` le pourcentage (« 465 € », « -40 % ») ; sinon les deux restent vides. L'application les garde avec le prix lu, et les retire si le prix est changé à la main. Le champ « Prix » de la fenêtre se cache quand la page donne le prix (Pauline, 23 novembre 2026).
+
+**Les photos (23 novembre 2026).** `photos` liste les photos de la page, la photo retenue d'abord, sans doublon, huit au plus. Quand il y en a deux ou plus, la fenêtre les montre en vignettes sous le lien, et Pauline touche celle qu'elle garde (variante 1 de `planches/choix-photo.html`) ; le champ de l'adresse de la photo se cache tant que la rangée est là.
 
 ### Comment la fonction lit la page
 
@@ -74,9 +81,9 @@ Dans l'ordre, la première source qui répond gagne, champ par champ :
 
 Le prix est rendu au format de l'application (« 29,90 € ») ; une autre devise est indiquée telle quelle.
 
-**La casse (Pauline, 19 novembre 2026).** La marque s'affiche en majuscules, par le style de la fiche. Le nom de l'article prend une seule majuscule, au début : un nom écrit tout en capitales (« BLOUSON BOMBER EFFET DAIM », Zara) passe en « Blouson bomber effet daim » ; un nom en casse mixte garde ses noms propres (« ASOS DESIGN jean barrel »). **Chez Zalando (Pauline, 20 novembre 2026)**, le nom arrive en trois morceaux, « MODÈLE - type - couleur » : le moteur garde le modèle (« LONG-SLEEVE T-SHIRT WITH FRONT GATHERING - T-shirt à manches longues - khaki » donne « Long-sleeve t-shirt with front gathering »).
+**La casse (Pauline, 19 novembre 2026).** La marque s'affiche en majuscules, par le style de la fiche. Le nom de l'article prend une seule majuscule, au début : un nom écrit tout en capitales (« BLOUSON BOMBER EFFET DAIM », Zara) passe en « Blouson bomber effet daim » ; un nom en casse mixte garde ses noms propres. **La marque au début du nom est retirée** (23 novembre 2026), puisqu'elle a son champ : « ZAPA Manteau macey Marron » (Printemps) donne « Manteau macey Marron », « ASOS DESIGN jean barrel » donne « Jean barrel ». **Chez Zalando (Pauline, 20 novembre 2026)**, le nom arrive en trois morceaux, « MODÈLE - type - couleur » : le moteur garde le modèle (« LONG-SLEEVE T-SHIRT WITH FRONT GATHERING - T-shirt à manches longues - khaki » donne « Long-sleeve t-shirt with front gathering »).
 
-**La photo (Pauline, 19 novembre 2026) : l'article seul d'abord, sinon la photo portée recadrée.** Quand le site donne une photo de l'article seul (packshot) parmi celles du produit, le moteur la prend : chez Zara, ce sont les photos dont le nom finit par « -e1 », « -e2 »… ; chez Zalando, celle dont l'adresse porte « filter=packshot », demandée en 800 pixels de large au lieu des 200 déclarés À défaut, la photo portée par un mannequin remplit la case de la fiche, cadrée sur le haut, au lieu d'y être réduite en pied. L'application la reconnaît à son adresse (Zara : « -p », « -a1 »…). Un autre site s'ajoute quand la base de liens le montre.
+**La photo (Pauline, 19 novembre 2026) : l'article seul d'abord, sinon la photo portée recadrée.** Quand le site donne une photo de l'article seul (packshot) parmi celles du produit, le moteur la prend : chez Zara, ce sont les photos dont le nom finit par « -e1 », « -e2 »… ; chez Zalando, celle dont l'adresse porte « filter=packshot », demandée en 800 pixels de large au lieu des 200 déclarés À défaut, la photo portée par un mannequin remplit la case de la fiche, cadrée sur le haut, au lieu d'y être réduite en pied. L'application la reconnaît à son adresse (Zara : « -p », « -a1 »…). Un autre site s'ajoute quand la base de liens le montre. **Chez Printemps**, rien ne signale le packshot ni sa place dans la galerie : le moteur rapporte la galerie de la page (`data-product-element="main-media"`), et Pauline choisit la photo (23 novembre 2026).
 
 **Une page sans article ne donne pas de fiche.** Ni produit déclaré, ni prix, et une page qui ne se dit pas produit (`og:type`) : c'est une liste, dont l'image de partage est souvent le logo du site (Zara, « Vestes pour femme », 19 novembre 2026). Le favori le dit et demande d'ouvrir la page d'un seul article.
 

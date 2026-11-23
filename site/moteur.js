@@ -8,7 +8,7 @@
 
   // La version du moteur, À CHANGER À CHAQUE MODIFICATION : un favori installé garde le moteur du jour
   // de son installation. Il envoie sa version au studio, qui demande de le réinstaller quand elle a changé
-  const VERSION = "2026-11-20.1";
+  const VERSION = "2026-11-23.1";
 
   // Les catégories d'objets et leur meuble (contrat, validées par Pauline le 4 novembre 2026, complétées
   // le 19). Les mots se comparent sans accents ni majuscules, au singulier comme au pluriel, en français
@@ -81,6 +81,18 @@
     // Zalando écrit le nom « MODÈLE - type - couleur » : on garde le modèle, choix de Pauline du 20 novembre
     // 2026. La photo de l'article seul porte « filter=packshot » ; les photos déclarées font 200 px de large,
     // on les demande en 800, comme l'image de partage du site
+    // Printemps : la galerie de la page (« main-media »). Ses données de produit ne déclarent qu'une photo,
+    // souvent portée, et le packshot, quand il existe, n'a pas de place fixe : Pauline le choisit (23 novembre 2026)
+    "printemps.com": function (html, fiche, contexte) {
+      const galerie = [];
+      String(html).replace(/<img\b[^>]*data-product-element="main-media"[^>]*>/gi, function (balise) {
+        // La photo moyenne (571 px de large), ni le zoom ni l'image d'attente des photos pas encore chargées
+        const adresse = capturer(balise, /data-src="(https:[^"]+)"/i) || capturer(balise, /\ssrc="(https:[^"]+\.jpe?g[^"]*)"/i) || capturer(balise, /data-src-zoom="(https:[^"]+)"/i);
+        if (adresse) galerie.push(decoder(adresse));
+        return balise;
+      });
+      if (galerie.length) contexte.photos = galerie;
+    },
     "zalando.fr": function (html, fiche, contexte) {
       const modele = String(fiche.nom || "").split(" - ")[0].trim();
       if (modele) fiche.nom = modele;
@@ -238,13 +250,29 @@
     return avecPrix[0] || null;
   }
 
+  // Le prix barré, c'est le prix d'avant la remise, que la boutique déclare à côté du prix du moment
+  // (« StrikethroughPrice » ou « ListPrice » de schema.org ; Printemps, 23 novembre 2026)
+  function estPrixBarre(spec) {
+    return /(Strikethrough|List)Price$/i.test(String((spec && spec.priceType) || ""));
+  }
+
   function lirePrix(offre) {
     if (!offre) return null;
     let montant = offre.price !== undefined ? offre.price : offre.lowPrice;
     let devise = offre.priceCurrency;
-    const spec = liste(offre.priceSpecification)[0];
+    const spec = liste(offre.priceSpecification).find(function (s) { return s && !estPrixBarre(s); });
     if (montant === undefined && spec) { montant = spec.price; devise = devise || spec.priceCurrency; }
     return montant === undefined ? null : { montant: montant, devise: devise || "" };
+  }
+
+  function lirePrixBarre(offre) {
+    if (!offre) return null;
+    const spec = liste(offre.priceSpecification).find(function (s) { return s && estPrixBarre(s) && s.price !== undefined; });
+    return spec ? { montant: spec.price, devise: spec.priceCurrency || offre.priceCurrency || "" } : null;
+  }
+
+  function nombre(montant) {
+    return typeof montant === "number" ? montant : parseFloat(String(montant).replace(/\s/g, "").replace(",", "."));
   }
 
   // « 29.9 EUR » devient « 29,90 € », « 1095 » devient « 1 095 € » ; une autre devise reste écrite telle quelle
@@ -362,7 +390,7 @@
 
     const titreSite = balises["og:site_name"] || "";
     const titrePage = texteDe(capturer(html, /<title[^>]*>([\s\S]*?)<\/title>/i));
-    const fiche = { lien: lien, nom: "", marque: "", prix: "", image: "", categorie: "", meuble: "", complet: false };
+    const fiche = { lien: lien, nom: "", marque: "", prix: "", prixBarre: "", remise: "", image: "", photos: [], categorie: "", meuble: "", complet: false };
 
     // Le nom : celui du produit, sinon le titre de partage, sinon le titre de la page
     fiche.nom = chaine(produit && produit.name) || chaine(groupe && groupe.name);
@@ -387,6 +415,12 @@
     const offre = choisirOffre([].concat(variante ? liste(variante.offers) : [], produit ? liste(produit.offers) : [], groupe ? liste(groupe.offers) : []), lien);
     const prix = lirePrix(offre);
     if (prix) fiche.prix = formaterPrix(prix.montant, prix.devise);
+    // Le prix barré, s'il dépasse le prix du moment, et la remise qu'il donne (« -40 % »)
+    const barre = lirePrixBarre(offre);
+    if (fiche.prix && barre && nombre(barre.montant) > nombre(prix.montant)) {
+      fiche.prixBarre = formaterPrix(barre.montant, barre.devise || prix.devise);
+      fiche.remise = "-" + Math.round((1 - nombre(prix.montant) / nombre(barre.montant)) * 100) + " %";
+    }
     if (!fiche.prix && balises["product:price:amount"]) fiche.prix = formaterPrix(balises["product:price:amount"], balises["product:price:currency"] || balises["og:price:currency"]);
     if (!fiche.prix && balises["price"]) fiche.prix = formaterPrix(balises["price"], balises["pricecurrency"]);
 
@@ -411,7 +445,18 @@
       }).filter(Boolean);
       if (toutes.length > images.length && toutes.some(function (u) { return sansParametres(u) === sansParametres(fiche.image); })) images = toutes;
     });
-    if (regle) regle(html, fiche, { images: images });
+    const contexte = { images: images, photos: null };
+    if (regle) regle(html, fiche, contexte);
+
+    // Les photos de la page, pour choisir celle de l'article (23 novembre 2026) : la photo retenue
+    // d'abord, puis les autres de sa liste ou de la galerie, sans doublon, huit au plus
+    const vues = {};
+    fiche.photos = [fiche.image].concat(contexte.photos || images).filter(function (u) {
+      const cle = sansParametres(u);
+      if (!u || vues[cle]) return false;
+      vues[cle] = true;
+      return true;
+    }).slice(0, 8);
 
     // La catégorie, puis le meuble
     const filAriane = ariane.map(function (a) {
@@ -423,6 +468,13 @@
     else { fiche.categorie = "autre"; fiche.meuble = "coffre"; }
     if (fiche.categorie === "livres" && auteur) fiche.marque = auteur;
 
+    // Le nom sans la marque au début, puisqu'elle a son champ (« ZAPA Manteau macey Marron » chez
+    // Printemps, le nom chez Merci ; 23 novembre 2026)
+    if (fiche.marque && fiche.nom) {
+      const marque = fiche.marque.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const reste = fiche.nom.replace(new RegExp("^" + marque + "\\s*[-\u2013|:]?\\s+", "i"), "").trim();
+      if (reste) fiche.nom = reste;
+    }
     fiche.nom = nomPropre(fiche.nom);
 
     fiche.complet = Boolean(fiche.nom && fiche.marque && fiche.prix && fiche.image);
