@@ -8,7 +8,7 @@
 
   // La version du moteur, À CHANGER À CHAQUE MODIFICATION : un favori installé garde le moteur du jour
   // de son installation. Il envoie sa version au studio, qui demande de le réinstaller quand elle a changé
-  const VERSION = "2026-11-23.2";
+  const VERSION = "2026-11-23.3";
 
   // Les catégories d'objets et leur meuble (contrat, validées par Pauline le 4 novembre 2026, complétées
   // le 19). Les mots se comparent sans accents ni majuscules, au singulier comme au pluriel, en français
@@ -111,6 +111,8 @@
       if (fiche.image) fiche.image = fiche.image.replace(/([?&]imwidth=)\d+/, "$1800");
     }
   };
+  // Place des Tendances est bâtie comme Printemps : même galerie, même règle
+  REGLES_SITES["placedestendances.com"] = REGLES_SITES["printemps.com"];
 
   // ---------------------------------------------------------------------------------------------
   // Outils
@@ -335,14 +337,22 @@
     for (const texte of textes) {
       if (!texte) continue;
       const t = normaliser(texte);
-      let meilleure = null, longueur = 0;
+      // Le premier mot trouvé l'emporte, comme dans un nom d'article (« Manteau long ceinturé » est un
+      // manteau) ; à la même place, le plus long (« sac à dos » plutôt que « sac »). Exception : un mot
+      // de papeterie l'emporte toujours sur « livre » ou « book » (« Book agenda » est un agenda)
+      let meilleure = null, place = Infinity, longueur = 0, papeterie = null;
       CATEGORIES.forEach(function (categorie) {
         categorie.mots.forEach(function (mot) {
           const m = normaliser(mot).trim();
           const motif = new RegExp(" " + m.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(s|x|es)? ");
-          if (m.length > longueur && motif.test(t)) { meilleure = categorie; longueur = m.length; }
+          const trouve = motif.exec(t);
+          if (trouve && categorie.cle === "papeterie") papeterie = categorie;
+          if (trouve && (trouve.index < place || (trouve.index === place && m.length > longueur))) {
+            meilleure = categorie; place = trouve.index; longueur = m.length;
+          }
         });
       });
+      if (meilleure && meilleure.cle === "livres" && papeterie) return papeterie;
       if (meilleure) return meilleure;
     }
     return null;
