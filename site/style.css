@@ -271,6 +271,25 @@ circle.ic-yeux { r: var(--ic-oeil, 1px); }
 .erreur { margin: 0; font: 700 12.5px Nunito, sans-serif; color: var(--rose-texte); }
 .aide.lecture { font-weight: 700; }
 .aide.lecture a { color: var(--rose-texte); font-weight: 800; }
+.champ[hidden] { display: none; }  /* sa règle display l'emporterait sur l'attribut hidden */
+.champs-duo.seul { grid-template-columns: 1fr; }
+
+/* Les photos lues sur la page (variante 1, Pauline, 23 novembre 2026) : des vignettes carrées, la photo
+   entière sur le gris clair des photos de studio ; la choisie prend le cadre rose et la coche */
+.etiquette { margin: 0; font: 800 13px Nunito, sans-serif; color: var(--brun); }
+.vignettes { display: flex; gap: 8px; overflow-x: auto; padding: 3px 3px 6px; margin: 0 -3px; scrollbar-width: none; }
+.vignettes::-webkit-scrollbar { display: none; }
+.vignette-photo {
+  position: relative; flex: none; width: 64px; height: 64px; padding: 0; cursor: pointer;
+  border: 2px solid var(--carte-ombre); border-radius: 14px; background: #F4F4F2; overflow: hidden;
+}
+.vignette-photo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.vignette-photo[aria-checked="true"] { border: 3px solid var(--rose); box-shadow: 0 0 0 3px var(--rose-pale); }
+.vignette-photo[aria-checked="true"]::after {
+  content: ""; position: absolute; right: 4px; bottom: 4px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--rose) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='8'%3E%3Cpath d='M1.2 4.2 3.8 6.6 8.8 1.4' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center;
+}
+.vignette-photo:focus-visible { outline: 3px dashed var(--focus); outline-offset: 3px; }
 .aide.lecture.en-cours::before {
   content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px;
   border: 2px solid var(--rose-pale); border-top-color: var(--rose); border-radius: 50%; animation: tourner 0.8s linear infinite;
