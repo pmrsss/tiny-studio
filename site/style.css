@@ -420,7 +420,11 @@ a.article-texte:focus-visible { outline: 3px dashed var(--focus); outline-offset
 .article-ligne { margin: 4px 0 0; font-size: 13.5px; color: var(--brun-doux); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
 .article-prix { font-weight: 800; color: var(--brun); font-size: 15px; }
 .article-lien { color: var(--rose-texte); font-weight: 800; }
-.article-boutique { color: var(--brun-doux); }
+/* La boutique suit la marque, en minuscules, après un point (variante 1, Pauline, 24 novembre 2026) ;
+   avec une marque longue, elle passe dessous */
+.article-marque { display: flex; flex-wrap: wrap; column-gap: 6px; }
+.article-boutique { text-transform: none; letter-spacing: 0; font: 700 12.5px Nunito, sans-serif; color: var(--brun-doux); }
+.marque-nom + .article-boutique::before { content: "·"; margin-right: 6px; }
 .article-exemple { font-style: italic; color: var(--brun-doux); }
 /* Les remises, retenues par Pauline le 19 octobre 2026 : le prix du moment en rose, l'ancien barré,
    une pastille « -10 % » (l'étiquette en biais sur la vignette, essayée le même jour, est retirée) */
