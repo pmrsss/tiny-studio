@@ -238,8 +238,8 @@ function analyserPhoto(adresse, rappel) {
   sonde.src = adresse;
 }
 
-// La boutique, sur un site qui vend plusieurs marques : la fiche dit « chez Zalando » à côté du prix (choix de
-// Pauline, 20 novembre 2026), sauf quand la marque est celle du site (ASOS DESIGN chez ASOS, Merci chez Merci).
+// La boutique, sur un site qui vend plusieurs marques : la fiche dit « chez Zalando » à la suite de la marque
+// (choix de Pauline, 20 novembre 2026, à côté du prix ; sur la ligne de la marque depuis le 24 novembre), sauf quand la marque est celle du site (ASOS DESIGN chez ASOS, Merci chez Merci).
 // Seuls les sites connus pour vendre plusieurs marques sont nommés ; un autre s'ajoute quand la base de liens le montre
 const BOUTIQUES = {
   "zalando.fr": "Zalando", "asos.com": "ASOS", "printemps.com": "Printemps", "amazon.fr": "Amazon",
@@ -363,7 +363,10 @@ function fiche(article) {
     texte.rel = "noopener";
   }
   texte.innerHTML = '<p class="article-marque"></p><p class="article-nom"></p><p class="article-ligne"><span class="article-prix"></span><span class="article-lien"></span></p>';
-  texte.querySelector(".article-marque").textContent = article.marque;
+  if (article.marque) {
+    texte.querySelector(".article-marque").insertAdjacentHTML("beforeend", '<span class="marque-nom"></span>');
+    texte.querySelector(".marque-nom").textContent = article.marque;
+  }
   texte.querySelector(".article-nom").textContent = article.nom;
   texte.querySelector(".article-prix").textContent = article.prix;
   // En promotion : le prix du moment en rose, l'ancien barré, la pastille de la remise, une précision
@@ -377,7 +380,7 @@ function fiche(article) {
   }
   const chez = boutique(article);
   if (chez) {
-    texte.querySelector(".article-ligne").insertAdjacentHTML("beforeend", '<span class="article-boutique"></span>');
+    texte.querySelector(".article-marque").insertAdjacentHTML("beforeend", '<span class="article-boutique"></span>');
     texte.querySelector(".article-boutique").textContent = "chez " + chez;
   }
   if (article.precision) {
