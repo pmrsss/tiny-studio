@@ -8,7 +8,7 @@
 
   // La version du moteur, À CHANGER À CHAQUE MODIFICATION : un favori installé garde le moteur du jour
   // de son installation. Il envoie sa version au studio, qui demande de le réinstaller quand elle a changé
-  const VERSION = "2026-11-23.3";
+  const VERSION = "2026-11-24.1";
 
   // Les catégories d'objets et leur meuble (contrat, validées par Pauline le 4 novembre 2026, complétées
   // le 19). Les mots se comparent sans accents ni majuscules, au singulier comme au pluriel, en français
@@ -110,6 +110,15 @@
       if (packshot) fiche.image = packshot;
       if (fiche.image) fiche.image = fiche.image.replace(/([?&]imwidth=)\d+/, "$1800");
     }
+  };
+  // La Fnac nomme ses livres « série : titre de la couverture » : on garde ce qui suit « : » (choix de
+  // Pauline, 24 novembre 2026), seulement quand le premier mot qui suit est déjà dans ce qui précède
+  // (« ACOTAR »), pour ne pas couper un vrai titre (« Sapiens : Une brève histoire de l'humanité »)
+  REGLES_SITES["fnac.com"] = function (html, fiche) {
+    const morceaux = String(fiche.nom || "").split(" : ");
+    if (morceaux.length !== 2) return;
+    const premier = normaliser(morceaux[1]).trim().split(" ")[0];
+    if (premier.length > 3 && normaliser(morceaux[0]).indexOf(" " + premier + " ") !== -1) fiche.nom = morceaux[1].trim();
   };
   // Place des Tendances est bâtie comme Printemps : même galerie, même règle
   REGLES_SITES["placedestendances.com"] = REGLES_SITES["printemps.com"];
